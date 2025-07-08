@@ -20,8 +20,9 @@ const LogViewer = ({ logs }) => {
                     } catch (error) {
                         // Jika error saat parsing JSON, tampilkan pesan yang sesuai
                         return (
-                            <div key={index} className="text-warning">
-                                Log entry tidak valid.
+                            <div key={index}>
+                                <div className="text-warning">Log entry tidak valid.</div>
+                                <div className="text-danger">{log}</div> {/* Tampilkan log asli */}
                             </div>
                         );
                     }
