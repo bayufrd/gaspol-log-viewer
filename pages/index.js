@@ -4,15 +4,16 @@ import React from 'react';
 import LogViewer from '../components/LogViewer';
 import LogFileButton from '../components/LogFileButton';
 
-const Home = ({ logFiles }) => {
-    const [logs, setLogs] = React.useState([]);
+const Home = ({ logFiles, pm2Logs }) => {
+    const [currentLogs, setCurrentLogs] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
     
-    const readLogFile = async (fileName) => {
+    // Function to read log files and set logs
+    const readLogFile = async (filePath) => {
         setLoading(true);
-        const response = await fetch(`/logs/${fileName}`);
+        const response = await fetch(filePath);
         const data = await response.text();
-        setLogs(data.split('\n'));
+        setCurrentLogs(data.split('\n'));
         setLoading(false);
     };
 
@@ -20,19 +21,16 @@ const Home = ({ logFiles }) => {
         <div className="container mt-4">
             <div className="row">
                 <div className="col-md-6">
-                    <h3 className="text-center">Sync Logs</h3>
+                    <h3 className="text-center">PM2 Logs</h3>
                     <div className="d-flex flex-column align-items-center mb-3">
-                        {logFiles.sync.length > 0 ? (
-                            logFiles.sync.map(fileName => (
-                                <LogFileButton 
-                                    key={fileName} 
-                                    fileName={fileName} 
-                                    onClick={() => readLogFile(fileName)} 
-                                />
-                            ))
-                        ) : (
-                            <div className="text-muted">Tidak ada file log sync ditemukan.</div>
-                        )}
+                        <LogFileButton 
+                            fileName="gaspol-api-out.log" 
+                            onClick={() => readLogFile('/pm2logs/gaspol-api-out.log')} 
+                        />
+                        <LogFileButton 
+                            fileName="gaspol-api-error.log" 
+                            onClick={() => readLogFile('/pm2logs/gaspol-api-error.log')} 
+                        />
                     </div>
                     {loading && 
                         <div className="text-center">
@@ -41,22 +39,30 @@ const Home = ({ logFiles }) => {
                             </div>
                         </div>
                     }
-                    <LogViewer logs={logs} />
+                    <div
+                        style={{ 
+                            height: '300px', 
+                            border: '1px solid #ccc', 
+                            overflowY: 'auto', 
+                            padding: '10px' 
+                        }}>
+                        <LogViewer logs={currentLogs} />
+                    </div>
                 </div>
                 
                 <div className="col-md-6">
-                    <h3 className="text-center">Error Logs</h3>
+                    <h3 className="text-center">Log Files</h3>
                     <div className="d-flex flex-column align-items-center mb-3">
-                        {logFiles.error.length > 0 ? (
-                            logFiles.error.map(fileName => (
+                        {logFiles.length > 0 ? (
+                            logFiles.map(fileName => (
                                 <LogFileButton 
                                     key={fileName} 
                                     fileName={fileName} 
-                                    onClick={() => readLogFile(fileName)} 
+                                    onClick={() => readLogFile(`/logs/${fileName}`)} 
                                 />
                             ))
                         ) : (
-                            <div className="text-muted">Tidak ada file log error ditemukan.</div>
+                            <div className="text-muted">Tidak ada file log ditemukan.</div>
                         )}
                     </div>
                     {loading && 
@@ -66,7 +72,15 @@ const Home = ({ logFiles }) => {
                             </div>
                         </div>
                     }
-                    <LogViewer logs={logs} />
+                    <div
+                        style={{ 
+                            height: '300px', 
+                            border: '1px solid #ccc', 
+                            overflowY: 'auto', 
+                            padding: '10px' 
+                        }}>
+                        <LogViewer logs={currentLogs} />
+                    </div>
                 </div>
             </div>
         </div>
@@ -76,28 +90,27 @@ const Home = ({ logFiles }) => {
 // Static Generation
 export async function getStaticProps() {
     const logsDirectory = path.join(process.cwd(), 'logs-gaspol-api', 'logs');
+    const pm2LogsDirectory = path.join(process.cwd(), 'pm2logs');
 
     try {
-        const files = fs.readdirSync(logsDirectory);
-        const syncFiles = files.filter(file => file.startsWith('sync-'));
-        const errorFiles = files.filter(file => file.startsWith('error-'));
-
+        const logFiles = fs.readdirSync(logsDirectory);
+        const pm2LogFiles = [
+            'gaspol-api-error.log',
+            'gaspol-api-out.log'
+        ];
+        
         return {
             props: {
-                logFiles: {
-                    sync: syncFiles,
-                    error: errorFiles,
-                },
+                logFiles: logFiles,
+                pm2Logs: pm2LogFiles,
             },
         };
     } catch (error) {
         console.error("Error reading logs folder:", error);
         return {
             props: {
-                logFiles: {
-                    sync: [],
-                    error: [],
-                },
+                logFiles: [],
+                pm2Logs: [],
             },
         };
     }
