@@ -8,13 +8,23 @@ const Home = ({ logFiles, pm2Logs }) => {
     const [currentLogs, setCurrentLogs] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
 
-    // Function to read log files and set logs
+    // Function to read log files, keep the last 100 lines and auto-scroll
     const readLogFile = async (filePath) => {
         setLoading(true);
         const response = await fetch(filePath);
         const data = await response.text();
-        setCurrentLogs(data.split('\n'));
+
+        // Split logs into lines and get the last 100
+        const lines = data.split('\n');
+        const last100Lines = lines.slice(-100); // Get only the last 100 lines
+        setCurrentLogs(last100Lines);
+
         setLoading(false);
+
+        // Auto-scroll to the bottom of the log viewer
+        if (logViewerRef.current) {
+            logViewerRef.current.scrollTop = logViewerRef.current.scrollHeight;
+        }
     };
 
     return (
