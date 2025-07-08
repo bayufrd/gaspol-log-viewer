@@ -1,4 +1,3 @@
-// components/LogEntry.js
 import React from 'react';
 
 const LogEntry = ({ timestamp, level, message }) => {
@@ -7,8 +6,9 @@ const LogEntry = ({ timestamp, level, message }) => {
             backgroundColor: level === 'error' ? '#f8d7da' : '#d4edda',
             borderColor: level === 'error' ? '#f5c6cb' : '#c3e6cb',
         }}>
-            <strong>{timestamp}</strong> <span className={`text-${level === 'error' ? 'danger' : 'success'}`}>{level.toUpperCase()}</span>
-            <div>{message}</div>
+            <strong>{timestamp}</strong> 
+            <span className={`text-${level === 'error' ? 'danger' : 'success'} ms-2`}>{level.toUpperCase()}</span>
+            <div className="mt-1">{message}</div>
         </div>
     );
 };
