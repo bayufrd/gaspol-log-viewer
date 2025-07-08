@@ -7,7 +7,7 @@ import LogFileButton from '../components/LogFileButton';
 const Home = ({ logFiles, pm2Logs }) => {
     const [currentLogs, setCurrentLogs] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
-    
+
     // Function to read log files and set logs
     const readLogFile = async (filePath) => {
         setLoading(true);
@@ -23,65 +23,66 @@ const Home = ({ logFiles, pm2Logs }) => {
                 <div className="col-md-6">
                     <h3 className="text-center">PM2 Logs</h3>
                     <div className="d-flex flex-column align-items-center mb-3">
-                        <LogFileButton 
-                            fileName="gaspol-api-out.log" 
-                            onClick={() => readLogFile('/pm2logs/gaspol-api-out.log')} 
+                        <LogFileButton
+                            fileName="gaspol-api-out.log"
+                            onClick={() => readLogFile('/pm2logs/gaspol-api-out.log')}
                         />
-                        <LogFileButton 
-                            fileName="gaspol-api-error.log" 
-                            onClick={() => readLogFile('/pm2logs/gaspol-api-error.log')} 
+                        <LogFileButton
+                            fileName="gaspol-api-error.log"
+                            onClick={() => readLogFile('/pm2logs/gaspol-api-error.log')}
                         />
                     </div>
-                    {loading && 
+                    {loading &&
                         <div className="text-center">
                             <div className="spinner-border" role="status">
                                 <span className="visually-hidden">Loading...</span>
                             </div>
                         </div>
                     }
-                    <div
-                        style={{ 
-                            height: '300px', 
-                            border: '1px solid #ccc', 
-                            overflowY: 'auto', 
-                            padding: '10px' 
-                        }}>
-                        <LogViewer logs={currentLogs} />
-                    </div>
                 </div>
-                
+
                 <div className="col-md-6">
                     <h3 className="text-center">Log Files</h3>
-                    <div className="d-flex flex-column align-items-center mb-3">
+                    <div
+                        className="d-flex flex-column align-items-center mb-3"
+                        style={{
+                            maxHeight: '400px', // Set a fixed max height
+                            overflowY: 'auto',   // Enable vertical scrolling
+                            border: '1px solid #ccc', // Set a border
+                            padding: '10px',      // Add padding for aesthetics
+                            width: '100%'         // Full width of the parent
+                        }}>
                         {logFiles.length > 0 ? (
                             logFiles.map(fileName => (
-                                <LogFileButton 
-                                    key={fileName} 
-                                    fileName={fileName} 
-                                    onClick={() => readLogFile(`/logs/${fileName}`)} 
+                                <LogFileButton
+                                    key={fileName}
+                                    fileName={fileName}
+                                    onClick={() => readLogFile(`/logs/${fileName}`)}
                                 />
                             ))
                         ) : (
                             <div className="text-muted">Tidak ada file log ditemukan.</div>
                         )}
                     </div>
-                    {loading && 
+                    {loading &&
                         <div className="text-center">
                             <div className="spinner-border" role="status">
                                 <span className="visually-hidden">Loading...</span>
                             </div>
                         </div>
                     }
-                    <div
-                        style={{ 
-                            height: '300px', 
-                            border: '1px solid #ccc', 
-                            overflowY: 'auto', 
-                            padding: '10px' 
-                        }}>
-                        <LogViewer logs={currentLogs} />
-                    </div>
                 </div>
+            </div>
+            {/* Footer Log Viewer that spans the full width */}
+            <div
+                style={{
+                    height: '300px',
+                    border: '1px solid #ccc',
+                    overflowY: 'auto',
+                    padding: '10px',
+                    marginTop: '20px' // Space above the footer log viewer
+                }}>
+                <LogViewer logs={currentLogs} />
             </div>
         </div>
     );
@@ -98,7 +99,7 @@ export async function getStaticProps() {
             'gaspol-api-error.log',
             'gaspol-api-out.log'
         ];
-        
+
         return {
             props: {
                 logFiles: logFiles,
