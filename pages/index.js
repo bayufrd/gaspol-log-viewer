@@ -5,29 +5,14 @@ import LogViewer from '../components/LogViewer';
 import LogFileButton from '../components/LogFileButton';
 
 const Home = ({ logFiles }) => {
-    const [syncLogs, setSyncLogs] = React.useState('');
-    const [errorLogs, setErrorLogs] = React.useState('');
+    const [logs, setLogs] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
-    const syncLogRef = React.useRef(null);
-    const errorLogRef = React.useRef(null);
-
-    const readLogFile = async (fileType, fileName) => {
+    
+    const readLogFile = async (fileName) => {
         setLoading(true);
         const response = await fetch(`/logs/${fileName}`);
         const data = await response.text();
-        
-        if (fileType === 'sync') {
-            setSyncLogs(prevLogs => prevLogs + "\n" + data);
-            if (syncLogRef.current) {
-                syncLogRef.current.scrollTop = syncLogRef.current.scrollHeight;
-            }
-        } else {
-            setErrorLogs(prevLogs => prevLogs + "\n" + data);
-            if (errorLogRef.current) {
-                errorLogRef.current.scrollTop = errorLogRef.current.scrollHeight;
-            }
-        }
-
+        setLogs(data.split('\n'));
         setLoading(false);
     };
 
@@ -35,14 +20,14 @@ const Home = ({ logFiles }) => {
         <div className="container mt-4">
             <div className="row">
                 <div className="col-md-6">
-                    <h3 className="text-center">API Logs file</h3>
+                    <h3 className="text-center">Sync Logs</h3>
                     <div className="d-flex flex-column align-items-center mb-3">
                         {logFiles.sync.length > 0 ? (
                             logFiles.sync.map(fileName => (
                                 <LogFileButton 
                                     key={fileName} 
                                     fileName={fileName} 
-                                    onClick={() => readLogFile('sync', fileName)} 
+                                    onClick={() => readLogFile(fileName)} 
                                 />
                             ))
                         ) : (
@@ -56,39 +41,23 @@ const Home = ({ logFiles }) => {
                             </div>
                         </div>
                     }
-                    <div 
-                        ref={syncLogRef}
-                        style={{ 
-                            height: '300px', 
-                            border: '1px solid #ccc', 
-                            overflowY: 'auto', 
-                            padding: '10px', 
-                            marginBottom: '20px'
-                        }}>
-                        <LogViewer logs={syncLogs.split('\n')} />
-                    </div>
-                    <div 
-                        ref={errorLogRef}
-                        style={{ 
-                            height: '300px', 
-                            border: '1px solid #ccc', 
-                            overflowY: 'auto', 
-                            padding: '10px' 
-                        }}>
-                        <LogViewer logs={errorLogs.split('\n')} />
-                    </div>
+                    <LogViewer logs={logs} />
                 </div>
+                
                 <div className="col-md-6">
-                    <h3 className="text-center">PM2 API Logs</h3>
+                    <h3 className="text-center">Error Logs</h3>
                     <div className="d-flex flex-column align-items-center mb-3">
-                        <LogFileButton 
-                            fileName="gaspol-api-error.log" 
-                            onClick={() => readLogFile('error', 'gaspol-api-error.log')} 
-                        />
-                        <LogFileButton 
-                            fileName="gaspol-api-out.log" 
-                            onClick={() => readLogFile('sync', 'gaspol-api-out.log')} 
-                        />
+                        {logFiles.error.length > 0 ? (
+                            logFiles.error.map(fileName => (
+                                <LogFileButton 
+                                    key={fileName} 
+                                    fileName={fileName} 
+                                    onClick={() => readLogFile(fileName)} 
+                                />
+                            ))
+                        ) : (
+                            <div className="text-muted">Tidak ada file log error ditemukan.</div>
+                        )}
                     </div>
                     {loading && 
                         <div className="text-center">
@@ -97,26 +66,7 @@ const Home = ({ logFiles }) => {
                             </div>
                         </div>
                     }
-                    <div 
-                        ref={syncLogRef}
-                        style={{ 
-                            height: '300px', 
-                            border: '1px solid #ccc', 
-                            overflowY: 'auto', 
-                            padding: '10px' 
-                        }}>
-                        <LogViewer logs={syncLogs.split('\n')} />
-                    </div>
-                    <div 
-                        ref={errorLogRef}
-                        style={{ 
-                            height: '300px', 
-                            border: '1px solid #ccc', 
-                            overflowY: 'auto', 
-                            padding: '10px' 
-                        }}>
-                        <LogViewer logs={errorLogs.split('\n')} />
-                    </div>
+                    <LogViewer logs={logs} />
                 </div>
             </div>
         </div>

@@ -9,40 +9,51 @@ const LogViewer = ({ logs }) => {
         if (match) {
             return {
                 timestamp: match.groups.timestamp,
-                level: match.groups.level.toLowerCase(), // Menjadi lowercase untuk konsistensi
+                level: match.groups.level.toLowerCase(),
                 message: match.groups.message,
             };
         }
-        return null; // Jika tidak cocok, kembalikan null
+        return null; // Return null if it doesn't match the log pattern
     };
 
     return (
-        <div>
-            {logs.length > 0 ? (
-                logs.map((log, index) => {
-                    const logObj = parseLogLine(log);
-                    if (logObj) {
-                        return (
-                            <LogEntry 
-                                key={index} 
-                                timestamp={logObj.timestamp} 
-                                level={logObj.level} 
-                                message={logObj.message} 
-                            />
-                        );
-                    } else {
-                        // Jika entry log tidak valid, tampilkan pesan
-                        return (
-                            <div key={index}>
-                                <div className="text-danger">{log}</div>
-                            </div>
-                        );
-                    }
-                })
-            ) : (
-                <div className="text-muted">Tidak ada log untuk ditampilkan.</div>
-            )}
-        </div>
+        <table className="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Level</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                {logs.length > 0 ? (
+                    logs.map((log, index) => {
+                        const logObj = parseLogLine(log);
+                        if (logObj) {
+                            return (
+                                <LogEntry 
+                                    key={index} 
+                                    timestamp={logObj.timestamp} 
+                                    level={logObj.level} 
+                                    message={logObj.message} 
+                                />
+                            );
+                        } else {
+                            // Invalid log entry
+                            return (
+                                <tr key={index}>
+                                    <td colSpan="3" className="text-danger">{log}</td>
+                                </tr>
+                            );
+                        }
+                    })
+                ) : (
+                    <tr>
+                        <td colSpan="3" className="text-muted text-center">Tidak ada log untuk ditampilkan.</td>
+                    </tr>
+                )}
+            </tbody>
+        </table>
     );
 };
 
