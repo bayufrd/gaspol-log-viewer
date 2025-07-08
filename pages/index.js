@@ -4,10 +4,10 @@ import React from 'react';
 import LogViewer from '../components/LogViewer';
 import LogFileButton from '../components/LogFileButton';
 
-const Home = ({ logFiles }) => {
+const Home = ({ logFiles, pm2Logs }) => {
     const [currentLogs, setCurrentLogs] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
-
+    
     // Function to read log files and set logs
     const readLogFile = async (filePath) => {
         setLoading(true);
@@ -32,7 +32,6 @@ const Home = ({ logFiles }) => {
                             onClick={() => readLogFile('/pm2logs/gaspol-api-error.log')} 
                         />
                     </div>
-
                     {loading && 
                         <div className="text-center">
                             <div className="spinner-border" role="status">
@@ -40,15 +39,12 @@ const Home = ({ logFiles }) => {
                             </div>
                         </div>
                     }
-
                     <div
                         style={{ 
-                            height: '400px', 
+                            height: '300px', 
                             border: '1px solid #ccc', 
                             overflowY: 'auto', 
-                            padding: '10px',
-                            width: '100%', // Full width for the log viewer
-                            marginTop: '20px'
+                            padding: '10px' 
                         }}>
                         <LogViewer logs={currentLogs} />
                     </div>
@@ -56,15 +52,7 @@ const Home = ({ logFiles }) => {
                 
                 <div className="col-md-6">
                     <h3 className="text-center">Log Files</h3>
-                    <div 
-                        className="d-flex flex-wrap justify-content-center" 
-                        style={{ 
-                            maxHeight: '400px', 
-                            overflowY: 'auto', 
-                            padding: '10px', 
-                            border: '1px solid #ccc',
-                            gap: '10px' // Optional spacing for button layout
-                        }}>
+                    <div className="d-flex flex-column align-items-center mb-3">
                         {logFiles.length > 0 ? (
                             logFiles.map(fileName => (
                                 <LogFileButton 
@@ -77,6 +65,22 @@ const Home = ({ logFiles }) => {
                             <div className="text-muted">Tidak ada file log ditemukan.</div>
                         )}
                     </div>
+                    {loading && 
+                        <div className="text-center">
+                            <div className="spinner-border" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    }
+                    <div
+                        style={{ 
+                            height: '300px', 
+                            border: '1px solid #ccc', 
+                            overflowY: 'auto', 
+                            padding: '10px' 
+                        }}>
+                        <LogViewer logs={currentLogs} />
+                    </div>
                 </div>
             </div>
         </div>
@@ -86,12 +90,19 @@ const Home = ({ logFiles }) => {
 // Static Generation
 export async function getStaticProps() {
     const logsDirectory = path.join(process.cwd(), 'logs-gaspol-api', 'logs');
+    const pm2LogsDirectory = path.join(process.cwd(), 'pm2logs');
 
     try {
         const logFiles = fs.readdirSync(logsDirectory);
+        const pm2LogFiles = [
+            'gaspol-api-error.log',
+            'gaspol-api-out.log'
+        ];
+        
         return {
             props: {
-                logFiles,
+                logFiles: logFiles,
+                pm2Logs: pm2LogFiles,
             },
         };
     } catch (error) {
@@ -99,6 +110,7 @@ export async function getStaticProps() {
         return {
             props: {
                 logFiles: [],
+                pm2Logs: [],
             },
         };
     }
