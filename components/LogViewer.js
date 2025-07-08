@@ -34,7 +34,6 @@ const LogViewer = ({ logs }) => {
                         // Jika entry log tidak valid, tampilkan pesan
                         return (
                             <div key={index}>
-                                <div className="text-warning">Log entry tidak valid.</div>
                                 <div className="text-danger">{log}</div>
                             </div>
                         );
