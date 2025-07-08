@@ -46,7 +46,7 @@ const Home = ({ logFiles, pm2Logs }) => {
                     <div
                         className="d-flex flex-column align-items-center mb-3"
                         style={{
-                            maxHeight: '400px', // Set a fixed max height
+                            maxHeight: '115px', // Set a fixed max height
                             overflowY: 'auto',   // Enable vertical scrolling
                             border: '1px solid #ccc', // Set a border
                             padding: '10px',      // Add padding for aesthetics
