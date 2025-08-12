@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-const swaggerUrl = process.env.NEXT_PUBLIC_SWAGGER_URL || 'http://localhost:3001/api-docs'  
+const swaggerUrl = process.env.NEXT_PUBLIC_SWAGGER_URL || 'https://gaspollmanagementcenter.com/api-docs'  
 
 export default function ApiDocs() {
   useEffect(() => {
