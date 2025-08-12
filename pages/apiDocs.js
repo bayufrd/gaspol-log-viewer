@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-const swaggerUrl = process.env.NEXT_PUBLIC_SWAGGER_URL || 'https://api.gaspollmanagementcenter.com/api-docs'  
+const swaggerUrl = process.env.NEXT_PUBLIC_SWAGGER_URL || 'http://localhost:3001/api-docs'  
 
 export default function ApiDocs() {
   useEffect(() => {
@@ -13,7 +13,7 @@ export default function ApiDocs() {
       <iframe 
         src={swaggerUrl}
         width="100%" 
-        height="100vh" 
+        height="100%" 
         style={{
           border: 'none',
           position: 'absolute',
