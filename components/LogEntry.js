@@ -1,14 +1,34 @@
 import React from 'react';
 
 const LogEntry = ({ timestamp, level, message }) => {
+    const levelColors = {
+        'error': {
+            bg: 'bg-danger text-white',
+            text: 'text-danger'
+        },
+        'warn': {
+            bg: 'bg-warning text-dark',
+            text: 'text-warning'
+        },
+        'info': {
+            bg: 'bg-info text-white',
+            text: 'text-info'
+        },
+        'debug': {
+            bg: 'bg-secondary text-light',
+            text: 'text-secondary'
+        }
+    };
+
+    const { bg, text } = levelColors[level] || levelColors['debug'];
+
     return (
-        <div className="log-entry mb-3 p-2 border rounded" style={{
-            backgroundColor: level === 'error' ? '#f8d7da' : '#d4edda',
-            borderColor: level === 'error' ? '#f5c6cb' : '#c3e6cb',
-        }}>
-            <strong>{timestamp}</strong> 
-            <span className={`text-${level === 'error' ? 'danger' : 'success'} ms-2`}>{level.toUpperCase()}</span>
-            <div className="mt-1">{message}</div>
+        <div className={`log-entry p-2 mb-2 rounded ${bg}`}>
+            <div className="d-flex justify-content-between align-items-center mb-1">
+                <small className="text-muted">{timestamp}</small>
+                <span className={`badge ${text} text-uppercase`}>{level}</span>
+            </div>
+            <div className="log-message">{message}</div>
         </div>
     );
 };

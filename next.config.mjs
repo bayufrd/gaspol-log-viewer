@@ -1,6 +1,15 @@
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-};
-
-export default nextConfig;
+    reactStrictMode: true,
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['var(--font-geist-sans)'],
+          mono: ['var(--font-geist-mono)']
+        }
+      }
+    }
+  };
+  
+  export default nextConfig;
+  

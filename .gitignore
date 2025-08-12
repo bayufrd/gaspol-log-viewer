@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+logs-gaspol-api
 
 # debug
 npm-debug.log*

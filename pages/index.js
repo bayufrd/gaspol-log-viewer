@@ -7,101 +7,81 @@ import LogFileButton from '../components/LogFileButton';
 const Home = ({ logFiles, pm2Logs }) => {
     const [currentLogs, setCurrentLogs] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
+    const logViewerRef = React.useRef(null);
 
-    // Function to read log files, keep the last 100 lines and auto-scroll
     const readLogFile = async (filePath) => {
         setLoading(true);
         const response = await fetch(filePath);
         const data = await response.text();
 
-        // Split logs into lines and get the last 100
         const lines = data.split('\n');
-        const last100Lines = lines.slice(-100); // Get only the last 100 lines
+        const last100Lines = lines.slice(-100);
         setCurrentLogs(last100Lines);
 
         setLoading(false);
 
-        // Auto-scroll to the bottom of the log viewer
         if (logViewerRef.current) {
             logViewerRef.current.scrollTop = logViewerRef.current.scrollHeight;
         }
     };
 
     return (
-        <div className="container mt-4">
-            <div className="row">
-                <div className="col-md-6">
-                    <h3 className="text-center">PM2 Logs</h3>
-                    <div className="d-flex flex-column align-items-center mb-3">
-                        <LogFileButton
-                            fileName="gaspol-api-out.log"
-                            onClick={() => readLogFile('/pm2logs/gaspol-api-out.log')}
-                        />
-                        <LogFileButton
-                            fileName="gaspol-api-error.log"
-                            onClick={() => readLogFile('/pm2logs/gaspol-api-error.log')}
-                        />
-                    </div>
-                    {loading &&
-                        <div className="text-center">
-                            <div className="spinner-border" role="status">
-                                <span className="visually-hidden">Loading...</span>
-                            </div>
+        <div className="container-fluid px-4 py-3 bg-dark text-light">
+            <div className="row g-4">
+                <div className="col-md-4">
+                    <div className="card bg-secondary text-white shadow-lg h-100">
+                        <div className="card-header bg-dark text-white">
+                            <h5 className="card-title mb-0 text-center">PM2 Logs</h5>
                         </div>
-                    }
-                </div>
-
-                <div className="col-md-6">
-                    <h3 className="text-center">Log Files</h3>
-                    <div
-                        className="d-flex flex-column align-items-center mb-3"
-                        style={{
-                            maxHeight: '115px', // Set a fixed max height
-                            overflowY: 'auto',   // Enable vertical scrolling
-                            border: '1px solid #ccc', // Set a border
-                            padding: '10px',      // Add padding for aesthetics
-                            width: '100%'         // Full width of the parent
-                        }}>
-                        {logFiles.length > 0 ? (
-                            logFiles.map(fileName => (
+                        <div className="card-body d-flex flex-column align-items-center">
+                            {pm2Logs.map(fileName => (
                                 <LogFileButton
                                     key={fileName}
                                     fileName={fileName}
-                                    onClick={() => readLogFile(`/logs/${fileName}`)}
+                                    onClick={() => readLogFile(`/pm2logs/${fileName}`)}
                                 />
-                            ))
-                        ) : (
-                            <div className="text-muted">Tidak ada file log ditemukan.</div>
-                        )}
-                    </div>
-                    {loading &&
-                        <div className="text-center">
-                            <div className="spinner-border" role="status">
-                                <span className="visually-hidden">Loading...</span>
-                            </div>
+                            ))}
+                            {loading && (
+                                <div className="text-center mt-3">
+                                    <div className="spinner-border text-light" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    }
+                    </div>
                 </div>
-            </div>
-            {/* Footer Log Viewer that spans the full width */}
-            <div
-                style={{
-                    height: '300px',
-                    border: '1px solid #ccc',
-                    overflowY: 'auto',
-                    padding: '10px',
-                    marginTop: '20px' // Space above the footer log viewer
-                }}>
-                <LogViewer logs={currentLogs} />
+
+                <div className="col-md-8">
+                    <div className="card bg-secondary text-white shadow-lg h-100">
+                        <div className="card-header bg-dark text-white">
+                            <h5 className="card-title mb-0 text-center">Log Viewer</h5>
+                        </div>
+                        <div 
+                            ref={logViewerRef}
+                            className="card-body log-viewer-container overflow-auto"
+                            style={{ 
+                                maxHeight: '600px', 
+                                backgroundColor: '#2c2c2c',
+                                color: '#e0e0e0'
+                            }}
+                        >
+                            <LogViewer logs={currentLogs} />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
 };
 
-// Static Generation
 export async function getStaticProps() {
     const logsDirectory = path.join(process.cwd(), 'logs-gaspol-api', 'logs');
-    const pm2LogsDirectory = path.join(process.cwd(), 'pm2logs');
+
+    // Buat direktori jika tidak ada
+    if (!fs.existsSync(logsDirectory)) {
+        fs.mkdirSync(logsDirectory, { recursive: true });
+    }
 
     try {
         const logFiles = fs.readdirSync(logsDirectory);
