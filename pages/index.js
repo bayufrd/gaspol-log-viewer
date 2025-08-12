@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import React from 'react';
+import Link from 'next/link';
 import LogViewer from '../components/LogViewer';
 import LogFileButton from '../components/LogFileButton';
 
@@ -27,6 +28,19 @@ const Home = ({ logFiles, pm2Logs }) => {
 
     return (
         <div className="container-fluid px-4 py-3 bg-dark text-light">
+            {/* Navigasi ke Swagger dengan desain tombol yang lebih menarik */}
+            <div className="row mb-4">
+                <div className="col-12 text-center">
+                    <Link href="/apiDocs" className="btn-swagger-custom">
+                        <div className="btn-swagger-content">
+                            <i className="bi bi-book me-2"></i>
+                            <span>Lihat Dokumentasi API</span>
+                            <div className="btn-swagger-overlay"></div>
+                        </div>
+                    </Link>
+                </div>
+            </div>
+
             <div className="row g-4">
                 <div className="col-md-4">
                     <div className="card bg-secondary text-white shadow-lg h-100">
@@ -57,11 +71,11 @@ const Home = ({ logFiles, pm2Logs }) => {
                         <div className="card-header bg-dark text-white">
                             <h5 className="card-title mb-0 text-center">Log Viewer</h5>
                         </div>
-                        <div 
+                        <div
                             ref={logViewerRef}
                             className="card-body log-viewer-container overflow-auto"
-                            style={{ 
-                                maxHeight: '600px', 
+                            style={{
+                                maxHeight: '600px',
                                 backgroundColor: '#2c2c2c',
                                 color: '#e0e0e0'
                             }}
@@ -71,6 +85,68 @@ const Home = ({ logFiles, pm2Logs }) => {
                     </div>
                 </div>
             </div>
+            {/* Tambahkan style kustom */}
+            <style jsx>{`  
+                .btn-swagger-custom {  
+                    position: relative;  
+                    display: inline-block;  
+                    text-decoration: none;  
+                    overflow: hidden;  
+                    transition: all 0.3s ease;  
+                    border-radius: 10px;  
+                    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);  
+                }  
+
+                .btn-swagger-content {  
+                    position: relative;  
+                    display: flex;  
+                    align-items: center;  
+                    justify-content: center;  
+                    padding: 12px 24px;  
+                    background-color: #1e2229; /* Warna gelap yang elegan */  
+                    color: #ffffff;  
+                    font-weight: 600;  
+                    border: 2px solid rgba(255, 255, 255, 0.1);  
+                    z-index: 1;  
+                    transition: all 0.3s ease;  
+                }  
+
+                .btn-swagger-custom:hover .btn-swagger-content {  
+                    background-color: #2c3340; /* Sedikit terang saat hover */  
+                    transform: translateY(-3px);  
+                }  
+
+                .btn-swagger-overlay {  
+                    position: absolute;  
+                    top: 0;  
+                    left: -100%;  
+                    width: 100%;  
+                    height: 100%;  
+                    background: linear-gradient(  
+                        120deg,   
+                        transparent,   
+                        rgba(255,255,255,0.1),   
+                        transparent  
+                    );  
+                    transition: all 0.5s ease;  
+                }  
+
+                .btn-swagger-custom:hover .btn-swagger-overlay {  
+                    left: 100%;  
+                }  
+
+                .btn-swagger-custom i {  
+                    margin-right: 8px;  
+                    font-size: 1.2em;  
+                }  
+
+                @media (max-width: 576px) {  
+                    .btn-swagger-content {  
+                        padding: 10px 18px;  
+                        font-size: 0.9em;  
+                    }  
+                }  
+            `}</style>
         </div>
     );
 };

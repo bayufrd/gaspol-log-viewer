@@ -1,9 +1,39 @@
-@import "tailwindcss";
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
 }
+
+body {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.light-mode {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.api-method {
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.method-get { background-color: #28a745; color: white; }
+.method-post { background-color: #ffc107; color: black; }
+.method-put { background-color: #17a2b8; color: white; }
+.method-delete { background-color: #dc3545; color: white; }
 
 @theme inline {
   --color-background: var(--background);
