@@ -57,7 +57,7 @@ return (
         <div className="row g-3">
             {/* Baris Pertama: 2 Kolom untuk Logs */}
             <div className="col-6">
-                <div className="card bg-secondary text-white h-100">
+                <div className="card bg-white text-white h-100">
                     <div className="card-header bg-dark text-white">
                         <h5 className="card-title mb-0 text-center">PM2 Logs</h5>
                     </div>
@@ -81,7 +81,7 @@ return (
             </div>
 
             <div className="col-6">
-                <div className="card bg-secondary text-white h-100">
+                <div className="card bg-white text-white h-100">
                     <div className="card-header bg-dark text-white">
                         <h5 className="card-title mb-0 text-center">Regular Logs</h5>
                     </div>
