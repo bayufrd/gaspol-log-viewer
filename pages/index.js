@@ -8,6 +8,8 @@ import LogFileButton from '../components/LogFileButton';
 const Home = ({ logFiles, pm2Logs }) => {
     const [currentLogs, setCurrentLogs] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
+    const [passwordInput, setPasswordInput] = React.useState('');
+    const [isAuthenticated, setIsAuthenticated] = React.useState(false);
     const logViewerRef = React.useRef(null);
 
     const readLogFile = async (filePath, ispm2Log = false) => {
@@ -15,118 +17,138 @@ const Home = ({ logFiles, pm2Logs }) => {
         try {
             const fullPath = ispm2Log ? `/pm2logs/${filePath}` : `/logs/${filePath}`;
             const response = await fetch(fullPath);
-            
-            if (!response.ok) {
-                throw new Error('File not found');
-            }
-            
+            if (!response.ok) throw new Error('File not found');
             const data = await response.text();
             const lines = data.split('\n');
-            const last100Lines = lines.slice(-100);
-            setCurrentLogs(last100Lines);
+            setCurrentLogs(lines.slice(-100));
         } catch (error) {
             console.error('Error reading log file:', error);
             setCurrentLogs([`Error membaca file: ${error.message}`]);
         }
-
         setLoading(false);
-
         if (logViewerRef.current) {
             logViewerRef.current.scrollTop = logViewerRef.current.scrollHeight;
         }
     };
 
-  
+    const handleLogin = (e) => {
+        e.preventDefault();
+        if (passwordInput === process.env.NEXT_PUBLIC_ACCESS_PASSWORD) {
+            setIsAuthenticated(true);
+        } else {
+            alert('Password salah!');
+            setPasswordInput('');
+        }
+    };
 
-return (
-    <div className="container-fluid px-4 py-3 bg-dark text-light">
-        {/* API Document Section */}
-        <div className="row mb-3">
-            <div className="col-12 text-center">
-                <Link href="/apiDocs" className="btn-swagger-custom">
-                    <div className="btn-swagger-content">
-                        <i className="bi bi-book me-2"></i>
-                        <span>Lihat Dokumentasi API</span>
-                        <div className="btn-swagger-overlay"></div>
-                    </div>
-                </Link>
+    // Jika belum login, tampilkan form login
+    if (!isAuthenticated) {
+        return (
+            <div className="container d-flex justify-content-center align-items-center vh-100">
+                <form onSubmit={handleLogin} className="p-4 border rounded bg-dark text-light">
+                    <h3 className="mb-3 text-center">Auth Logs Dastrevas x GASPOLL</h3>
+                    <input
+                        type="password"
+                        className="form-control mb-3"
+                        placeholder="Masukkan password Access"
+                        value={passwordInput}
+                        onChange={(e) => setPasswordInput(e.target.value)}
+                    />
+                    <button className="btn btn-primary w-100" type="submit">Login</button>
+                </form>
             </div>
-        </div>
+        );
+    }
 
-        {/* Logs Layout */}
-        <div className="row g-3">
-            {/* Baris Pertama: 2 Kolom untuk Logs */}
-            <div className="col-6">
-                <div className="card bg-white text-white h-100">
-                    <div className="card-header bg-dark text-white">
-                        <h5 className="card-title mb-0 text-center">PM2 Logs</h5>
-                    </div>
-                    <div className="card-body overflow-auto" style={{maxHeight: '250px'}}>
-                        {logFiles.map(fileName => (
-                            <LogFileButton
-                                key={fileName}
-                                fileName={fileName}
-                                onClick={() => readLogFile(fileName, false)}
-                            />
-                        ))}
-                        {loading && (
-                            <div className="text-center mt-3">
-                                <div className="spinner-border text-light" role="status">
-                                    <span className="visually-hidden">Loading...</span>
+    return (
+        <div className="container-fluid px-4 py-3 bg-dark text-light">
+            {/* API Document Section */}
+            <div className="row mb-3">
+                <div className="col-12 text-center">
+                    <Link href="/apiDocs" className="btn-swagger-custom">
+                        <div className="btn-swagger-content">
+                            <i className="bi bi-book me-2"></i>
+                            <span>Lihat Dokumentasi API</span>
+                            <div className="btn-swagger-overlay"></div>
+                        </div>
+                    </Link>
+                </div>
+            </div>
+
+            {/* Logs Layout */}
+            <div className="row g-3">
+                {/* Baris Pertama: 2 Kolom untuk Logs */}
+                <div className="col-6">
+                    <div className="card bg-white text-white h-100">
+                        <div className="card-header bg-dark text-white">
+                            <h5 className="card-title mb-0 text-center">API Regular Logs</h5>
+                        </div>
+                        <div className="card-body overflow-auto" style={{ maxHeight: '250px' }}>
+                            {logFiles.map(fileName => (
+                                <LogFileButton
+                                    key={fileName}
+                                    fileName={fileName}
+                                    onClick={() => readLogFile(fileName, false)}
+                                />
+                            ))}
+                            {loading && (
+                                <div className="text-center mt-3">
+                                    <div className="spinner-border text-light" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="col-6">
-                <div className="card bg-white text-white h-100">
-                    <div className="card-header bg-dark text-white">
-                        <h5 className="card-title mb-0 text-center">Regular Logs</h5>
-                    </div>
-                    <div className="card-body overflow-auto" style={{maxHeight: '250px'}}>
-                        {pm2Logs.map(fileName => (
-                            <LogFileButton
-                                key={fileName}
-                                fileName={fileName}
-                                onClick={() => readLogFile(fileName, true)}
-                            />
-                        ))}
-                        {loading && (
-                            <div className="text-center mt-3">
-                                <div className="spinner-border text-light" role="status">
-                                    <span className="visually-hidden">Loading...</span>
+                <div className="col-6">
+                    <div className="card bg-white text-white h-100">
+                        <div className="card-header bg-dark text-white">
+                            <h5 className="card-title mb-0 text-center">PM2 Gaspoll Logs</h5>
+                        </div>
+                        <div className="card-body overflow-auto" style={{ maxHeight: '250px' }}>
+                            {pm2Logs.map(fileName => (
+                                <LogFileButton
+                                    key={fileName}
+                                    fileName={fileName}
+                                    onClick={() => readLogFile(fileName, true)}
+                                />
+                            ))}
+                            {loading && (
+                                <div className="text-center mt-3">
+                                    <div className="spinner-border text-light" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Baris Kedua: Log Viewer Penuh Lebar */}
+                <div className="col-12">
+                    <div className="card bg-secondary text-white">
+                        <div className="card-header bg-dark text-white">
+                            <h5 className="card-title mb-0 text-center">Log Viewer</h5>
+                        </div>
+                        <div
+                            ref={logViewerRef}
+                            className="card-body overflow-auto"
+                            style={{
+                                height: '300px',
+                                backgroundColor: '#2c2c2c',
+                                color: '#e0e0e0'
+                            }}
+                        >
+                            <LogViewer logs={currentLogs} />
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Baris Kedua: Log Viewer Penuh Lebar */}
-            <div className="col-12">
-                <div className="card bg-secondary text-white">
-                    <div className="card-header bg-dark text-white">
-                        <h5 className="card-title mb-0 text-center">Log Viewer</h5>
-                    </div>
-                    <div 
-                        ref={logViewerRef}
-                        className="card-body overflow-auto"
-                        style={{
-                            height: '300px',
-                            backgroundColor: '#2c2c2c',
-                            color: '#e0e0e0'
-                        }}
-                    >
-                        <LogViewer logs={currentLogs} />
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {/* Styling */}
-        <style jsx>{`
+            {/* Styling */}
+            <style jsx>{`
             .btn-swagger-custom {  
                 position: relative;  
                 display: inline-block;  
@@ -151,8 +173,8 @@ return (
                 transition: all 0.3s ease;  
             }  
         `}</style>
-    </div>
-);
+        </div>
+    );
 
 
 };
