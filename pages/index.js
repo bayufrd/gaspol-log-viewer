@@ -10,14 +10,24 @@ const Home = ({ logFiles, pm2Logs }) => {
     const [loading, setLoading] = React.useState(false);
     const logViewerRef = React.useRef(null);
 
-    const readLogFile = async (filePath) => {
+    const readLogFile = async (filePath, ispm2Log = false) => {
         setLoading(true);
-        const response = await fetch(filePath);
-        const data = await response.text();
-
-        const lines = data.split('\n');
-        const last100Lines = lines.slice(-100);
-        setCurrentLogs(last100Lines);
+        try {
+            const fullPath = ispm2Log ? `/pm2logs/${filePath}` : `/logs/${filePath}`;
+            const response = await fetch(fullPath);
+            
+            if (!response.ok) {
+                throw new Error('File not found');
+            }
+            
+            const data = await response.text();
+            const lines = data.split('\n');
+            const last100Lines = lines.slice(-100);
+            setCurrentLogs(last100Lines);
+        } catch (error) {
+            console.error('Error reading log file:', error);
+            setCurrentLogs([`Error membaca file: ${error.message}`]);
+        }
 
         setLoading(false);
 
@@ -28,7 +38,7 @@ const Home = ({ logFiles, pm2Logs }) => {
 
     return (
         <div className="container-fluid px-4 py-3 bg-dark text-light">
-            {/* Navigasi ke Swagger dengan desain tombol yang lebih menarik */}
+              {/* Navigasi ke Swagger dengan desain tombol yang lebih menarik */}
             <div className="row mb-4">
                 <div className="col-12 text-center">
                     <Link href="/apiDocs" className="btn-swagger-custom">
@@ -40,19 +50,19 @@ const Home = ({ logFiles, pm2Logs }) => {
                     </Link>
                 </div>
             </div>
-
             <div className="row g-4">
+                {/* Kolom PM2 Logs */}
                 <div className="col-md-4">
                     <div className="card bg-secondary text-white shadow-lg h-100">
                         <div className="card-header bg-dark text-white">
-                            <h5 className="card-title mb-0 text-center">PM2 Logs</h5>
+                            <h5 className="card-title mb-0 text-center">Regular Logs</h5>
                         </div>
                         <div className="card-body d-flex flex-column align-items-center">
                             {pm2Logs.map(fileName => (
                                 <LogFileButton
                                     key={fileName}
                                     fileName={fileName}
-                                    onClick={() => readLogFile(`/pm2logs/${fileName}`)}
+                                    onClick={() => readLogFile(fileName, true)}
                                 />
                             ))}
                             {loading && (
@@ -66,7 +76,33 @@ const Home = ({ logFiles, pm2Logs }) => {
                     </div>
                 </div>
 
-                <div className="col-md-8">
+                {/* Kolom Regular Logs */}
+                <div className="col-md-4">
+                    <div className="card bg-secondary text-white shadow-lg h-100">
+                        <div className="card-header bg-dark text-white">
+                            <h5 className="card-title mb-0 text-center">PM2 Logs</h5>
+                        </div>
+                        <div className="card-body d-flex flex-column align-items-center">
+                            {logFiles.map(fileName => (
+                                <LogFileButton
+                                    key={fileName}
+                                    fileName={fileName}
+                                    onClick={() => readLogFile(fileName, false)}
+                                />
+                            ))}
+                            {loading && (
+                                <div className="text-center mt-3">
+                                    <div className="spinner-border text-light" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Log Viewer */}
+                <div className="col-md-4">
                     <div className="card bg-secondary text-white shadow-lg h-100">
                         <div className="card-header bg-dark text-white">
                             <h5 className="card-title mb-0 text-center">Log Viewer</h5>
@@ -85,6 +121,9 @@ const Home = ({ logFiles, pm2Logs }) => {
                     </div>
                 </div>
             </div>
+
+
+            {/* Style tetap sama */}
             {/* Tambahkan style kustom */}
             <style jsx>{`  
                 .btn-swagger-custom {  
@@ -153,24 +192,27 @@ const Home = ({ logFiles, pm2Logs }) => {
 
 export async function getStaticProps() {
     const logsDirectory = path.join(process.cwd(), 'logs-gaspol-api', 'logs');
+    const pm2LogsDirectory = path.join(process.cwd(), 'logs-gaspol-api', 'pm2logs');
 
     // Buat direktori jika tidak ada
     if (!fs.existsSync(logsDirectory)) {
         fs.mkdirSync(logsDirectory, { recursive: true });
     }
 
+    if (!fs.existsSync(pm2LogsDirectory)) {
+        fs.mkdirSync(pm2LogsDirectory, { recursive: true });
+    }
+
     try {
         const logFiles = fs.readdirSync(logsDirectory);
-        const pm2LogFiles = [
-            'gaspol-api-error.log',
-            'gaspol-api-out.log'
-        ];
+        const pm2LogFiles = fs.readdirSync(pm2LogsDirectory);
 
         return {
             props: {
                 logFiles: logFiles,
                 pm2Logs: pm2LogFiles,
             },
+            revalidate: 10 // Opsional: untuk ISR (Incremental Static Regeneration)
         };
     } catch (error) {
         console.error("Error reading logs folder:", error);
