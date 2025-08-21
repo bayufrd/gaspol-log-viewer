@@ -1,16 +1,36 @@
-import fs from 'fs';
 import path from 'path';
 import React from 'react';
 import Link from 'next/link';
 import LogViewer from '../components/LogViewer';
 import LogFileButton from '../components/LogFileButton';
+import LogWindowsViewer from '../components/LogWindowsViewer';
 
-const Home = ({ logFiles, pm2Logs }) => {
+const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
     const [currentLogs, setCurrentLogs] = React.useState([]);
+    const [windowsLogsData, setWindowsLogsData] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
     const [passwordInput, setPasswordInput] = React.useState('');
     const [isAuthenticated, setIsAuthenticated] = React.useState(false);
     const logViewerRef = React.useRef(null);
+
+    const fetchWindowsLogs = async () => {
+        setLoading(true);
+        try {
+            const baseUri = process.env.NEXT_PUBLIC_API_URL;
+            const response = await fetch(`${baseUri}/logs`); // Ganti dengan endpoint yang sesuai
+            if (!response.ok) throw new Error('File not found');
+            const data = await response.json();
+            setWindowsLogsData(data.data); // Mengambil data dari JSON yang dikembalikan
+        } catch (error) {
+            console.error('Error fetching Windows logs:', error);
+            setWindowsLogsData([`Error fetching logs: ${error.message}`]);
+        }
+        setLoading(false);
+    };
+
+    React.useEffect(() => {
+        fetchWindowsLogs(); // Memanggil fetchWindowsLogs saat komponen dimuat
+    }, []);
 
     const readLogFile = async (filePath, ispm2Log = false) => {
         setLoading(true);
@@ -145,10 +165,28 @@ const Home = ({ logFiles, pm2Logs }) => {
                         </div>
                     </div>
                 </div>
+                <div className="col-12 mt-4">
+                    <div className="card bg-secondary text-white">
+                        <div className="card-header bg-dark text-white">
+                            <h5 className="card-title mb-0 text-center">Log Client Windows</h5>
+                        </div>
+                        <LogWindowsViewer windowsLogsData={windowsLogsData} loading={loading} />
+                    </div>
+                </div>
             </div>
 
             {/* Styling */}
             <style jsx>{`
+    .log-card {
+        padding: 10px;
+        margin-bottom: 5px; /* Ruang antara kartu */
+        color: black; /* Warna teks hitam untuk kontras yang lebih baik */
+    }
+
+    .log-item {
+        display: block; /* Membuat setiap elemen di baris baru */
+        padding: 5px;
+    }
             .btn-swagger-custom {  
                 position: relative;  
                 display: inline-block;  
@@ -175,14 +213,14 @@ const Home = ({ logFiles, pm2Logs }) => {
         `}</style>
         </div>
     );
-
-
 };
 
-
 export async function getStaticProps() {
+    const fs = require('fs'); // Mengimpor fs di dalam fungsi ini
+    const path = require('path'); // Mengimpor path di dalam fungsi ini
     const logsDirectory = path.join(process.cwd(), 'logs-gaspol-api', 'logs');
     const pm2LogsDirectory = path.join(process.cwd(), 'logs-gaspol-api', 'pm2logs');
+    const windowsLogsDirectory = path.join(process.cwd(), 'logs-gaspol-api', 'windowsLogs'); // Path untuk log client Windows
 
     // Buat direktori jika tidak ada
     if (!fs.existsSync(logsDirectory)) {
@@ -193,14 +231,24 @@ export async function getStaticProps() {
         fs.mkdirSync(pm2LogsDirectory, { recursive: true });
     }
 
+    if (!fs.existsSync(windowsLogsDirectory)) {
+        fs.mkdirSync(windowsLogsDirectory, { recursive: true });
+    }
+
     try {
         const logFiles = fs.readdirSync(logsDirectory);
         const pm2LogFiles = fs.readdirSync(pm2LogsDirectory);
+        const windowsLogFiles = fs.readdirSync(windowsLogsDirectory); // Ambil logs client Windows jika diperlukan
+
+        // Cek ada atau tidaknya log client Windows
+        const windowsLogs = windowsLogFiles.length > 0 ? await fs.promises.readFile(path.join(windowsLogsDirectory, windowsLogFiles[0]), 'utf-8') : '{}';
 
         return {
             props: {
                 logFiles: logFiles,
                 pm2Logs: pm2LogFiles,
+                // Mengembalikan log client windows yang sudah diparsing
+                windowsLogs: JSON.parse(windowsLogs).data || [],
             },
             revalidate: 10 // Opsional: untuk ISR (Incremental Static Regeneration)
         };
@@ -210,9 +258,11 @@ export async function getStaticProps() {
             props: {
                 logFiles: [],
                 pm2Logs: [],
+                windowsLogs: [],
             },
         };
     }
 }
+
 
 export default Home;

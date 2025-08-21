@@ -24,11 +24,11 @@ const LogEntry = ({ timestamp, level, message }) => {
 
     return (
         <div className={`log-entry p-2 mb-2 rounded ${bg}`}>
-            <div className="d-flex justify-content-between align-items-center mb-1">
+            <div className="d-flex justify-content-between align-items-center mb-1"style={{ fontFamily: 'Courier New, Courier, monospace' }}>
                 <small className="text-muted">{timestamp}</small>
                 <span className={`badge ${text} text-uppercase`}>{level}</span>
             </div>
-            <div className="log-message">{message}</div>
+            <div className="log-message" style={{ fontFamily: 'Courier New, Courier, monospace' }}>{message}</div>
         </div>
     );
 };
