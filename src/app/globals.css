@@ -56,3 +56,16 @@ body {
   color: var(--foreground);
   font-family: 'Courier New', Courier, monospace;
 }
+
+.bg-dark {
+  background-color: #1c1c1e !important;
+}
+.bg-error {
+  background-color: #ff4c4c !important;
+}
+.bg-warning {
+  background-color: #ffcc00 !important;
+}
+.bg-info {
+  background-color: #000000 !important;
+}

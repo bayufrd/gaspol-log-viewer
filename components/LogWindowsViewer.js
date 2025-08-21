@@ -8,7 +8,7 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading }) => {
     useEffect(() => {
         setFilteredLogs(
             windowsLogsData.filter(log => {
-                const logMessage = `${log.log_level} ${log.log_code} ${log.outlet_name} ${log.message}`;
+                const logMessage = `${log.id} ${new Date(log.created_at).toLocaleString()} ${log.outlet_id} ${log.exception} ${log.source} ${log.additional_info} ${log.log_level} ${log.log_code} ${log.outlet_name} ${log.message}`;
                 
                 return logMessage.toLowerCase().includes(searchTerm.toLowerCase());
             })
@@ -43,6 +43,7 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading }) => {
                         <LogEntry 
                             key={log.id} 
                             timestamp={new Date(log.created_at).toLocaleString()} 
+                            outlet_id= {log.outlet_id}
                             level={log.log_level.toLowerCase()} 
                             message={log.message} 
                             logCode={log.log_code} 
