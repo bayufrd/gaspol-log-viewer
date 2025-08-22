@@ -1,5 +1,5 @@
 import path from 'path';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import LogViewer from '../components/LogViewer';
 import LogFileButton from '../components/LogFileButton';
@@ -31,6 +31,16 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
     React.useEffect(() => {
         fetchWindowsLogs(); // Memanggil fetchWindowsLogs saat komponen dimuat
     }, []);
+
+    useEffect(() => {  
+        fetchWindowsLogs(); // Panggil fungsi fetch saat pertama kali  
+    
+        const interval = setInterval(() => {  
+            fetchWindowsLogs(); // Memanggil ulang fungsi fetch setiap 10 detik  
+        }, 10000); // 10000 ms = 10 detik  
+    
+        return () => clearInterval(interval); // Membersihkan interval saat komponen dibongkar  
+    }, []);  
 
     const readLogFile = async (filePath, ispm2Log = false) => {
         setLoading(true);

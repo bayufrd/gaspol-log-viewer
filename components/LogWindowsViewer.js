@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import LogEntry from './LogWindowsEntry';
 
 const LogWindowsViewer = ({ windowsLogsData = [], loading }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredLogs, setFilteredLogs] = useState([]);
+    const [updateConfirmData, setUpdateConfirmData] = useState([]);
+    const logContainerRef = useRef(null);
 
     useEffect(() => {
         setFilteredLogs(
@@ -14,6 +16,31 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading }) => {
             })
         );
     }, [windowsLogsData, searchTerm]);
+
+
+    const fetchUpdateConfirmData = async () => {
+        try {
+            const baseUri = process.env.NEXT_PUBLIC_API_URL;
+            const response = await fetch(`${baseUri}/update-confirm`);
+
+            if (!response.ok) throw new Error('Data tidak ditemukan');
+            const data = await response.json();
+            setUpdateConfirmData(data.data);
+        } catch (error) {
+            console.error('Error fetching update confirm data:', error);
+            setUpdateConfirmData([]);
+        }
+    };
+
+    useEffect(() => {
+        fetchUpdateConfirmData();
+
+        const interval = setInterval(() => {  
+            fetchUpdateConfirmData(); // Memanggil ulang fungsi fetch setiap 10 detik  
+        }, 10000); // 10000 ms = 10 detik  
+    
+        return () => clearInterval(interval); // Membersihkan interval saat komponen dibongkar  
+    }, []);
 
     return (
         <div>
@@ -30,7 +57,11 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading }) => {
                 />
             </div>
 
-            <div className="log-entries">
+            <div
+                ref={logContainerRef}
+                className="log-entries"
+                style={{ maxHeight: '300px', overflowY: 'auto' }}
+            >
                 {loading && (
                     <div className="text-center">
                         <div className="spinner-border text-light" role="status">
@@ -43,7 +74,7 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading }) => {
                         <LogEntry 
                             key={log.id} 
                             timestamp={new Date(log.created_at).toLocaleString()} 
-                            outlet_id= {log.outlet_id}
+                            outlet_id={log.outlet_id}
                             level={log.log_level.toLowerCase()} 
                             message={log.message} 
                             logCode={log.log_code} 
@@ -58,6 +89,50 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading }) => {
                         Tidak ada log untuk ditampilkan
                     </div>
                 )}
+            </div>
+
+            {/* Container Baru untuk Log Update Confirm */}
+            <div className="mt-4">
+                <h5 className="text-center">Log Update Confirm Client Windows</h5>
+                <div className="overflow-auto" style={{ maxHeight: '300px' }}>
+                    {updateConfirmData.length > 0 ? (
+                        <ul className="list-group">
+                            {updateConfirmData.map((update) => {
+                                const currentVersion = update.version.split(" UpdaterVer:")[0]; // Ambil hanya versi
+                                const updaterVersion = update.version.split(" UpdaterVer:")[1]; // Ambil updater version
+                                const isUpdated = currentVersion.trim() === update.new_version.trim();
+
+                                return (
+                                    <li key={update.outlet_id} className="list-group-item bg-dark text-white d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <h6>{update.outlet_name} (ID: {update.outlet_id})</h6>
+                                            <p>Version: {currentVersion}</p>
+                                            {updaterVersion && <p>Updater Version: {updaterVersion.trim()}</p>} {/* Tampilkan updater version */}
+                                            <p>New Version: {update.new_version.trim()}</p>
+                                            <p>Last Updated: {new Date(update.last_updated).toLocaleString()}</p>
+                                        </div>
+                                        <div>
+                                            <span 
+                                                style={{
+                                                    width: '10px', 
+                                                    height: '10px', 
+                                                    borderRadius: '50%', 
+                                                    backgroundColor: isUpdated ? 'green' : 'yellow',
+                                                    display: 'inline-block',
+                                                    marginLeft: '10px'
+                                                }} 
+                                            />
+                                        </div>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    ) : (
+                        <div className="alert alert-info bg-dark text-info text-center">
+                            Tidak ada data update yang tersedia
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
