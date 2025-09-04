@@ -1,31 +1,53 @@
+// LogWindowsEntry.js
 import React from 'react';
 
-const LogWindowsEntry = ({ key ,timestamp, outlet_id, level, message, logCode, outletName, exception, source, additionalInfo }) => {
+const LogWindowsEntry = ({
+    timestamp,
+    outlet_id,
+    outletName,
+    level,
+    message,
+    logCode,
+    exception,
+    source,
+    additionalInfo,
+    visibleFields
+}) => {
     const levelColors = {
-        error: {
-            bg: 'bg-black',  // Kelas latar belakang gelap bootstrap
-            text: 'text-danger'  // Kelas teks merah dari bootstrap
-        },
-        warn: {
-            bg: 'bg-warning',  // Kelas latar belakang gelap bootstrap
-            text: 'text-dark'  // Kelas teks kuning dari bootstrap
-        },
-        info: {
-            bg: 'bg-dark',   // Kelas latar belakang hitam bootstrap
-            text: 'text-success'   // Kelas teks hijau bootstrap
-        }
+        error: { bg: 'bg-black', text: 'text-danger' },
+        warn: { bg: 'bg-warning', text: 'text-dark' },
+        info: { bg: 'bg-dark', text: 'text-success' }
     };
 
     const { bg, text } = levelColors[level] || levelColors['info'];
 
     return (
         <div className={`log-entry p-2 mb-2 rounded ${bg}`}>
-            <div className="d-flex justify-content-between align-items-center mb-1"style={{ fontFamily: 'Courier New, Courier, monospace' }}>
-                <small className="text-white300">{timestamp}</small>
-                <span className={`badge ${text} text-uppercase`}>{level.toUpperCase()}</span>
+            <div className="d-flex justify-content-between align-items-center mb-1" style={{ fontFamily: 'Courier New, Courier, monospace' }}>
+                {visibleFields?.created_at && (
+                    <small className="text-white-300">{timestamp}</small>
+                )}
+                {visibleFields?.log_level && (
+                    <span className={`badge ${text} text-uppercase`}>
+                        {level.toUpperCase()}
+                    </span>
+                )}
             </div>
-            <div className="log-message" style={{ fontFamily: 'Courier New, Courier, monospace' }}>
-                {`${level.toUpperCase()}[${logCode}] Outlet ID : ${outlet_id}  (${outletName}) || msg: ${message} || ex: ${exception} || sc: ${source} || adtinfo: ${additionalInfo}`}</div>
+
+            <div
+                className="log-message"
+                style={{
+                    fontFamily: "Courier New, Courier, monospace",
+                    whiteSpace: "pre-line",
+                }}
+            >
+                {visibleFields?.log_level && `${level.toUpperCase()}[${logCode}]\n`}
+                {visibleFields?.outlet_id && `⚠️ Outlet ID : ${outlet_id} (${outletName})\n`}
+                {visibleFields?.message && `⚠️ msg: ${message}\n`}
+                {visibleFields?.exception && `⚠️ ex: ${exception}\n`}
+                {visibleFields?.source && `⚠️ sc: ${source}\n`}
+                {visibleFields?.additional_info && `⚠️ adtinfo: ${additionalInfo}\n`}
+            </div>
         </div>
     );
 };

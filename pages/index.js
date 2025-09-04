@@ -12,6 +12,56 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
     const [passwordInput, setPasswordInput] = React.useState('');
     const [isAuthenticated, setIsAuthenticated] = React.useState(false);
     const logViewerRef = React.useRef(null);
+    const [summaryData, setSummaryData] = React.useState([]);
+    const [outletLogs, setOutletLogs] = React.useState(() => {
+        return localStorage.getItem("selectedOutlet") || "ALL";
+    });
+    
+    const [visibleFields, setVisibleFields] = React.useState({
+        outlet_id: true,
+        message: true,
+        exception: false,
+        source: false,
+        additional_info: false,
+        log_level: true,
+        created_at: true,
+    });
+
+    const fetchSummary = async () => {
+        try {
+            const baseUri = process.env.NEXT_PUBLIC_API_URL;
+            const response = await fetch(`${baseUri}/logsummary/all`);
+            if (!response.ok) throw new Error("Gagal ambil summary");
+            const data = await response.json();
+            setSummaryData(data.data || []);
+        } catch (err) {
+            console.error("Error fetch summary:", err);
+        }
+    };
+    useEffect(() => {
+        fetchSummary();
+    }, []);
+
+    const fetchLogsByOutlet = async (outletId) => {
+        setLoading(true);
+        try {
+            const baseUri = process.env.NEXT_PUBLIC_API_URL;
+            const endpoint =
+                outletId === "ALL"
+                    ? `${baseUri}/logs` // all outlet
+                    : `${baseUri}/logs/${outletId}`;
+            setOutletLogs(outletId);
+            const response = await fetch(endpoint);
+            if (!response.ok) throw new Error("Gagal ambil logs");
+            const data = await response.json();
+            setWindowsLogsData(data.data || []);
+        } catch (err) {
+            console.error("Error fetch outlet logs:", err);
+            setWindowsLogsData([]);
+        }
+        setLoading(false);
+    };
+
 
     const fetchWindowsLogs = async () => {
         setLoading(true);
@@ -28,19 +78,24 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
         setLoading(false);
     };
 
-    React.useEffect(() => {
-        fetchWindowsLogs(); // Memanggil fetchWindowsLogs saat komponen dimuat
-    }, []);
+    // React.useEffect(() => {
+    //     fetchWindowsLogs(outletLogs); // Memanggil fetchWindowsLogs saat komponen dimuat
+    // }, []);
 
-    useEffect(() => {  
-        fetchWindowsLogs(); // Panggil fungsi fetch saat pertama kali  
-    
-        const interval = setInterval(() => {  
-            fetchWindowsLogs(); // Memanggil ulang fungsi fetch setiap 10 detik  
-        }, 10000); // 10000 ms = 10 detik  
-    
-        return () => clearInterval(interval); // Membersihkan interval saat komponen dibongkar  
-    }, []);  
+    useEffect(() => {
+        localStorage.setItem("selectedOutlet", outletLogs); // simpan setiap kali berubah
+    }, [outletLogs]);
+
+    useEffect(() => {
+        if (!outletLogs) return;
+        fetchLogsByOutlet(outletLogs);
+
+        const interval = setInterval(() => {
+            fetchLogsByOutlet(outletLogs);
+        }, 10000);
+
+        return () => clearInterval(interval);
+    }, [outletLogs]);
 
     const readLogFile = async (filePath, ispm2Log = false) => {
         setLoading(true);
@@ -180,7 +235,51 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
                         <div className="card-header bg-dark text-white">
                             <h5 className="card-title mb-0 text-center">Log Client Windows</h5>
                         </div>
-                        <LogWindowsViewer windowsLogsData={windowsLogsData} loading={loading} />
+
+                        {/* Tombol Summary */}
+                        <div className="card-body d-flex flex-wrap gap-2">
+                            <button
+                                className="btn btn-outline-light btn-sm"
+                                onClick={() => fetchLogsByOutlet("ALL")}
+                            >
+                                All Outlet
+                            </button>
+                            {summaryData.map((item) => (
+                                <button
+                                    key={item.outlet_id}
+                                    className="btn btn-outline-light btn-sm"
+                                    onClick={() => fetchLogsByOutlet(item.outlet_id)}
+                                >
+                                    {item.outlet_name} ({item.total_logs})
+                                </button>
+                            ))}
+                        </div>
+                        <div className="mb-2 d-flex flex-wrap gap-3">
+                            {Object.keys(visibleFields).map((field) => (
+                                <label key={field} className="text-light me-3">
+                                    <input
+                                        type="checkbox"
+                                        checked={visibleFields[field]}
+                                        onChange={() =>
+                                            setVisibleFields((prev) => ({
+                                                ...prev,
+                                                [field]: !prev[field],
+                                            }))
+                                        }
+                                    />{" "}
+                                    {field.replace("_", " ")}
+                                </label>
+                            ))}
+                        </div>
+
+                        {/* Log Viewer */}
+                        <LogWindowsViewer
+                            windowsLogsData={windowsLogsData}
+                            loading={loading}
+                            visibleFields={visibleFields}   // ✅ kirim ke viewer
+                        />
+
+                        {/* <LogWindowsViewer windowsLogsData={windowsLogsData} loading={loading} /> */}
                     </div>
                 </div>
             </div>
