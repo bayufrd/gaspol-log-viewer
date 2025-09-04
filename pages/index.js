@@ -13,10 +13,14 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
     const [isAuthenticated, setIsAuthenticated] = React.useState(false);
     const logViewerRef = React.useRef(null);
     const [summaryData, setSummaryData] = React.useState([]);
-    const [outletLogs, setOutletLogs] = React.useState(() => {
-        return localStorage.getItem("selectedOutlet") || "ALL";
-    });
-    
+    const [outletLogs, setOutletLogs] = React.useState("ALL");
+
+    useEffect(() => {
+        const saved = localStorage.getItem("selectedOutlet");
+        if (saved) setOutletLogs(saved);
+    }, []);
+
+
     const [visibleFields, setVisibleFields] = React.useState({
         outlet_id: true,
         message: true,
