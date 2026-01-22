@@ -33,9 +33,9 @@ const LogViewer = ({ logs = [] }) => {
     };
 
     return (
-        <div>
-            <div className="input-group mb-3">
-                <span className="input-group-text bg-dark text-light">
+        <div className="modern-log-viewer">
+            <div className="d-flex align-items-center mb-2" style={{gap: 8}}>
+                <span className="bg-dark text-light px-2 py-1 rounded">
                     <i className="bi bi-search"></i>
                 </span>
                 <input
@@ -43,11 +43,11 @@ const LogViewer = ({ logs = [] }) => {
                     placeholder="Cari log..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="form-control bg-dark text-light"
+                    className="form-control bg-dark text-light border-0 rounded"
+                    style={{maxWidth: 300}}
                 />
             </div>
-
-            <div className="log-entries">
+            <div className="log-entries" style={{marginTop: 8}}>
                 {processedLogs.length > 0 ? (
                     processedLogs.map((log, index) => {
                         const logObj = parseLogLine(log);
@@ -61,14 +61,15 @@ const LogViewer = ({ logs = [] }) => {
                         ) : (
                             <div 
                                 key={index} 
-                                className="alert alert-warning bg-dark text-warning"
+                                className="alert alert-warning bg-dark text-warning rounded shadow-sm"
+                                style={{fontSize: 13, padding: 8}}
                             >
                                 Log tidak valid: {log}
                             </div>
                         );
                     })
                 ) : (
-                    <div className="alert alert-info bg-dark text-info text-center">
+                    <div className="alert alert-info bg-dark text-info text-center rounded shadow-sm" style={{fontSize: 13, padding: 8}}>
                         Tidak ada log untuk ditampilkan
                     </div>
                 )}

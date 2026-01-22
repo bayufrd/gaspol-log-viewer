@@ -23,12 +23,12 @@ const LogEntry = ({ timestamp, level, message }) => {
     const { bg, text } = levelColors[level] || levelColors['debug'];
 
     return (
-        <div className={`log-entry p-2 mb-2 rounded ${bg}`}>
-            <div className="d-flex justify-content-between align-items-center mb-1"style={{ fontFamily: 'Courier New, Courier, monospace' }}>
+        <div className={`log-entry p-2 mb-2 rounded shadow-sm ${bg}`} style={{border: 'none', fontSize: 13}}>
+            <div className="d-flex justify-content-between align-items-center mb-1" style={{ fontFamily: 'GeistMono, Courier New, Courier, monospace' }}>
                 <small className="text-muted">{timestamp}</small>
-                <span className={`badge ${text} text-uppercase`}>{level}</span>
+                <span className={`badge ${text} text-uppercase`} style={{fontSize: 11}}>{level}</span>
             </div>
-            <div className="log-message" style={{ fontFamily: 'Courier New, Courier, monospace' }}>{message}</div>
+            <div className="log-message" style={{ fontFamily: 'GeistMono, Courier New, Courier, monospace', whiteSpace: 'pre-line' }}>{message}</div>
         </div>
     );
 };

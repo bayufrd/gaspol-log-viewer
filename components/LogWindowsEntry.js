@@ -37,28 +37,27 @@ const LogWindowsEntry = ({
     };
 
     return (
-        <div className={`log-entry p-2 mb-2 rounded ${bg}`}>
-            <div className="d-flex justify-content-between align-items-center mb-1" style={{ fontFamily: 'Courier New, Courier, monospace' }}>
+        <div className={`log-entry p-2 mb-2 rounded shadow-sm ${bg}`} style={{border: 'none', fontSize: 13}}>
+            <div className="d-flex justify-content-between align-items-center mb-1" style={{ fontFamily: 'GeistMono, Courier New, Courier, monospace' }}>
                 <div>
                     {visibleFields?.created_at && (
                         <small className="text-white-300">{timestamp}</small>
                     )}
                     {visibleFields?.log_level && (
-                        <span className={`badge ${text} text-uppercase`}>
+                        <span className={`badge ${text} text-uppercase`} style={{fontSize: 11}}>
                             {level.toUpperCase()}
                         </span>
                     )}
                 </div>
                 {/* Tombol Salin */}
-                <button className="btn btn-outline-light btn-sm" onClick={handleCopy}>
+                <button className="btn btn-outline-light btn-sm" style={{fontSize: 11, padding: '2px 8px'}} onClick={handleCopy}>
                     Copy
                 </button>
             </div>
-
             <div
                 className="log-message"
                 style={{
-                    fontFamily: "Courier New, Courier, monospace",
+                    fontFamily: "GeistMono, Courier New, Courier, monospace",
                     whiteSpace: "pre-line",
                 }}
             >
