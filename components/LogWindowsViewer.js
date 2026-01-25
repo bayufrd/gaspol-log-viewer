@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import LogEntry from './LogWindowsEntry';
 
 const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUpdateConfirm = false }) => {
-    const [latestVersion, setLatestVersion] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredLogs, setFilteredLogs] = useState([]);
     const [updateConfirmData, setUpdateConfirmData] = useState([]);
@@ -36,64 +35,46 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUp
         return () => clearInterval(interval);
     }, []);
 
-    useEffect(() => {
-        async function fetchLatestVersion() {
-            try {
-                const res = await fetch('https://gaspollmanagementcenter.com/server/version.txt');
-                const txt = await res.text();
-                setLatestVersion(txt.trim());
-            } catch (err) {
-                setLatestVersion(null);
-            }
-        }
-        fetchLatestVersion();
-    }, []);
-
-    // Only green if new_version === latestVersion (after trim)
-    function isVersionUpToDate(newVersion, latestVersion) {
-        if (!newVersion || !latestVersion) return false;
-        return newVersion.trim() === latestVersion.trim();
-    }
-
     if (onlyUpdateConfirm) {
+        const UpdateConfirmCard = require('./UpdateConfirmCard').default;
+        // Sort by outlet_id ascending
+        const sortedData = [...updateConfirmData].sort((a, b) => Number(a.outlet_id) - Number(b.outlet_id));
         return (
-            <div className="mt-2">
-                <div className="overflow-auto" style={{ maxHeight: '400px' }}>
-                    {updateConfirmData.length > 0 ? (
-                        <ul className="list-group">
-                            {updateConfirmData.map((update) => {
-                                const currentVersion = update.version.split(" UpdaterVer:")[0];
-                                const updaterVersion = update.version.split(" UpdaterVer:")[1];
-                                const newVersion = update.new_version.trim();
-                                // Compare with latestVersion from web
-                                const isUpdated = latestVersion ? isVersionUpToDate(newVersion, latestVersion) : (currentVersion.trim() === newVersion);
-                                console.log('[DEBUG] Outlet:', update.outlet_name, '| newVersion:', JSON.stringify(newVersion), '| latestVersion:', JSON.stringify(latestVersion), '| isUpdated:', isUpdated);
-                                return (
-                                    <li key={update.outlet_id} className="list-group-item bg-dark text-white d-flex align-items-center justify-content-between rounded shadow-sm" style={{marginBottom: 8}}>
-                                        <div>
-                                            <h6>{update.outlet_name} (ID: {update.outlet_id})</h6>
-                                            <p>Version: {currentVersion}</p>
-                                            {updaterVersion && <p>Updater Version: {updaterVersion.trim()}</p>}
-                                            <p>New Version: {newVersion}</p>
-                                            <p>Last Updated: {new Date(update.last_updated).toLocaleString()}</p>
-                                            {latestVersion && <p>Latest Version (server): <b>{latestVersion}</b></p>}
-                                        </div>
-                                        <div>
-                                            <span
-                                                style={{
-                                                    width: '10px',
-                                                    height: '10px',
-                                                    borderRadius: '50%',
-                                                    backgroundColor: isUpdated ? 'green' : 'yellow',
-                                                    display: 'inline-block',
-                                                    marginLeft: '10px'
-                                                }}
-                                            />
-                                        </div>
-                                    </li>
-                                );
-                            })}
-                        </ul>
+            <div className="mt-2" style={{flex: 1, minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column'}}>
+                <div className="overflow-auto" style={{
+                    flex: 1,
+                    minHeight: 0,
+                    height: '100%',
+                    background: '#23272e',
+                    border: '2px solid #111',
+                    borderRadius: 12,
+                    boxShadow: '0 2px 12px rgba(56,189,248,0.08)',
+                    padding: 8,
+                    margin: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}>
+                    {sortedData.length > 0 ? (
+                        <div
+                            className="update-confirm-cards-grid"
+                            style={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                columnGap: 12,
+                                rowGap: 6,
+                                alignItems: 'flex-start',
+                                justifyContent: 'flex-start',
+                                width: '100%',
+                                height: '100%',
+                                overflow: 'auto',
+                                padding: 4,
+                                background: 'transparent',
+                            }}
+                        >
+                            {sortedData.map((update) => (
+                                <UpdateConfirmCard key={update.outlet_id} update={update} />
+                            ))}
+                        </div>
                     ) : (
                         <div className="alert alert-info bg-dark text-info text-center rounded shadow-sm" style={{fontSize: 13, padding: 8}}>
                             Tidak ada data update yang tersedia
@@ -104,7 +85,7 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUp
         );
     }
     return (
-        <div className="modern-log-windows-viewer">
+        <div className="modern-log-windows-viewer" style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
             <div className="d-flex align-items-center mb-2" style={{gap: 8}}>
                 <span className="bg-dark text-light px-2 py-1 rounded">
                     <i className="bi bi-search"></i>
@@ -121,7 +102,7 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUp
             <div
                 ref={logContainerRef}
                 className="log-entries"
-                style={{ maxHeight: '300px', overflowY: 'auto', marginTop: 8 }}
+                style={{ flex: 1, minHeight: 0, overflowY: 'auto', marginTop: 8, display: 'flex', flexDirection: 'column' }}
             >
                 {loading && (
                     <div className="text-center">

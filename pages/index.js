@@ -15,9 +15,17 @@ function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisi
                     key: 'client',
                     label: 'Log Client Windows',
                     content: (
-                        <div style={{width: '100%', minHeight: '65vh', maxHeight: '80vh', overflowY: 'auto'}}>
-                            <h5 className="mb-3 text-center">Log Client Windows</h5>
-                            <div className="d-flex flex-wrap gap-2 mb-3">
+                        <div style={{
+                            width: '100%',
+                            height: 'calc(90vh - 80px)',
+                            minHeight: '30vh',
+                            maxHeight: '90vh',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            overflow: 'hidden',
+                        }}>
+                            <h5 className="mb-2 text-center" style={{fontSize: 18}}>Log Client Windows</h5>
+                            <div className="d-flex flex-wrap gap-2 mb-2" style={{fontSize: 13}}>
                                 <button
                                     className="btn btn-outline-light btn-sm"
                                     onClick={() => fetchLogsByOutlet("ALL")}
@@ -34,9 +42,9 @@ function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisi
                                     </button>
                                 ))}
                             </div>
-                            <div className="mb-2 d-flex flex-wrap gap-3">
+                            <div className="mb-1 d-flex flex-wrap gap-2" style={{fontSize: 13}}>
                                 {Object.keys(visibleFields).map((field) => (
-                                    <label key={field} className="text-light me-3">
+                                    <label key={field} className="text-light me-2">
                                         <input
                                             type="checkbox"
                                             checked={visibleFields[field]}
@@ -51,11 +59,14 @@ function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisi
                                     </label>
                                 ))}
                             </div>
-                            <LogWindowsViewer
-                                windowsLogsData={windowsLogsData}
-                                loading={loading}
-                                visibleFields={visibleFields}
-                            />
+                            <div style={{flex: 1, minHeight: 0, overflow: 'auto', display: 'flex', flexDirection: 'column'}}>
+                                <LogWindowsViewer
+                                    windowsLogsData={windowsLogsData}
+                                    loading={loading}
+                                    visibleFields={visibleFields}
+                                    style={{flex: 1, minHeight: 0, height: '100%'}}
+                                />
+                            </div>
                         </div>
                     )
                 },
@@ -63,14 +74,25 @@ function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisi
                     key: 'update',
                     label: 'Log Update Confirm Client Windows',
                     content: (
-                        <div style={{width: '100%', minHeight: '65vh', maxHeight: '80vh', overflowY: 'auto'}}>
+                        <div style={{
+                            width: '100%',
+                            height: 'calc(90vh - 80px)',
+                            minHeight: '30vh',
+                            maxHeight: '90vh',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            overflow: 'hidden',
+                        }}>
                             <h5 className="mb-3 text-center">Log Update Confirm Client Windows</h5>
-                            <LogWindowsViewer
-                                windowsLogsData={[]}
-                                loading={loading}
-                                visibleFields={visibleFields}
-                                onlyUpdateConfirm={true}
-                            />
+                            <div style={{flex: 1, minHeight: 0, maxHeight: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column'}}>
+                                <LogWindowsViewer
+                                    windowsLogsData={[]}
+                                    loading={loading}
+                                    visibleFields={visibleFields}
+                                    onlyUpdateConfirm={true}
+                                    style={{flex: 1, minHeight: 0, height: '100%'}}
+                                />
+                            </div>
                         </div>
                     )
                 }
