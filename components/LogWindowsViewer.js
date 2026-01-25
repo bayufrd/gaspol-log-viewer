@@ -5,6 +5,7 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUp
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredLogs, setFilteredLogs] = useState([]);
     const [updateConfirmData, setUpdateConfirmData] = useState([]);
+    const [remoteVersion, setRemoteVersion] = useState(null);
     const logContainerRef = useRef(null);
 
     useEffect(() => {
@@ -35,10 +36,35 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUp
         return () => clearInterval(interval);
     }, []);
 
+    // Fetch remote version from local proxy endpoint on first load
+    useEffect(() => {
+        const fetchRemoteVersion = async () => {
+            try {
+                const response = await fetch('/api/version-proxy');
+                if (!response.ok) throw new Error('Failed to fetch remote version');
+                const text = await response.text();
+                setRemoteVersion(text.trim());
+            } catch (error) {
+                console.error('Error fetching remote version:', error);
+                setRemoteVersion(null);
+            }
+        };
+        fetchRemoteVersion();
+    }, []);
+
     if (onlyUpdateConfirm) {
         const UpdateConfirmCard = require('./UpdateConfirmCard').default;
         // Sort by outlet_id ascending
         const sortedData = [...updateConfirmData].sort((a, b) => Number(a.outlet_id) - Number(b.outlet_id));
+        if (!remoteVersion) {
+            return (
+                <div className="mt-2" style={{flex: 1, minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column'}}>
+                    <div className="alert alert-info bg-dark text-info text-center rounded shadow-sm" style={{fontSize: 13, padding: 8}}>
+                        Mengambil versi terbaru dari server...
+                    </div>
+                </div>
+            );
+        }
         return (
             <div className="mt-2" style={{flex: 1, minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column'}}>
                 <div className="overflow-auto" style={{
@@ -72,7 +98,7 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUp
                             }}
                         >
                             {sortedData.map((update) => (
-                                <UpdateConfirmCard key={update.outlet_id} update={update} />
+                                <UpdateConfirmCard key={update.outlet_id} update={update} remoteVersion={remoteVersion} />
                             ))}
                         </div>
                     ) : (

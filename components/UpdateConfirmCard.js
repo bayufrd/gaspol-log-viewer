@@ -1,10 +1,30 @@
 // UpdateConfirmCard.js
 import React from 'react';
 
-export default function UpdateConfirmCard({ update }) {
+function compareVersions(v1, v2) {
+  if (!v1 || !v2) return false;
+  // Try normal dot split comparison
+  const a = v1.trim().split('.').map(Number);
+  const b = v2.trim().split('.').map(Number);
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    const numA = a[i] || 0;
+    const numB = b[i] || 0;
+    if (numA > numB) return true;
+    if (numA < numB) return false;
+  }
+  // Fallback: remove dots and spaces, compare as integer
+  const intA = parseInt(v1.replace(/\.|\s/g, ''), 10);
+  const intB = parseInt(v2.replace(/\.|\s/g, ''), 10);
+  return intA >= intB;
+}
+
+export default function UpdateConfirmCard({ update, remoteVersion }) {
   const currentVersion = update.version.split(" UpdaterVer:")[0];
   const updaterVersion = update.version.split(" UpdaterVer:")[1];
-  const isUpdated = currentVersion.trim() === update.new_version.trim();
+  // Use numeric version comparison
+  const isUpdated = remoteVersion && compareVersions(currentVersion, remoteVersion);
+  // Debug log
+  console.log(`ID: ${update.outlet_id} | Outlet: ${update.outlet_name} | currentVersion: ${currentVersion} | remoteVersion: ${remoteVersion} | isUpdated: ${isUpdated}`);
   return (
     <div
       className="update-confirm-card bg-dark text-white rounded shadow-sm d-flex flex-column justify-content-between"
