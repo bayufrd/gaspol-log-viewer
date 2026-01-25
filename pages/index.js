@@ -114,6 +114,49 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
     const [outletLogs, setOutletLogs] = React.useState("ALL");
     const [activeTab, setActiveTab] = React.useState('api');
 
+    // Simple custom encrypt/decrypt (XOR + base64)
+    function encryptSession(str) {
+        const key = 'gaspol2026';
+        let result = '';
+        for (let i = 0; i < str.length; i++) {
+            result += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+        }
+        return btoa(result);
+    }
+    function decryptSession(enc) {
+        const key = 'gaspol2026';
+        let str = atob(enc);
+        let result = '';
+        for (let i = 0; i < str.length; i++) {
+            result += String.fromCharCode(str.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+        }
+        return result;
+    }
+
+    // Check session on mount
+    React.useEffect(() => {
+        const session = localStorage.getItem('dt_logs_gaspol_session');
+        if (session) {
+            try {
+                const decrypted = decryptSession(session);
+                const sessionObj = JSON.parse(decrypted);
+                const now = new Date();
+                const sessionDate = new Date(sessionObj.timestamp);
+                const diffMs = now - sessionDate;
+                const diffDays = diffMs / (1000 * 60 * 60 * 24);
+                if (diffDays < 7) {
+                    setIsAuthenticated(true);
+                } else {
+                    localStorage.removeItem('dt_logs_gaspol_session');
+                    setIsAuthenticated(false);
+                }
+            } catch (e) {
+                localStorage.removeItem('dt_logs_gaspol_session');
+                setIsAuthenticated(false);
+            }
+        }
+    }, []);
+
     useEffect(() => {
         const saved = localStorage.getItem("selectedOutlet");
         if (saved) setOutletLogs(saved);
@@ -222,6 +265,13 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
     const handleLogin = (e) => {
         e.preventDefault();
         if (passwordInput === process.env.NEXT_PUBLIC_ACCESS_PASSWORD) {
+            // Save session with encrypted timestamp
+            const sessionObj = {
+                timestamp: new Date().toISOString(),
+                info: 'gaspol-login',
+            };
+            const encrypted = encryptSession(JSON.stringify(sessionObj));
+            localStorage.setItem('dt_logs_gaspol_session', encrypted);
             setIsAuthenticated(true);
         } else {
             alert('Password salah!');
@@ -232,17 +282,110 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
     // Jika belum login, tampilkan form login
     if (!isAuthenticated) {
         return (
-            <div className="container d-flex justify-content-center align-items-center vh-100">
-                <form onSubmit={handleLogin} className="p-4 border rounded bg-dark text-light shadow-lg" style={{minWidth: 350}}>
-                    <h3 className="mb-3 text-center">Auth Logs Dastrevas x GASPOLL</h3>
+            <div style={{
+                minHeight: '100vh',
+                width: '100vw',
+                background: 'linear-gradient(120deg, #101014 0%, #18181c 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}>
+                <form
+                    onSubmit={handleLogin}
+                    style={{
+                        minWidth: 350,
+                        maxWidth: 400,
+                        padding: '2.5rem 2rem',
+                        borderRadius: 18,
+                        background: 'rgba(30, 30, 35, 0.55)',
+                        boxShadow: '0 8px 32px 0 rgba(0,0,0,0.37)',
+                        backdropFilter: 'blur(12px)',
+                        WebkitBackdropFilter: 'blur(12px)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        color: '#fff',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 18,
+                        alignItems: 'center',
+                    }}
+                >
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        marginBottom: 10,
+                    }}>
+                        <div style={{
+                            width: 64,
+                            height: 64,
+                            borderRadius: 18,
+                            background: 'rgba(255,255,255,0.10)',
+                            border: '2px solid rgba(255,255,255,0.45)',
+                            boxShadow: '0 2px 12px #0006',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginBottom: 10,
+                            backdropFilter: 'blur(6px)',
+                            WebkitBackdropFilter: 'blur(6px)',
+                        }}>
+                            <img
+                                src="/favicon.ico"
+                                alt="Logo"
+                                style={{ width: 38, height: 38, borderRadius: 10, filter: 'drop-shadow(0 2px 8px #0008)' }}
+                            />
+                        </div>
+                        <h3 style={{
+                            marginBottom: 0,
+                            textAlign: 'center',
+                            fontWeight: 700,
+                            letterSpacing: 1,
+                            fontSize: 22,
+                            color: '#fff',
+                            textShadow: '0 2px 8px #0008',
+                        }}>
+                            Auth Logs Dastrevas x GASPOLL
+                        </h3>
+                    </div>
                     <input
                         type="password"
-                        className="form-control mb-3"
+                        className="form-control mb-2"
                         placeholder="Masukkan password Access"
                         value={passwordInput}
                         onChange={(e) => setPasswordInput(e.target.value)}
+                        style={{
+                            background: 'rgba(20,20,25,0.7)',
+                            color: '#fff',
+                            border: '1px solid #333',
+                            borderRadius: 8,
+                            padding: '0.75rem 1rem',
+                            fontSize: 16,
+                            textAlign: 'center',
+                        }}
+                        // Inline placeholder color for React
+                        onFocus={e => e.target.style.setProperty('color', '#fff', 'important')}
                     />
-                    <button className="btn btn-primary w-100" type="submit">Login</button>
+                    <style>{`
+                        input::placeholder {
+                            color: #fff !important;
+                            opacity: 1;
+                        }
+                    `}</style>
+                    <button
+                        className="btn btn-primary w-100"
+                        type="submit"
+                        style={{
+                            background: 'rgba(0,0,0,0.7)',
+                            border: 'none',
+                            borderRadius: 8,
+                            fontWeight: 600,
+                            fontSize: 16,
+                            letterSpacing: 1,
+                            boxShadow: '0 2px 8px #0006',
+                        }}
+                    >
+                        Login
+                    </button>
                 </form>
             </div>
         );
