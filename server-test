@@ -1,0 +1,1031 @@
+ sda: sda1 sda14 sda15
+Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (ESM 2018): 365188c1d374d6b07c3c8f240f8ef722433d6a8b'
+Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (2019): c0746fd6c5da3ae827864651ad66ae47fe24b3e8'
+Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (2021 v1): a8d54bbb3825cfb94fa13c9f8a594a195c107b8d'
+Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (2021 v2): 4cf046892d6fd3c9a5b03f98d845f90851dc6a8c'
+Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (2021 v3): 100437bb6de6e469b581e61cd66bce3ef4ed53af'
+Loaded X.509 cert 'Canonical Ltd. Secure Boot Signing (Ubuntu Core 2019): c1d57b8f6b743f23ee41f4f7ee292f06eecadfb9'
+Key type ._fscrypt registered
+Key type .fscrypt registered
+AppArmor: AppArmor sha1 policy hashing enabled
+sd 0:0:0:0: [sda] Attached SCSI disk
+clk: Disabling unused clocks
+ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+scsi 2:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
+sr 2:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+cdrom: Uniform CD-ROM driver Revision: 3.20
+EXT4-fs (sda1): mounted filesystem with ordered data mode. Opts: (null)
+VFS: Mounted root (ext4 filesystem) readonly on device 8:1.
+devtmpfs: mounted
+Freeing unused kernel image memory: 1140K
+Write protecting the kernel read-only data: 18432k
+Freeing unused kernel image memory: 2032K
+Freeing unused kernel image memory: 1344K
+x86/mm: Checked W+X mappings: passed, no W+X pages found.
+Run /sbin/init as init process
+systemd[1]: systemd 245.4-4ubuntu3.22 running in system mode. (+PAM +AUDIT +SELINUX +IMA +APPARMOR +SMACK +SYSVINIT +UTMP +LIBCRYPTSETUP +GCRYPT +GNUTLS +ACL +XZ +LZ4 +SECCOMP +BLKID )
+systemd[1]: Detected virtualization kvm.
+systemd[1]: Detected architecture x86-64.
+
+Welcome to Ubuntu 20.04.6 LTS!
+
+systemd[1]: Set hostname to <srv427189>.
+systemd[1]: Configuration file /run/systemd/system/netplan-ovs-cleanup.service is marked world-inaccessible. This has no effect as configuration data is accessible via APIs without re.
+systemd[1]: Created slice system-modprobe.slice.
+[  OK  ] Created slice system-modprobe.slice.
+systemd[1]: Created slice system-serial\x2dgetty.slice.
+[  OK  ] Created slice system-serial\x2dgetty.slice.
+systemd[1]: Created slice User and Session Slice.
+[  OK  ] Created slice User and Session Slice.
+systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+[  OK  ] Started Forward Password R…uests to Wall Directory Watch.
+systemd[1]: Condition check resulted in Arbitrary Executable File Formats File System Automount Point being skipped.
+systemd[1]: Reached target User and Group Name Lookups.
+[  OK  ] Reached target User and Group Name Lookups.
+systemd[1]: Reached target Slices.
+[  OK  ] Reached target Slices.
+systemd[1]: Reached target Mounting snaps.
+[  OK  ] Reached target Mounting snaps.
+systemd[1]: Reached target Swap.
+[  OK  ] Reached target Swap.
+systemd[1]: Listening on Device-mapper event daemon FIFOs.
+[  OK  ] Listening on Device-mapper event daemon FIFOs.
+systemd[1]: Listening on LVM2 poll daemon socket.
+[  OK  ] Listening on LVM2 poll daemon socket.
+systemd[1]: Listening on multipathd control socket.
+[  OK  ] Listening on multipathd control socket.
+systemd[1]: Listening on Syslog Socket.
+[  OK  ] Listening on Syslog Socket.
+systemd[1]: Listening on fsck to fsckd communication Socket.
+[  OK  ] Listening on fsck to fsckd communication Socket.
+systemd[1]: Listening on initctl Compatibility Named Pipe.
+[  OK  ] Listening on initctl Compatibility Named Pipe.
+systemd[1]: Listening on Journal Audit Socket.
+[  OK  ] Listening on Journal Audit Socket.
+systemd[1]: Listening on Journal Socket (/dev/log).
+[  OK  ] Listening on Journal Socket (/dev/log).
+systemd[1]: Listening on Journal Socket.
+[  OK  ] Listening on Journal Socket.
+systemd[1]: Listening on Network Service Netlink Socket.
+[  OK  ] Listening on Network Service Netlink Socket.
+systemd[1]: Listening on udev Control Socket.
+[  OK  ] Listening on udev Control Socket.
+systemd[1]: Listening on udev Kernel Socket.
+[  OK  ] Listening on udev Kernel Socket.
+systemd[1]: Mounting Huge Pages File System...
+         Mounting Huge Pages File System...
+systemd[1]: Mounting POSIX Message Queue File System...
+         Mounting POSIX Message Queue File System...
+systemd[1]: Mounting Kernel Debug File System...
+         Mounting Kernel Debug File System...
+systemd[1]: Mounting Kernel Trace File System...
+         Mounting Kernel Trace File System...
+systemd[1]: Starting Journal Service...
+         Starting Journal Service...
+systemd[1]: Starting Set the console keyboard layout...
+         Starting Set the console keyboard layout...
+systemd[1]: Starting Create list of static device nodes for the current kernel...
+         Starting Create list of stodes for the current kernel...
+systemd[1]: Starting Monitoring of LVM2 mirrors, snapshots etc. using dmeventd or progress polling...
+         Starting Monitoring of LVM…meventd or progress polling...
+systemd[1]: Starting Load Kernel Module chromeos_pstore...
+         Starting Load Kernel Module chromeos_pstore...
+systemd[1]: Starting Load Kernel Module drm...
+         Starting Load Kernel Module drm...
+systemd[1]: Starting Load Kernel Module efi_pstore...
+         Starting Load Kernel Module efi_pstore...
+systemd[1]: Starting Load Kernel Module pstore_blk...
+         Starting Load Kernel Module pstore_blk...
+systemd[1]: Starting Load Kernel Module pstore_zone...
+         Starting Load Kernel Module pstore_zone...
+systemd[1]: Starting Load Kernel Module ramoops...
+         Starting Load Kernel Module ramoops...
+systemd[1]: Condition check resulted in OpenVSwitch configuration for cleanup being skipped.
+systemd[1]: Condition check resulted in Set Up Additional Binary Formats being skipped.
+systemd[1]: Starting File System Check on Root Device...
+         Starting File System Check on Root Device...
+systemd[1]: Starting Load Kernel Modules...
+         Starting Load Kernel Modules...
+systemd[1]: Starting udev Coldplug all Devices...
+         Starting udev Coldplug all Devices...
+systemd[1]: Starting Uncomplicated firewall...
+         Starting Uncomplicated firewall...
+systemd[1]: Mounted Huge Pages File System.
+[  OK  ] Mounted Huge Pages File System.
+systemd[1]: Mounted POSIX Message Queue File System.
+[  OK  ] Mounted POSIX Message Queue File System.
+systemd[1]: Mounted Kernel Debug File System.
+[  OK  ] Mounted Kernel Debug File System.
+systemd[1]: Mounted Kernel Trace File System.
+[  OK  ] Mounted Kernel Trace File System.
+systemd[1]: Finished Set the console keyboard layout.
+[  OK  ] Finished Set the console keyboard layout.
+systemd[1]: Finished Create list of static device nodes for the current kernel.
+[  OK  ] Finished Create list of st nodes for the current kernel.
+systemd[1]: modprobe@chromeos_pstore.service: Succeeded.
+systemd[1]: Finished Load Kernel Module chromeos_pstore.
+[  OK  ] Finished Load Kernel Module chromeos_pstore.
+systemd[1]: modprobe@drm.service: Succeeded.
+systemd[1]: Finished Load Kernel Module drm.
+[  OK  ] Finished Load Kernel Module drm.
+systemd[1]: modprobe@efi_pstore.service: Succeeded.
+systemd[1]: Finished Load Kernel Module efi_pstore.
+[  OK  ] Finished Load Kernel Module efi_pstore.
+systemd[1]: Started Journal Service.
+[  OK  ] Started Journal Service.
+[  OK  ] Finished Load Kernel Module pstore_blk.
+[  OK  ] Finished Load Kernel Module pstore_zone.
+[  OK  ] Finished Load Kernel Module ramoops.
+[  OK  ] Finished File System Check on Root Device.
+[  OK  ] Finished Load Kernel Modules.
+[  OK  ] Finished Uncomplicated firewall.
+[  OK  ] Started File System Check Daemon to report status.
+         Starting Remount Root and Kernel File Systems...
+         Starting Apply Kernel Variables...
+[  OK  ] Finished Apply Kernel Variables.
+[  OK  ] Finished udev Coldplug all Devices.
+         Starting udev Wait for Complete Device Initialization...
+[  OK  ] Finished Remount Root and Kernel File Systems.
+         Starting Flush Journal to Persistent Storage...
+         Starting Load/Save Random Seed...
+         Starting Create System Users...
+[  OK  ] Finished Load/Save Random Seed.
+[  OK  ] Finished Create System Users.
+         Starting Create Static Device Nodes in /dev...
+[  OK  ] Finished Create Static Device Nodes in /dev.
+         Starting udev Kernel Device Manager...
+[  OK  ] Finished Flush Journal to Persistent Storage.
+[  OK  ] Started udev Kernel Device Manager.
+[  OK  ] Started Dispatch Password …ts to Console Directory Watch.
+[  OK  ] Reached target Local Encrypted Volumes.
+         Starting Load Kernel Module chromeos_pstore...
+         Starting Load Kernel Module efi_pstore...
+         Starting Load Kernel Module pstore_blk...
+         Starting Load Kernel Module pstore_zone...
+         Starting Load Kernel Module ramoops...
+[  OK  ] Finished Load Kernel Module chromeos_pstore.
+[  OK  ] Finished Load Kernel Module efi_pstore.
+[  OK  ] Finished Load Kernel Module pstore_blk.
+[  OK  ] Finished Load Kernel Module pstore_zone.
+[  OK  ] Finished Load Kernel Module ramoops.
+[  OK  ] Found device /dev/ttyS0.
+[  OK  ] Finished udev Wait for Complete Device Initialization.
+         Starting Device-Mapper Multipath Device Controller...
+[  OK  ] Finished Monitoring of LVM… dmeventd or progress polling.
+[  OK  ] Started Device-Mapper Multipath Device Controller.
+[  OK  ] Reached target Local File Systems (Pre).
+         Mounting Mount unit for core20, revision 2686...
+         Mounting Mount unit for core20, revision 2717...
+         Mounting Mount unit for lxd, revision 32662...
+         Mounting Mount unit for lxd, revision 36554...
+         Mounting Mount unit for snapd, revision 25577...
+         Mounting Mount unit for snapd, revision 25935...
+[  OK  ] Mounted Mount unit for lxd, revision 36554.
+[  OK  ] Mounted Mount unit for lxd, revision 32662.
+[  OK  ] Mounted Mount unit for core20, revision 2686.
+[  OK  ] Mounted Mount unit for core20, revision 2717.
+[  OK  ] Mounted Mount unit for snapd, revision 25577.
+[  OK  ] Mounted Mount unit for snapd, revision 25935.
+[  OK  ] Reached target Mounted snaps.
+[  OK  ] Reached target Local File Systems.
+         Starting Load AppArmor profiles...
+         Starting Set console font and keymap...
+         Starting Create final runt…dir for shutdown pivot root...
+         Starting Tell Plymouth To Write Out Runtime Data...
+         Starting Create Volatile Files and Directories...
+[  OK  ] Finished Set console font and keymap.
+[  OK  ] Finished Create final runt…e dir for shutdown pivot root.
+[  OK  ] Finished Tell Plymouth To Write Out Runtime Data.
+[  OK  ] Finished Create Volatile Files and Directories.
+         Starting Network Time Synchronization...
+         Starting Update UTMP about System Boot/Shutdown...
+[  OK  ] Finished Update UTMP about System Boot/Shutdown.
+[  OK  ] Finished Load AppArmor profiles.
+         Starting Load AppArmor pro…managed internally by snapd...
+         Starting Initial cloud-init job (pre-networking)...
+[  OK  ] Started Network Time Synchronization.
+[  OK  ] Reached target System Time Set.
+[  OK  ] Reached target System Time Synchronized.
+[  OK  ] Finished Load AppArmor pros managed internally by snapd.
+cloud-init[330]: Cloud-init v. 23.3.1-0ubuntu1~20.04.1 running 'init-local' at Wed, 25 Feb 2026 19:29:52 +0000. Up 2.97 seconds.
+[  OK  ] Finished Initial cloud-init job (pre-networking).
+[  OK  ] Reached target Network (Pre).
+         Starting Network Service...
+[  OK  ] Started Network Service.
+         Starting Wait for Network to be Configured...
+         Starting Network Name Resolution...
+[  OK  ] Started Network Name Resolution.
+[  OK  ] Reached target Network.
+[  OK  ] Reached target Host and Network Name Lookups.
+[  OK  ] Finished Wait for Network to be Configured.
+         Starting Initial cloud-ini… (metadata service crawler)...
+cloud-init[348]: Cloud-init v. 23.3.1-0ubuntu1~20.04.1 running 'init' at Wed, 25 Feb 2026 19:29:55 +0000. Up 5.29 seconds.
+cloud-init[348]: ci-info: +++++++++++++++++++++++++++++++++++++++Net device info+++++++++++++++++++++++++++++++++++++++
+cloud-init[348]: ci-info: +--------+------+------------------------------+---------------+--------+-------------------+
+cloud-init[348]: ci-info: | Device |  Up  |           Address            |      Mask     | Scope  |     Hw-Address    |
+cloud-init[348]: ci-info: +--------+------+------------------------------+---------------+--------+-------------------+
+cloud-init[348]: ci-info: |  eth0  | True |         62.72.59.78          | 255.255.255.0 | global | ea:69:62:23:fe:9a |
+cloud-init[348]: ci-info: |  eth0  | True |   2a02:4780:12:183a::1/48    |       .       | global | ea:69:62:23:fe:9a |
+cloud-init[348]: ci-info: |  eth0  | True | fe80::e869:62ff:fe23:fe9a/64 |       .       |  link  | ea:69:62:23:fe:9a |
+cloud-init[348]: ci-info: |   lo   | True |          127.0.0.1           |   255.0.0.0   |  host  |         .         |
+cloud-init[348]: ci-info: |   lo   | True |           ::1/128            |       .       |  host  |         .         |
+cloud-init[348]: ci-info: +--------+------+------------------------------+---------------+--------+-------------------+
+cloud-init[348]: ci-info: +++++++++++++++++++++++++++++Route IPv4 info++++++++++++++++++++++++++++++
+cloud-init[348]: ci-info: +-------+-------------+--------------+---------------+-----------+-------+
+cloud-init[348]: ci-info: | Route | Destination |   Gateway    |    Genmask    | Interface | Flags |
+cloud-init[348]: ci-info: +-------+-------------+--------------+---------------+-----------+-------+
+cloud-init[348]: ci-info: |   0   |   0.0.0.0   | 62.72.59.254 |    0.0.0.0    |    eth0   |   UG  |
+cloud-init[348]: ci-info: |   1   |  62.72.59.0 |   0.0.0.0    | 255.255.255.0 |    eth0   |   U   |
+cloud-init[348]: ci-info: +-------+-------------+--------------+---------------+-----------+-------+
+cloud-init[348]: ci-info: ++++++++++++++++++++++++++Route IPv6 info++++++++++++++++++++++++++
+cloud-init[348]: ci-info: +-------+-------------------+-----------------+-----------+-------+
+cloud-init[348]: ci-info: | Route |    Destination    |     Gateway     | Interface | Flags |
+cloud-init[348]: ci-info: +-------+-------------------+-----------------+-----------+-------+
+cloud-init[348]: ci-info: |   1   | 2a02:4780:12::/48 |        ::       |    eth0   |   U   |
+cloud-init[348]: ci-info: |   2   |     fe80::/64     |        ::       |    eth0   |   U   |
+cloud-init[348]: ci-info: |   3   |        ::/0       | 2a02:4780:12::1 |    eth0   |   UG  |
+cloud-init[348]: ci-info: |   5   |       local       |        ::       |    eth0   |   U   |
+cloud-init[348]: ci-info: |   6   |       local       |        ::       |    eth0   |   U   |
+cloud-init[348]: ci-info: |   7   |     multicast     |        ::       |    eth0   |   U   |
+cloud-init[348]: ci-info: +-------+-------------------+-----------------+-----------+-------+
+[  OK  ] Finished Initial cloud-iniob (metadata service crawler).
+[  OK  ] Reached target Cloud-config availability.
+[  OK  ] Reached target Network is Online.
+[  OK  ] Reached target System Initialization.
+[  OK  ] Started Daily apt download activities.
+[  OK  ] Started Daily apt upgrade and clean activities.
+[  OK  ] Started Run certbot twice daily.
+[  OK  ] Started Periodic ext4 Onli…ata Check for All Filesystems.
+[  OK  ] Started Discard unused blocks once a week.
+[  OK  ] Started Refresh fwupd metadata regularly.
+[  OK  ] Started Daily rotation of log files.
+[  OK  ] Started Daily man-db regeneration.
+[  OK  ] Started Message of the Day.
+[  OK  ] Started Clean PHP session files every 30 mins.
+[  OK  ] Started Daily Cleanup of Temporary Directories.
+[  OK  ] Reached target Paths.
+[  OK  ] Reached target Timers.
+[  OK  ] Listening on cloud-init hotplug hook socket.
+[  OK  ] Listening on D-Bus System Message Bus Socket.
+[  OK  ] Listening on Open-iSCSI iscsid Socket.
+[  OK  ] Listening on Socket unix for snap application lxd.daemon.
+         Starting Socket activation for snappy daemon.
+[  OK  ] Listening on UUID daemon activation socket.
+[  OK  ] Reached target Remote File Systems (Pre).
+[  OK  ] Reached target Remote File Systems.
+         Starting Availability of block devices...
+[  OK  ] Listening on Socket activation for snappy daemon.
+[  OK  ] Finished Availability of block devices.
+[  OK  ] Reached target Sockets.
+[  OK  ] Reached target Basic System.
+         Starting Accounts Service...
+         Starting LSB: automatic crash report generation...
+         Starting Deferred execution scheduler...
+[  OK  ] Started Regular background program processing daemon.
+[  OK  ] Started D-Bus System Message Bus.
+[  OK  ] Started Save initial kernel messages after boot.
+         Starting Remove Stale Onli…t4 Metadata Check Snapshots...
+         Starting Record successful boot for GRUB...
+[  OK  ] Started irqbalance daemon.
+         Starting MySQL Community Server...
+         Starting Dispatcher daemon for systemd-networkd...
+         Starting A high performanc… and a reverse proxy server...
+         Starting The PHP 7.4 FastCGI Process Manager...
+         Starting PM2 process manager...
+         Starting PM2 process manager...
+         Starting Authorization Manager...
+[  OK  ] Started QEMU Guest Agent.
+         Starting System Logging Service...
+         Starting Service for snap application lxd.activate...
+[  OK  ] Reached target Login Prompts (Pre).
+         Starting Wait until snapd is fully seeded...
+         Starting Snap Daemon...
+         Starting OpenBSD Secure Shell server...
+         Starting Login Service...
+         Starting Disk Manager...
+[  OK  ] Started Deferred execution scheduler.
+[  OK  ] Finished Record successful boot for GRUB.
+         Starting GRUB failed boot detection...
+[  OK  ] Started System Logging Service.
+[  OK  ] Finished Remove Stale Onli…ext4 Metadata Check Snapshots.
+[  OK  ] Finished GRUB failed boot detection.
+[  OK  ] Started Authorization Manager.
+         Starting Modem Manager...
+[  OK  ] Started LSB: automatic crash report generation.
+[  OK  ] Started OpenBSD Secure Shell server.
+[  OK  ] Started Accounts Service.
+[  OK  ] Started Modem Manager.
+[  OK  ] Started A high performanceer and a reverse proxy server.
+[  OK  ] Started Login Service.
+[  OK  ] Started Unattended Upgrades Shutdown.
+[  OK  ] Started Disk Manager.
+[  OK  ] Started The PHP 7.4 FastCGI Process Manager.
+[  OK  ] Started Dispatcher daemon for systemd-networkd.
+[  OK  ] Started Snap Daemon.
+         Starting Time & Date Service...
+[  OK  ] Started Time & Date Service.
+[  OK  ] Finished Wait until snapd is fully seeded.
+         Starting Apply the settings specified in cloud-config...
+[  OK  ] Finished Service for snap application lxd.activate.
+[  OK  ] Started MySQL Community Server.
+cloud-init[740]: Cloud-init v. 23.3.1-0ubuntu1~20.04.1 running 'modules:config' at Wed, 25 Feb 2026 19:30:01 +0000. Up 11.28 seconds.
+
+Ubuntu 20.04.6 LTS srv427189 ttyS0
+
+srv427189 login: cloud-init[766]: Cloud-init v. 23.3.1-0ubuntu1~20.04.1 running 'modules:final' at Wed, 25 Feb 2026 19:30:02 +0000. Up 12.53 seconds.
+cloud-init[766]: Cloud-init v. 23.3.1-0ubuntu1~20.04.1 finished at Wed, 25 Feb 2026 19:30:02 +0000. Datasource DataSourceNoCloud [seed=/dev/sr0][dsmode=net].  Up 12.76 seconds
+clear
+
+  CPU[#####################****82.1%]   Tasks: 48, 180 thr; 1 running
+  Mem[||||||#*****        694M/3.85G]   Load average: 1.16 0.81 0.36 
+  Swp[                         0K/0K]   Uptime: 00:04:14
+
+    PID USER      PRI  NI  VIRT   RES   SHR S CPU% MEM%   TIME+  Command        
+   9767 root       20   0  627M 65280 38020 R 14.1  1.6  0:00.22 npm            
+    529 root       20   0  895M  143M 37720 S  3.2  3.6  0:10.22 PM2 v6.0.8: God
+   2488 root       20   0  8108  3828  3156 R  1.9  0.1  0:03.42 htop
+    492 mysql      20   0 1470M  208M 38208 S  0.6  5.3  0:01.68 /usr/sbin/mysql
+    544 mysql      20   0 1470M  208M 38208 S  0.6  5.3  0:00.64 /usr/sbin/mysql
+   9770 root       20   0  627M 65280 38020 S  0.6  1.6  0:00.01 npm
+    666 root       20   0  707M 70272 40512 S  0.0  1.7  0:00.79 npm exec serve 
+    531 root       20   0  895M  143M 37720 S  0.0  3.6  0:00.31 PM2 v6.0.8: God
+root@srv427189:~# pm2 list
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ gaspol-api         │ fork     │ 0    │ online    │ 0%       │ 67.9mb   │
+│ 1  │ gaspol-cms         │ fork     │ 0    │ online    │ 0%       │ 67.2mb   │
+│ 2  │ gaspol-log         │ fork     │ 423  │ stopping  │ 0%       │ 0b       │
+│ 4  │ jempolan-be        │ fork     │ 0    │ online    │ 0%       │ 51.3mb   │
+│ 3  │ jempolan-fe        │ fork     │ 0    │ online    │ 0%       │ 68.4mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+root@srv427189:~# pm2 restart gaspol-log
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [gaspol-log](ids: [ 2 ])
+[PM2] [gaspol-log](2) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ gaspol-api         │ fork     │ 0    │ online    │ 0%       │ 67.9mb   │
+│ 1  │ gaspol-cms         │ fork     │ 0    │ online    │ 0%       │ 67.2mb   │
+│ 2  │ gaspol-log         │ fork     │ 441  │ online    │ 0%       │ 4.0kb    │
+│ 4  │ jempolan-be        │ fork     │ 0    │ online    │ 0%       │ 51.3mb   │
+│ 3  │ jempolan-fe        │ fork     │ 0    │ online    │ 0%       │ 68.4mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+root@srv427189:~# pm2 logs gaspol-log
+[TAILING] Tailing last 15 lines for [gaspol-log] process (change the value with --lines option)
+/root/.pm2/logs/gaspol-log-error.log last 15 lines:
+2|gaspol-l |  ⚠ Invalid next.config.mjs options detected: 
+2|gaspol-l |  ⚠     Unrecognized key(s) in object: 'theme'
+2|gaspol-l |  ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+2|gaspol-l |  ⚠ Invalid next.config.mjs options detected: 
+2|gaspol-l |  ⚠     Unrecognized key(s) in object: 'theme'
+2|gaspol-l |  ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+2|gaspol-l |  ⚠ Invalid next.config.mjs options detected: 
+2|gaspol-l |  ⚠     Unrecognized key(s) in object: 'theme'
+2|gaspol-l |  ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+2|gaspol-l |  ⚠ Invalid next.config.mjs options detected: 
+2|gaspol-l |  ⚠     Unrecognized key(s) in object: 'theme'
+2|gaspol-l |  ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+2|gaspol-l |  ⚠ Invalid next.config.mjs options detected: 
+2|gaspol-l |  ⚠     Unrecognized key(s) in object: 'theme'
+2|gaspol-l |  ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+
+/root/.pm2/logs/gaspol-log-out.log last 15 lines:
+2|gaspol-l | > gaspol-log-viewer@0.1.0 start
+2|gaspol-l | > cross-env PORT=3030 next start
+2|gaspol-l | 
+2|gaspol-l | 
+2|gaspol-l | > gaspol-log-viewer@0.1.0 start
+2|gaspol-l | > cross-env PORT=3030 next start
+2|gaspol-l | 
+2|gaspol-l | 
+2|gaspol-l | > gaspol-log-viewer@0.1.0 start
+2|gaspol-l | > cross-env PORT=3030 next start
+2|gaspol-l | 
+2|gaspol-l | 
+2|gaspol-l | > gaspol-log-viewer@0.1.0 start
+2|gaspol-l | > cross-env PORT=3030 next start
+2|gaspol-l | 
+
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+^C
+root@srv427189:~# cat /etc/nginx/sites-available
+cat: /etc/nginx/sites-available: Is a directory
+root@srv427189:~# cat etc/nginx/sites-available
+cat: etc/nginx/sites-available: No such file or directory
+root@srv427189:~# cd /etc/nginx/sites-available
+root@srv427189:/etc/nginx/sites-available# ls
+default     gaspol-cms  gaspol-services  jempolan-lp  wa-bot.bak
+gaspol-api  gaspol-log  jempolan-be      wa-bot
+root@srv427189:/etc/nginx/sites-available# cat gaspol-log
+server {
+    listen 80;
+    server_name logs.gaspollmanagementcenter.com www.logs.gaspollmanagementcenter.com;
+
+    # Atur pengalihan HTTP ke HTTPS
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name logs.gaspollmanagementcenter.com www.logs.gaspollmanagementcenter.com;
+
+    ssl_certificate /etc/letsencrypt/live/cms.gaspollmanagementcenter.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/cms.gaspollmanagementcenter.com/privkey.pem; # managed by Certbot
+
+    location / {
+        proxy_pass http://localhost:3030;  # Pastikan aplikasi Node.js berjalan di port ini
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location /logs {
+        alias /root/gaspol-log-viewer/logs-gaspol-api/logs;  # Pastikan path ini benar
+        autoindex on;  # Tampilkan daftar file jika perlu, opsional
+    }
+
+        location /pm2logs {
+        alias /root/gaspol-log-viewer/logs-gaspol-api/pm2logs;  # Pastikan path ini benar
+        autoindex on;  # Tampilkan daftar file jika perlu, opsional
+    }
+
+}
+root@srv427189:/etc/nginx/sites-available# cd ..
+root@srv427189:/etc/nginx# cd
+root@srv427189:~# ls
+gaspol-log-viewer  gaspol-repo  jempolan-lp  script-cronjob  snap  update
+root@srv427189:~# cd gaspol-log-viewer
+root@srv427189:~/gaspol-log-viewer# ls
+README.md      logs-gaspol-api  package-lock.json  postcss.config.mjs
+components     next.config.mjs  package.json       public
+jsconfig.json  node_modules     pages              src
+art gaspol-log; pm2 logs gaspol-log
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'next@14.0.0',
+npm WARN EBADENGINE   required: { node: '>=18.17.0' },
+npm WARN EBADENGINE   current: { node: 'v18.15.0', npm: '9.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@tailwindcss/oxide@4.2.1',
+npm WARN EBADENGINE   required: { node: '>= 20' },
+npm WARN EBADENGINE   current: { node: 'v18.15.0', npm: '9.5.0' }
+npm WARN EBADENGINE }
+npm WARN deprecated next@14.0.0: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.
+
+added 58 packages, and audited 59 packages in 28s
+
+12 packages are looking for funding
+  run `npm fund` for details
+
+1 critical severity vulnerability
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@tailwindcss/oxide@4.2.1',
+npm WARN EBADENGINE   required: { node: '>= 20' },
+npm WARN EBADENGINE   current: { node: 'v18.15.0', npm: '9.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'next@14.0.0',
+npm WARN EBADENGINE   required: { node: '>=18.17.0' },
+npm WARN EBADENGINE   current: { node: 'v18.15.0', npm: '9.5.0' }
+npm WARN EBADENGINE }
+npm WARN deprecated next@14.0.0: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.
+
+added 58 packages, and audited 59 packages in 14s
+
+12 packages are looking for funding
+  run `npm fund` for details
+
+1 critical severity vulnerability
+
+To address all issues, run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> gaspol-log-viewer@0.1.0 build
+> next build
+
+ ⚠ Invalid next.config.mjs options detected: 
+ ⚠     Unrecognized key(s) in object: 'theme'
+ ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+   ▲ Next.js 14.0.0
+   - Environments: .env
+
+ ✓ Creating an optimized production build    
+ ✓ Compiled successfully
+ ✓ Linting and checking validity of types    
+ ✓ Collecting page data    
+ ✓ Generating static pages (4/4) 
+ ✓ Collecting build traces    
+ ✓ Finalizing page optimization    
+
+Route (pages)                              Size     First Load JS
+┌ ● / (ISR: 10 Seconds)                    78.4 kB         166 kB
+├   /_app                                  0 B            87.6 kB
+├ ○ /404                                   182 B          87.8 kB
+├ λ /api/logs                              0 B            87.6 kB
+├ λ /api/test                              0 B            87.6 kB
+├ λ /api/version-proxy                     0 B            87.6 kB
+└ ○ /apiDocs                               431 B          88.1 kB
++ First Load JS shared by all              132 kB
+  ├ chunks/framework-6960281599d39117.js   45.5 kB
+  ├ chunks/main-3696393455be0cc9.js        40.1 kB
+  ├ chunks/pages/_app-a90126a964c48585.js  416 B
+  ├ chunks/webpack-f5d134ce35118a12.js     1.61 kB
+  └ css/5d504e63a2ca2b15.css               44.3 kB
+
+○  (Static)   prerendered as static HTML
+●  (SSG)      prerendered as static HTML (uses getStaticProps)
+   (ISR)      incremental static regeneration (uses revalidate in getStaticProps)
+λ  (Dynamic)  server-rendered on demand using Node.js
+
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [gaspol-log](ids: [ 2 ])
+[PM2] [gaspol-log](2) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ gaspol-api         │ fork     │ 0    │ online    │ 0%       │ 68.5mb   │
+│ 1  │ gaspol-cms         │ fork     │ 0    │ online    │ 0%       │ 68.1mb   │
+│ 2  │ gaspol-log         │ fork     │ 860  │ online    │ 0%       │ 4.0kb    │
+│ 4  │ jempolan-be        │ fork     │ 0    │ online    │ 0%       │ 51.3mb   │
+│ 3  │ jempolan-fe        │ fork     │ 0    │ online    │ 0%       │ 68.8mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+[TAILING] Tailing last 15 lines for [gaspol-log] process (change the value with --lines option)
+/root/.pm2/logs/gaspol-log-error.log last 15 lines:
+2|gaspol-l |     at Server.setupListenHandle [as _listen2] (node:net:1740:16)
+2|gaspol-l |     at listenInCluster (node:net:1788:12)
+2|gaspol-l |     at Server.listen (node:net:1876:7)
+2|gaspol-l |     at /root/gaspol-log-viewer/node_modules/next/dist/server/lib/start-server.js:268:16
+2|gaspol-l |     at new Promise (<anonymous>)
+2|gaspol-l |     at startServer (/root/gaspol-log-viewer/node_modules/next/dist/server/lib/start-server.js:181:11)
+2|gaspol-l |     at nextStart (/root/gaspol-log-viewer/node_modules/next/dist/cli/next-start.js:50:40)
+2|gaspol-l |     at /root/gaspol-log-viewer/node_modules/next/dist/bin/next:150:54
+2|gaspol-l |     at async main (/root/gaspol-log-viewer/node_modules/next/dist/bin/next:150:5) {
+2|gaspol-l |   code: 'EADDRINUSE',
+2|gaspol-l |   errno: -98,
+2|gaspol-l |   syscall: 'listen',
+2|gaspol-l |   address: '::',
+2|gaspol-l |   port: 3030
+2|gaspol-l | }
+
+/root/.pm2/logs/gaspol-log-out.log last 15 lines:
+2|gaspol-l | > gaspol-log-viewer@0.1.0 start
+2|gaspol-l | > cross-env PORT=3030 next start
+2|gaspol-l | 
+2|gaspol-l | 
+2|gaspol-l | > gaspol-log-viewer@0.1.0 start
+2|gaspol-l | > cross-env PORT=3030 next start
+2|gaspol-l | 
+2|gaspol-l | 
+2|gaspol-l | > gaspol-log-viewer@0.1.0 start
+2|gaspol-l | > cross-env PORT=3030 next start
+2|gaspol-l | 
+2|gaspol-l | 
+2|gaspol-l | > gaspol-log-viewer@0.1.0 start
+2|gaspol-l | > cross-env PORT=3030 next start
+2|gaspol-l | 
+
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  |  ⨯ Failed to start server
+2|gaspol-log  | Error: listen EADDRINUSE: address already in use :::3030
+2|gaspol-log  |     at Server.setupListenHandle [as _listen2] (node:net:1740:16)
+2|gaspol-log  |     at listenInCluster (node:net:1788:12)
+2|gaspol-log  |     at Server.listen (node:net:1876:7)
+2|gaspol-log  |     at /root/gaspol-log-viewer/node_modules/next/dist/server/lib/start-server.js:268:16
+2|gaspol-log  |     at new Promise (<anonymous>)
+2|gaspol-log  |     at startServer (/root/gaspol-log-viewer/node_modules/next/dist/server/lib/start-server.js:181:11)
+2|gaspol-log  |     at nextStart (/root/gaspol-log-viewer/node_modules/next/dist/cli/next-start.js:50:40)
+2|gaspol-log  |     at /root/gaspol-log-viewer/node_modules/next/dist/bin/next:150:54
+2|gaspol-log  |     at async main (/root/gaspol-log-viewer/node_modules/next/dist/bin/next:150:5) {
+2|gaspol-log  |   code: 'EADDRINUSE',
+2|gaspol-log  |   errno: -98,
+2|gaspol-log  |   syscall: 'listen',
+2|gaspol-log  |   address: '::',
+2|gaspol-log  |   port: 3030
+2|gaspol-log  | }
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+2|gaspol-log  | > gaspol-log-viewer@0.1.0 start
+2|gaspol-log  | > cross-env PORT=3030 next start
+^C
+root@srv427189:~/gaspol-log-viewer# pm2 stop gaspol-log
+[PM2] Applying action stopProcessId on app [gaspol-log](ids: [ 2 ])
+[PM2] [gaspol-log](2) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ gaspol-api         │ fork     │ 0    │ online    │ 0%       │ 68.1mb   │
+│ 1  │ gaspol-cms         │ fork     │ 0    │ online    │ 0%       │ 67.9mb   │
+│ 2  │ gaspol-log         │ fork     │ 890  │ stopped   │ 0%       │ 0b       │
+│ 4  │ jempolan-be        │ fork     │ 0    │ online    │ 0%       │ 51.3mb   │
+│ 3  │ jempolan-fe        │ fork     │ 0    │ online    │ 0%       │ 68.4mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+root@srv427189:~/gaspol-log-viewer# ls
+README.md      logs-gaspol-api  package-lock.json  postcss.config.mjs
+components     next.config.mjs  package.json       public
+jsconfig.json  node_modules     pages              src
+root@srv427189:~/gaspol-log-viewer# sudo ss -tulwnp
+Netid   State    Recv-Q   Send-Q     Local Address:Port      Peer Address:Port  Process                                                                         
+raw     UNCONN   0        0                      *:58                   *:*      users:(("systemd-network",pid=340,fd=17))                                      
+udp     UNCONN   0        0             127.0.0.53:53             0.0.0.0:*      users:(("systemd-resolve",pid=342,fd=12))                                      
+tcp     LISTEN   0        50               0.0.0.0:3306           0.0.0.0:*      users:(("mysqld",pid=492,fd=33))                                               
+tcp     LISTEN   0        511              0.0.0.0:80             0.0.0.0:*      users:(("nginx",pid=478,fd=6),("nginx",pid=476,fd=6))                          
+tcp     LISTEN   0        4096       127.0.0.53%lo:53             0.0.0.0:*      users:(("systemd-resolve",pid=342,fd=13))                                      
+tcp     LISTEN   0        128              0.0.0.0:22             0.0.0.0:*      users:(("sshd",pid=448,fd=3))                                                  
+tcp     LISTEN   0        511              0.0.0.0:443            0.0.0.0:*      users:(("nginx",pid=478,fd=8),("nginx",pid=476,fd=8))                          
+tcp     LISTEN   0        70             127.0.0.1:33060          0.0.0.0:*      users:(("mysqld",pid=492,fd=21))                                               
+tcp     LISTEN   0        511                    *:5000                 *:*      users:(("node",pid=681,fd=20))                                                 
+tcp     LISTEN   0        511                    *:8080                 *:*      users:(("node",pid=777,fd=18))                                                 
+tcp     LISTEN   0        511                 [::]:80                [::]:*      users:(("nginx",pid=478,fd=7),("nginx",pid=476,fd=7))                          
+tcp     LISTEN   0        511                    *:1234                 *:*      users:(("node",pid=776,fd=17))                                                 
+tcp     LISTEN   0        511                    *:3030                 *:*      users:(("next-server",pid=2871,fd=18))                                         
+tcp     LISTEN   0        128                 [::]:22                [::]:*      users:(("sshd",pid=448,fd=4))                                                  
+tcp     LISTEN   0        511                    *:3000                 *:*      users:(("node",pid=775,fd=17))                                                 
+root@srv427189:~/gaspol-log-viewer# root@srv427189:~/gaspol-log-viewer# sudo ss -tulwnp
+-bash: root@srv427189:~/gaspol-log-viewer#: No such file or directory
+root@srv427189:~/gaspol-log-viewer# Netid   State    Recv-Q   Send-Q     Local Address:Port      Peer Address:Port  Process                                                             
+            
+                        
+udp     UNCONN   0        0             127.0.0.53:53             0.0.0.0:*      users:(("systemd-resolve",pid=342,fd=12))                                      
+tcp     LISTEN   0        50               0.0.0.0:3306           0.0.0.0:*      users:(("mysqld",pid=492,fd=33))                                               
+tcp     LISTEN   0        511              0.0.0.0:80             0.0.0.0:*      users:(("nginx",pid=478,fd=6),("nginx",pid=476,fd=6))                          
+tcp     LISTEN   0        4096       127.0.0.53%lo:53             0.0.0.0:*      users:(("systemd-resolve",pid=342,fd=13))                                      
+tcp     LISTEN   0        128              0.0.0.0:22             0.0.0.0:*      users:(("sshd",pid=448,fd=3))                                                  
+tcp     LISTEN   0        511              0.0.0.0:443            0.0.0.0:*      users:(("nginx",pid=478,fd=8),("nginx",pid=476,fd=8))                          
+tcp     LISTEN   0        70             127.0.0.1:33060          0.0.0.0:*      users:(("mysqld",pid=492,fd=21))                                               
+tcp     LISTEN   0        511                    *:5000                 *:*      users:(("node",pid=681,fd=20))                                                 
+tcp     LISTEN   0        511                    *:8080                 *:*      users:(("node",pid=777,fd=18))                                                 
+tcp     LISTEN   0        511                 [::]:80                [::]:*      users:(("nginx",pid=478,fd=7),("nginx",pid=476,fd=7))                          
+tcp     LISTEN   0        511                    *:1234                 *:*      users:(("node",pid=776,fd=17))                                                 
+tcp     LISTEN   0        511                    *:3030                 *:*      users:(("next-server",pid=2871,fd=18))                                         
+tcp     LISTEN   0        128                 [::]:22                [::]:*      users:(("sshd",pid=448,fd=4))                                                  
+tcp     LISTEN   0        511                    *:3000                 *:*      users:(("node",pid=775,fd=17))                                                 
+root@srv427189:~/gaspol-log-viewer# 
+Netid: command not found
+root@srv427189:~/gaspol-log-viewer# raw     UNCONN   0        0                      *:58                   *:*      users:(("systemd-network",pid=340,fd=17))                          
+            
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# udp     UNCONN   0        0             127.0.0.53:53             0.0.0.0:*      users:(("systemd-resolve",pid=342,fd=12))                                      
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# tcp     LISTEN   0        50               0.0.0.0:3306           0.0.0.0:*      users:(("mysqld",pid=492,fd=33))                                               
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# tcp     LISTEN   0        511              0.0.0.0:80             0.0.0.0:*      users:(("nginx",pid=478,fd=6),("nginx",pid=476,fd=6))                          
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# tcp     LISTEN   0        4096       127.0.0.53%lo:53             0.0.0.0:*      users:(("systemd-resolve",pid=342,fd=13))                                      
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# tcp     LISTEN   0        128              0.0.0.0:22             0.0.0.0:*      users:(("sshd",pid=448,fd=3))                                                  
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# tcp     LISTEN   0        511              0.0.0.0:443            0.0.0.0:*      users:(("nginx",pid=478,fd=8),("nginx",pid=476,fd=8))                          
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# tcp     LISTEN   0        70             127.0.0.1:33060          0.0.0.0:*      users:(("mysqld",pid=492,fd=21))                                               
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# tcp     LISTEN   0        511                    *:5000                 *:*      users:(("node",pid=681,fd=20))                                                 
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# tcp     LISTEN   0        511                    *:8080                 *:*      users:(("node",pid=777,fd=18))                                                 
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# tcp     LISTEN   0        511                 [::]:80                [::]:*      users:(("nginx",pid=478,fd=7),("nginx",pid=476,fd=7))                          
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# tcp     LISTEN   0        511                    *:1234                 *:*      users:(("node",pid=776,fd=17))                                                 
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# tcp     LISTEN   0        511                    *:3030                 *:*      users:(("next-server",pid=2871,fd=18))                                         
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# tcp     LISTEN   0        128                 [::]:22                [::]:*      users:(("sshd",pid=448,fd=4))                                                  
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# tcp     LISTEN   0        511                    *:3000                 *:*      users:(("node",pid=775,fd=17))                                                 
+-bash: syntax error near unexpected token `('
+root@srv427189:~/gaspol-log-viewer# root@srv427189:~/gaspol-log-viewer# 
+-bash: root@srv427189:~/gaspol-log-viewer#: No such file or directory
+root@srv427189:~/gaspol-log-viewer# pm2 list
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ gaspol-api         │ fork     │ 0    │ online    │ 0%       │ 68.2mb   │
+│ 1  │ gaspol-cms         │ fork     │ 0    │ online    │ 0%       │ 67.8mb   │
+│ 2  │ gaspol-log         │ fork     │ 890  │ stopped   │ 0%       │ 0b       │
+│ 4  │ jempolan-be        │ fork     │ 0    │ online    │ 0%       │ 51.3mb   │
+│ 3  │ jempolan-fe        │ fork    sudo ss -tulwnp
+Netid   State    Recv-Q   Send-Q     Local Address:Port      Peer Address:Port  Process                                                                         
+raw     UNCONN   0        0                      *:58                   *:*      users:(("systemd-network",pid=340,fd=17))                                      udp     UNCONN   0        0             127.0.0.53:53             0.0.0.0:*      users:(("systemd-resolve",pid=342,fd=12))                                      
+tcp     LISTEN   0        50               0.0.0.0:3306           0.0.0.0:*      users:(("mysqld",pid=492,fd=33))                                               
+tcp     LISTEN   0        511              0.0.0.0:80             0.0.0.0:*      users:(("nginx",pid=478,fd=6),("nginx",pid=476,fd=6))                          
+tcp     LISTEN   0        4096       127.0.0.53%lo:53             0.0.0.0:*      users:(("systemd-resolve",pid=342,fd=13))                                      
+tcp     LISTEN   0        128              0.0.0.0:22             0.0.0.0:*      users:(("sshd",pid=448,fd=3))                                                  
+tcp     LISTEN   0        511              0.0.0.0:443            0.0.0.0:*      users:(("nginx",pid=478,fd=8),("nginx",pid=476,fd=8))                          
+tcp     LISTEN   0        70             127.0.0.1:33060          0.0.0.0:*      users:(("mysqld",pid=492,fd=21))                                               
+tcp     LISTEN   0        511                    *:5000                 *:*      users:(("node",pid=681,fd=20))                                                 
+tcp     LISTEN   0        511                    *:8080                 *:*      users:(("node",pid=777,fd=18))                                                 
+tcp     LISTEN   0        511                 [::]:80                [::]:*      users:(("nginx",pid=478,fd=7),("nginx",pid=476,fd=7))                          
+tcp     LISTEN   0        511                    *:1234                 *:*      users:(("node",pid=776,fd=17))                                                 
+tcp     LISTEN   0        511                    *:3030                 *:*      users:(("next-server",pid=2871,fd=18))                                         
+tcp     LISTEN   0        128                 [::]:22                [::]:*      users:(("sshd",pid=448,fd=4))                                                  
+tcp     LISTEN   0        511                    *:3000                 *:*      users:(("node",pid=775,fd=17))                                                 
+root@srv427189:~/gaspol-log-viewer# pm2 list
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ gaspol-api         │ fork     │ 0    │ online    │ 0%       │ 68.3mb   │
+│ 1  │ gaspol-cms         │ fork     │ 0    │ online    │ 0%       │ 68.0mb   │
+│ 2  │ gaspol-log         │ fork     │ 890  │ stopped   │ 0%       │ 0b       │
+│ 4  │ jempolan-be        │ fork     │ 0    │ online    │ 0%       │ 51.3mb   │
+│ 3  │ jempolan-fe        │ fork     │ 0    │ online    │ 0%       │ 69.4mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+root@srv427189:~/gaspol-log-viewer# # 1) Kirim SIGTERM (aman)
+root@srv427189:~/gaspol-log-viewer# sudo kill 2871
+root@srv427189:~/gaspol-log-viewer# 
+root@srv427189:~/gaspol-log-viewer# # tunggu 3-5 detik, lalu cek:
+root@srv427189:~/gaspol-log-viewer# ps -p 2871 -o pid,cmd,etime || echo "PID 2871 not running"
+    PID CMD                             ELAPSED
+PID 2871 not running
+root@srv427189:~/gaspol-log-viewer# sudo ss -ltnp | grep ':3030' || echo "port 3030 not listening"
+port 3030 not listening
+root@srv427189:~/gaspol-log-viewer# 
+root@srv427189:~/gaspol-log-viewer# # 2) Jika tidak mati, kirim SIGINT atau SIGQUIT/TERM lagi, lalu paksa:
+root@srv427189:~/gaspol-log-viewer# sudo kill -15 2871
+kill: (2871): No such process
+root@srv427189:~/gaspol-log-viewer# sleep 3
+
+root@srv427189:~/gaspol-log-viewer# ps -p 2871 || sudo kill -9 2871   # kill -9 hanya jika proses tidak berhenti
+    PID TTY          TIME CMD
+kill: (2871): No such process
+root@srv427189:~/gaspol-log-viewer# pm2 restart gaspol-log
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [gaspol-log](ids: [ 2 ])
+[PM2] [gaspol-log](2) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+root@srv427189:~# ls
+gaspol-log-viewer  gaspol-repo  jempolan-lp  script-cronjob  snap  update
+root@srv427189:~# cat gaspol-log-viewer/.env
+PORT=3030
+NEXT_PUBLIC_API_URL=https://api.gaspollmanagementcenter.com
+LOGS_DIRECTORY=../gaspol-repo/gaspol-api/logs
+NEXT_PUBLIC_SWAGGER_URL=https://api.gaspollmanagementcenter.com/api-docs
+NEXT_PUBLIC_ACCESS_PASSWORD=DT2025
+root@srv427189:~# cat gaspol-repo/gaspol-api/.env
+PORT=8080
+DB_USERNAME=gaspol
+DB_PASSWORD=Simple123!
+DB_NAME=gaspol
+DB_HOST=62.72.59.78
+DB_PORT=3306
+DB_DIALECT=mysql
+JWT_SECRET_KEY=Uk3zdfHXz27AaR2mT5fCrfdpYWWirDYaRykI4IAtLrFuEXPDRzrOdmS8x0rUdT5zqIdQK0fMaeQmxyT16Bj4WAfh310zdcyd2zKu
+CORS_ORIGIN=https://cms.gaspollmanagementcenter.com
+root@srv427189:~# cat gaspol-repo/gaspol-cms/.env
+REACT_APP_API_BASE_URL=https://api.gaspollmanagementcenter.com
+REACT_APP_API_WHATSAPP_URL=https://whatsapp.gaspollmanagementcenter.com
+root@srv427189:~# ls
+gaspol-log-viewer  gaspol-repo  jempolan-lp  script-cronjob  snap  update
+root@srv427189:~# script-cronjob
+script-cronjob: command not found
+root@srv427189:~# cd script-cronjob
+root@srv427189:~/script-cronjob# ls
+clean_cache.sh
+root@srv427189:~/script-cronjob# cd ..
+root@srv427189:~# ls
+gaspol-log-viewer  gaspol-repo  jempolan-lp  script-cronjob  snap  update
+root@srv427189:~# cd jempolan-lp
+root@srv427189:~/jempolan-lp# ls
+_config.yml   build                package.json       tailwind.config.js
+backend       ecosystem.config.js  postcss.config.js  yarn.lock
+be-error.log  node_modules         public
+be-out.log    package-lock.json    src
+root@srv427189:~/jempolan-lp# cat .env
+PORT=1234
+BACKEND_PORT=5000
+REACT_APP_API_URL=https://jempolan-be.gaspollmanagementcenter.com/api
+root@srv427189:~/jempolan-lp# ls backend
+customers_reviews.db  database.js  server.js
+root@srv427189:~/jempolan-lp# cd ..
+root@srv427189:~# ls gaspol-log-viewer
+README.md      logs-gaspol-api  package-lock.json  postcss.config.mjs
+components     next.config.mjs  package.json       public
+jsconfig.json  node_modules     pages              src
+root@srv427189:~# cat package.json
+cat: package.json: No such file or directory
+root@srv427189:~# cat gaspol-log-viewer/package.json
+{
+  "name": "gaspol-log-viewer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "cross-env PORT=3030 next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@geist-ui/react": "^2.2.5",
+    "@geist-ui/react-icons": "^1.0.1",
+    "bootstrap": "^5.3.7",
+    "bootstrap-icons": "^1.13.1",
+    "next": "14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "swr": "^2.2.0"  
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "cross-env": "^7.0.3",
+    "tailwindcss": "^4"
+  }
+}
+root@srv427189:~# cat gaspol-repo/gaspol-cms/package.json
+{
+  "name": "react-template",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.4.0",
+    "chart.js": "^4.4.1",
+    "filepond": "^4.32.8",
+    "filepond-plugin-file-validate-type": "^1.2.9",
+    "filepond-plugin-image-preview": "^4.6.12",
+    "flatpickr": "^4.6.13",
+    "jwt-decode": "^3.1.2",
+    "react": "^18.2.0",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.2.0",
+    "react-filepond": "^7.1.2",
+    "react-router-dom": "^6.16.0",
+    "react-scripts": "5.0.1",
+    "react-to-print": "^2.14.15",
+    "sweetalert2": "^11.7.27",
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "serve": "serve -s build"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
+root@srv427189:~# pm2 list
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 0  │ gaspol-api         │ fork     │ 0    │ online    │ 0%       │ 68.6mb   │
+│ 1  │ gaspol-cms         │ fork     │ 0    │ online    │ 0%       │ 68.6mb   │
+│ 2  │ gaspol-log         │ fork     │ 890  │ online    │ 0%       │ 68.5mb   │
+│ 4  │ jempolan-be        │ fork     │ 0    │ online    │ 0%       │ 51.3mb   │
+│ 3  │ jempolan-fe        │ fork     │ 0    │ online    │ 0%       │ 69.1mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+root@srv427189:~# cat gaspol-repo/gaspol-api/package.json
+{
+  "scripts": {
+    "swagger-autogen": "node swagger-gen.js",  
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "axios": "^1.8.4",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "moment-timezone": "^0.5.43",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.5.1",
+    "nodemon": "^3.0.1",
+    "path": "^0.12.7",
+    "sequelize": "^6.32.1",
+    "sequelize-cli": "^6.6.1",
+    "swagger-autogen": "^2.23.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^9.0.0",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0",
+    "winston-telegram": "^2.7.0"
+  }
+}
+root@srv427189:~# ls
+gaspol-log-viewer  gaspol-repo  jempolan-lp  script-cronjob  snap  update
+root@srv427189:~# cat jempolan-lp/package.json
+{
+  "name": "jempolan-lp",
+  "homepage": ".",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "axios": "^1.11.0",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "emailjs-com": "^2.6.4",
+    "express": "^5.1.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-icons": "^5.5.0",
+    "react-scripts": "^5.0.1",
+    "react-star-ratings": "^2.3.0",
+    "smooth-scroll": "^16.1.3",
+    "sqlite3": "^5.1.7"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "start-backend": "node backend/server.js",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build",
+    "serve": "serve -s build -l 1234",
+    "start:production": "npm run build && npm run serve",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
+}
+root@srv427189:~# 
