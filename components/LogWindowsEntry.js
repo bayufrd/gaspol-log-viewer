@@ -1,5 +1,5 @@
 // LogWindowsEntry.js
-import React from 'react';
+import React, { useState } from 'react';
 
 const LogWindowsEntry = ({
     timestamp,
@@ -11,8 +11,11 @@ const LogWindowsEntry = ({
     exception,
     source,
     additionalInfo,
-    visibleFields
+    visibleFields,
+    mergedCount = 1,
+    mergedItems = [],
 }) => {
+    const [expanded, setExpanded] = useState(false);
     const levelColors = {
         error: { bg: 'bg-black', text: 'text-danger' },
         warn: { bg: 'bg-warning', text: 'text-dark' },
@@ -49,11 +52,45 @@ const LogWindowsEntry = ({
                         </span>
                     )}
                 </div>
-                {/* Tombol Salin */}
-                <button className="btn btn-outline-light btn-sm" style={{fontSize: 11, padding: '2px 8px'}} onClick={handleCopy}>
-                    Copy
-                </button>
+                <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
+                    {mergedCount > 1 && (
+                        <button
+                            className="btn btn-outline-light btn-sm"
+                            style={{fontSize: 11, padding: '2px 8px', minWidth: 30}}
+                            onClick={() => setExpanded((v) => !v)}
+                            aria-label={expanded ? 'Hide merged items' : 'Show merged items'}
+                        >
+                            {expanded ? '▾' : '▸'}
+                        </button>
+                    )}
+                    {mergedCount > 1 && (
+                        <span className="badge bg-secondary" style={{fontSize: 11}}>
+                            {mergedCount} logs merged
+                        </span>
+                    )}
+                    {/* Tombol Salin */}
+                    <button className="btn btn-outline-light btn-sm" style={{fontSize: 11, padding: '2px 8px'}} onClick={handleCopy}>
+                        Copy
+                    </button>
+                </div>
             </div>
+            {expanded && mergedItems && mergedItems.length > 1 && (
+                <div className="merged-items-list mt-2" style={{fontSize: 12, color: '#cbd5e1', paddingLeft: 8}}>
+                    {mergedItems.map((it, i) => (
+                        <div key={`${it.id || i}_${i}`} style={{padding: '4px 0', borderBottom: '1px dashed rgba(255,255,255,0.04)'}}>
+                            <div style={{display: 'flex', justifyContent: 'space-between', gap: 8}}>
+                                <div style={{fontFamily: 'GeistMono, Courier New, monospace'}}>
+                                    {visibleFields?.created_at ? new Date(it.created_at).toLocaleString() : ''}
+                                    {visibleFields?.source && ` — ${it.source || ''}`}
+                                </div>
+                                <div>
+                                    {/* optional per-item small copy could go here */}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
             <div
                 className="log-message"
                 style={{

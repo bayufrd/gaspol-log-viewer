@@ -56,9 +56,9 @@ module.exports = {
 
         {
             name: 'jempolan-be',
-            // backend is started with node backend/server.js (see package.json scripts)
-            script: 'node',
-            args: 'backend/server.js',
+            // start backend via npm script defined in jempolan-lp/package.json: "start-backend": "node backend/server.js"
+            script: 'npm',
+            args: 'run start-backend',
             // run from jempolan-lp repo root
             cwd: '/root/jempolan-lp',
             exec_mode: 'fork',
@@ -72,8 +72,8 @@ module.exports = {
             name: 'jempolan-fe',
             script: 'npm',
             args: 'start',
-            // inferred location: absolute path under /root
-            cwd: '/root/jempolan-lp/jempolan-fe',
+            // front-end is served from jempolan-lp root (see package.json)
+            cwd: '/root/jempolan-lp',
             exec_mode: 'fork',
             instances: 1,
             autorestart: true,

@@ -113,6 +113,10 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
     const [summaryData, setSummaryData] = React.useState([]);
     const [outletLogs, setOutletLogs] = React.useState("ALL");
     const [activeTab, setActiveTab] = React.useState('api');
+    const [complaintsData, setComplaintsData] = React.useState([]);
+    const [complaintLoading, setComplaintLoading] = React.useState(false);
+    const [complaintProgress, setComplaintProgress] = React.useState({ loaded: 0, total: null, done: false, error: null });
+    const [complaintCardsLoaded, setComplaintCardsLoaded] = React.useState(0);
 
     // Simple custom encrypt/decrypt (XOR + base64)
     function encryptSession(str) {
@@ -187,6 +191,329 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
     useEffect(() => {
         fetchSummary();
     }, []);
+
+    // IndexedDB helpers (simple) for caching large payloads
+    const idbSet = (storeName, key, value) => new Promise((resolve, reject) => {
+        try {
+            const open = indexedDB.open('gaspol-cache', 1);
+            open.onupgradeneeded = () => {
+                const db = open.result;
+                if (!db.objectStoreNames.contains(storeName)) db.createObjectStore(storeName);
+            };
+            open.onsuccess = () => {
+                const db = open.result;
+                const tx = db.transaction(storeName, 'readwrite');
+                const store = tx.objectStore(storeName);
+                store.put(value, key);
+                tx.oncomplete = () => { db.close(); resolve(); };
+                tx.onerror = (e) => { db.close(); reject(e); };
+            };
+            open.onerror = (e) => reject(e);
+        } catch (e) { reject(e); }
+    });
+
+    const idbGet = (storeName, key) => new Promise((resolve, reject) => {
+        try {
+            const open = indexedDB.open('gaspol-cache', 1);
+            open.onupgradeneeded = () => {
+                const db = open.result;
+                if (!db.objectStoreNames.contains(storeName)) db.createObjectStore(storeName);
+            };
+            open.onsuccess = () => {
+                const db = open.result;
+                const tx = db.transaction(storeName, 'readonly');
+                const store = tx.objectStore(storeName);
+                const req = store.get(key);
+                req.onsuccess = () => { db.close(); resolve(req.result); };
+                req.onerror = (e) => { db.close(); reject(e); };
+            };
+            open.onerror = (e) => reject(e);
+        } catch (e) { reject(e); }
+    });
+
+    // Fetch complaints with streaming parsing per-object, incremental UI updates and caching in IndexedDB
+    const fetchComplaints = React.useCallback(async (opts = { force: false }) => {
+        // check cache first unless forced
+        try {
+            if (!opts.force) {
+                const cachedMeta = await idbGet('complaints', 'meta');
+                if (cachedMeta && cachedMeta.ts) {
+                    const age = Date.now() - cachedMeta.ts;
+                    if (age < 6 * 60 * 60 * 1000 && cachedMeta.sizeKey) {
+                        // load cached data
+                        const cached = await idbGet('complaints', 'data');
+                        if (cached) {
+                            setComplaintsData(cached);
+                            setComplaintCardsLoaded(Array.isArray(cached) ? cached.length : 0);
+                            setComplaintProgress((p) => ({ ...p, done: true, loaded: 0, total: null }));
+                            return;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('Cache read error', e);
+        }
+
+        setComplaintLoading(true);
+        setComplaintProgress({ loaded: 0, total: null, done: false, error: null });
+        setComplaintsData([]);
+        setComplaintCardsLoaded(0);
+
+        let aborted = false;
+        const controller = new AbortController();
+        try {
+            const baseUri = process.env.NEXT_PUBLIC_API_URL;
+            // Try the request up to 3 times (network errors or non-OK responses). If server returns 304,
+            // immediately fall back to cache. After attempts exhausted, try cache as fallback.
+            let resp = null;
+            const maxAttempts = 3;
+            let attempt = 0;
+            let lastErr = null;
+            while (attempt < maxAttempts) {
+                attempt += 1;
+                try {
+                    resp = await fetch(`${baseUri}/complaint`, { signal: controller.signal });
+                    if (resp.status === 304) {
+                        // fall back to cache
+                        try {
+                            const cached = await idbGet('complaints', 'data');
+                            if (cached) {
+                                setComplaintsData(cached);
+                                setComplaintCardsLoaded(Array.isArray(cached) ? cached.length : 0);
+                                setComplaintProgress((p) => ({ ...p, done: true, loaded: cached ? Math.round(JSON.stringify(cached).length) : 0, total: cached ? Math.round(JSON.stringify(cached).length) : null }));
+                                setComplaintLoading(false);
+                                return;
+                            }
+                        } catch (e) {
+                            console.warn('Error reading cache after 304', e);
+                        }
+                        lastErr = new Error(`HTTP ${resp.status}`);
+                        break; // don't retry on 304
+                    }
+                    if (resp.ok) break; // success
+                    lastErr = new Error(`HTTP ${resp.status}`);
+                } catch (err) {
+                    lastErr = err;
+                }
+
+                // if not last attempt, wait with exponential backoff
+                if (attempt < maxAttempts) {
+                    const waitMs = 500 * Math.pow(2, attempt - 1);
+                    await new Promise(r => setTimeout(r, waitMs));
+                }
+            }
+
+            if (!resp || !resp.ok) {
+                // attempts exhausted or non-OK -> try to use cache as fallback
+                try {
+                    const cached = await idbGet('complaints', 'data');
+                    if (cached) {
+                        setComplaintsData(cached);
+                        setComplaintCardsLoaded(Array.isArray(cached) ? cached.length : 0);
+                        setComplaintProgress((p) => ({ ...p, done: true, loaded: cached ? Math.round(JSON.stringify(cached).length) : 0, total: cached ? Math.round(JSON.stringify(cached).length) : null, error: lastErr ? lastErr.message : null }));
+                        setComplaintLoading(false);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Cache fallback failed', e);
+                }
+                throw lastErr || new Error('Failed to fetch complaints');
+            }
+            const total = resp.headers.get('Content-Length');
+            const reader = resp.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+            let received = 0;
+            let buffer = '';
+            let inArray = false;
+            let objectStarted = false;
+            let braceCount = 0;
+            let inString = false;
+            let escape = false;
+            const parsedItems = [];
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                if (aborted) { controller.abort(); return; }
+                received += value.length;
+                setComplaintProgress((p) => ({ ...p, loaded: received, total: total ? Number(total) : null }));
+                buffer += decoder.decode(value, { stream: true });
+
+                // process buffer: find start of array
+                if (!inArray) {
+                    const idx = buffer.indexOf('[');
+                    if (idx !== -1) {
+                        inArray = true;
+                        buffer = buffer.slice(idx + 1);
+                    } else {
+                        // keep buffer small
+                        if (buffer.length > 1024 * 64) buffer = buffer.slice(-1024 * 16);
+                        continue;
+                    }
+                }
+
+                // parse objects from buffer
+                let i = 0;
+                let startIdx = -1;
+                while (i < buffer.length) {
+                    const ch = buffer[i];
+                    if (!objectStarted) {
+                        if (ch === '{') {
+                            objectStarted = true;
+                            braceCount = 1;
+                            inString = false;
+                            escape = false;
+                            startIdx = i;
+                        }
+                        i++;
+                        continue;
+                    }
+
+                    if (inString) {
+                        if (escape) { escape = false; }
+                        else if (ch === '\\') { escape = true; }
+                        else if (ch === '"') { inString = false; }
+                    } else {
+                        if (ch === '"') { inString = true; }
+                        else if (ch === '{') { braceCount++; }
+                        else if (ch === '}') { braceCount--; }
+                    }
+
+                    if (objectStarted && braceCount === 0) {
+                        const objText = buffer.slice(startIdx, i + 1);
+                        // attempt parse
+                        try {
+                            const obj = JSON.parse(objText);
+                            parsedItems.push(obj);
+                            // update UI incrementally
+                            setComplaintsData((prev) => {
+                                const next = [...prev, obj];
+                                setComplaintCardsLoaded(next.length);
+                                return next;
+                            });
+                        } catch (e) {
+                            console.warn('Partial JSON parse failed, will retry with more data');
+                        }
+                        // move buffer past this object and possible comma
+                        buffer = buffer.slice(i + 1);
+                        i = 0;
+                        objectStarted = false;
+                        startIdx = -1;
+                        continue;
+                    }
+                    i++;
+                }
+                // keep buffer small
+                if (buffer.length > 1024 * 128) buffer = buffer.slice(-1024 * 64);
+            }
+
+            // finished reading, try to parse any trailing object (if present)
+            if (buffer.trim().length > 0) {
+                // buffer may contain closing ]} etc. try to extract final object(s)
+                let b = buffer;
+                while (true) {
+                    const idx = b.indexOf('{');
+                    if (idx === -1) break;
+                    let brace = 0;
+                    let j = idx;
+                    inString = false;
+                    escape = false;
+                    for (; j < b.length; j++) {
+                        const ch = b[j];
+                        if (inString) {
+                            if (escape) { escape = false; }
+                            else if (ch === '\\') { escape = true; }
+                            else if (ch === '"') { inString = false; }
+                        } else {
+                            if (ch === '"') { inString = true; }
+                            else if (ch === '{') brace++;
+                            else if (ch === '}') brace--;
+                            if (brace === 0) break;
+                        }
+                    }
+                    if (brace === 0) {
+                        const objText = b.slice(idx, j + 1);
+                        try {
+                            const obj = JSON.parse(objText);
+                            parsedItems.push(obj);
+                            setComplaintsData((prev) => {
+                                const next = [...prev, obj];
+                                setComplaintCardsLoaded(next.length);
+                                return next;
+                            });
+                        } catch (e) {
+                            // ignore
+                        }
+                        b = b.slice(j + 1);
+                    } else break;
+                }
+            }
+
+            // mark done
+            setComplaintProgress((p) => ({ ...p, done: true }));
+
+            // If we parsed too few items (possible parser failure on large/complex JSON),
+            // attempt a full-buffer fallback once (opts.forceFull prevents loop).
+            if ((parsedItems.length < 2) && !opts.forceFull) {
+                console.warn('Parsed very few items during streaming; attempting full-buffer fallback');
+                try {
+                    // read full response again (or use resp if still available) and parse fully
+                    const resp2 = await fetch(`${baseUri}/complaint`);
+                    if (resp2.ok) {
+                        const total2 = resp2.headers.get('Content-Length');
+                        const reader2 = resp2.body.getReader();
+                        const decoder2 = new TextDecoder('utf-8');
+                        let received2 = 0;
+                        const chunks2 = [];
+                        while (true) {
+                            const { done: done2, value: value2 } = await reader2.read();
+                            if (done2) break;
+                            chunks2.push(value2);
+                            received2 += value2.length;
+                            setComplaintProgress((p) => ({ ...p, loaded: received2, total: total2 ? Number(total2) : null }));
+                        }
+                        let full2 = new Uint8Array(received2);
+                        let pos2 = 0;
+                        for (const chunk of chunks2) { full2.set(chunk, pos2); pos2 += chunk.length; }
+                        const text2 = decoder2.decode(full2);
+                        const json2 = JSON.parse(text2);
+                        const items = json2.data || [];
+                        setComplaintsData(items);
+                        setComplaintCardsLoaded(items.length);
+                        // store to IDB
+                        try {
+                            await idbSet('complaints', 'data', items);
+                            await idbSet('complaints', 'meta', { ts: Date.now(), sizeKey: items.length });
+                        } catch (ee) { console.warn('IDB write failed on fallback', ee); }
+                        setComplaintProgress((p) => ({ ...p, done: true }));
+                        setComplaintLoading(false);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Full-buffer fallback failed', e);
+                }
+            }
+
+            // store parsedItems (full array) into IndexedDB if possible
+            try {
+                await idbSet('complaints', 'data', parsedItems);
+                await idbSet('complaints', 'meta', { ts: Date.now(), sizeKey: parsedItems.length });
+            } catch (e) {
+                console.warn('IDB write failed', e);
+            }
+        } catch (err) {
+            console.error('Error fetching complaints:', err);
+            setComplaintProgress({ loaded: 0, total: null, done: true, error: err.message });
+        } finally {
+            setComplaintLoading(false);
+        }
+    }, []);
+
+    // start fetch on mount, but prefer cache
+    useEffect(() => {
+        fetchComplaints({ force: false });
+    }, [fetchComplaints]);
 
     const fetchLogsByOutlet = async (outletId) => {
         setLoading(true);
@@ -457,6 +784,30 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
                             )
                         },
                         {
+                            key: 'complaints',
+                            label: 'Complaint Report',
+                            content: (
+                                <div className="p-0" style={{width: '100%', height: '70vh', display: 'flex', flexDirection: 'column', overflow: 'auto'}}>
+                                    {/* Lazy load component to keep bundle small */}
+                                    <React.Suspense fallback={<div className="p-3">Loading complaint UI...</div>}>
+                                        {/* Import dynamically to avoid SSR issues */}
+                                        {typeof window !== 'undefined' && (() => {
+                                            const C = require('../components/ComplaintReport').default;
+                                            return (
+                                                <C
+                                                    complaints={complaintsData}
+                                                    loading={complaintLoading}
+                                                    onRefetch={() => fetchComplaints({ force: true })}
+                                                    progress={complaintProgress}
+                                                    cardsLoaded={complaintCardsLoaded}
+                                                />
+                                            );
+                                        })()}
+                                    </React.Suspense>
+                                </div>
+                            )
+                        },
+                        {
                             key: 'docs',
                             label: 'API Docs',
                             content: (
@@ -474,6 +825,27 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
                     active={activeTab}
                     onChange={setActiveTab}
                 />
+                {/* Floating progress snackbar for complaint fetch */}
+                {(!complaintProgress.done || complaintProgress.loaded > 0) && (
+                    <div style={{position: 'fixed', right: 16, bottom: 16, zIndex: 1200}}>
+                        <div className="badge bg-dark text-light shadow-sm" style={{padding: '10px 14px', border: '1px solid rgba(255,255,255,0.04)'}}>
+                            <div style={{fontSize: 12}}>
+                                {complaintProgress.error ? (
+                                    <span style={{color: '#fca5a5'}}>Error: {complaintProgress.error}</span>
+                                ) : (
+                                    <>
+                                        <strong>Complaint fetch</strong>
+                                        <div style={{fontSize: 11, color: '#9ca3af'}}>
+                                            {complaintProgress.loaded ? `${Math.round(complaintProgress.loaded/1024)} KB` : '0 KB'}
+                                            {complaintProgress.total ? ` / ${Math.round(complaintProgress.total/1024)} KB` : ''}
+                                            {complaintProgress.total ? ` (${Math.round((complaintProgress.loaded/complaintProgress.total)*100)}%)` : ''}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -9,12 +9,41 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUp
     const logContainerRef = useRef(null);
 
     useEffect(() => {
-        setFilteredLogs(
-            windowsLogsData.filter(log => {
-                const logMessage = `${log.id} ${new Date(log.created_at).toLocaleString()} ${log.outlet_id} ${log.exception} ${log.source} ${log.additional_info} ${log.log_level} ${log.log_code} ${log.outlet_name} ${log.message}`;
-                return logMessage.toLowerCase().includes(searchTerm.toLowerCase());
-            })
-        );
+        // Filter first based on searchTerm
+        const filtered = windowsLogsData.filter(log => {
+            const logMessage = `${log.id} ${new Date(log.created_at).toLocaleString()} ${log.outlet_id} ${log.exception} ${log.source} ${log.additional_info} ${log.log_level} ${log.log_code} ${log.outlet_name} ${log.message}`;
+            return logMessage.toLowerCase().includes(searchTerm.toLowerCase());
+        });
+
+        // Group ALL identical logs globally (not only consecutive).
+        // Key fields: outlet_id, message, exception, source, additional_info
+        const makeKey = (l) => `${l.outlet_id}||${l.message}||${l.exception}||${l.source}||${l.additional_info}`;
+        const groupsMap = new Map();
+        for (const log of filtered) {
+            const key = makeKey(log);
+            if (!groupsMap.has(key)) groupsMap.set(key, []);
+            groupsMap.get(key).push(log);
+        }
+
+        // Build groups array with representative being the most recent log
+        const groups = [];
+        for (const [key, items] of groupsMap.entries()) {
+            // find most recent item by created_at
+            const sorted = [...items].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            const representative = sorted[0];
+            groups.push({
+                _groupKey: key,
+                mergedCount: items.length,
+                representativeTimestamp: representative.created_at,
+                representative,
+                mergedItems: sorted // most recent first
+            });
+        }
+
+        // Sort groups by most recent timestamp descending so latest groups show first
+        groups.sort((a, b) => new Date(b.representativeTimestamp) - new Date(a.representativeTimestamp));
+
+        setFilteredLogs(groups);
     }, [windowsLogsData, searchTerm]);
 
     const fetchUpdateConfirmData = async () => {
@@ -138,21 +167,26 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUp
                     </div>
                 )}
                 {filteredLogs.length > 0 ? (
-                    filteredLogs.map((log) => (
-                        <LogEntry
-                            key={log.id}
-                            timestamp={new Date(log.created_at).toLocaleString()}
-                            outlet_id={log.outlet_id}
-                            outletName={log.outlet_name}
-                            level={log.log_level}
-                            message={log.message}
-                            logCode={log.log_code}
-                            exception={log.exception}
-                            source={log.source}
-                            additionalInfo={log.additional_info}
-                            visibleFields={visibleFields}
-                        />
-                    ))
+                    filteredLogs.map((group, idx) => {
+                        const rep = group.representative || {};
+                        return (
+                            <LogEntry
+                                key={`${group._groupKey || idx}`}
+                                timestamp={new Date(group.representativeTimestamp || rep.created_at).toLocaleString()}
+                                outlet_id={rep.outlet_id}
+                                outletName={rep.outlet_name}
+                                level={rep.log_level}
+                                message={rep.message}
+                                logCode={rep.log_code}
+                                exception={rep.exception}
+                                source={rep.source}
+                                additionalInfo={rep.additional_info}
+                                visibleFields={visibleFields}
+                                mergedCount={group.mergedCount || 1}
+                                mergedItems={group.mergedItems || [rep]}
+                            />
+                        );
+                    })
                 ) : (
                     <div className="alert alert-info bg-dark text-info text-center rounded shadow-sm" style={{fontSize: 13, padding: 8}}>
                         Tidak ada log untuk ditampilkan
