@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Complaints Monitoring | Gaspol Log Viewer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#7bd0ff",
+                    "surface-container-highest": "#303539",
+                    "tertiary-container": "#f1a02b",
+                    "surface-variant": "#303539",
+                    "on-secondary-fixed-variant": "#47464a",
+                    "tertiary": "#ffc176",
+                    "on-secondary-fixed": "#1b1b1e",
+                    "on-primary": "#00354a",
+                    "on-primary-fixed": "#001e2c",
+                    "outline": "#87929a",
+                    "on-surface-variant": "#bdc8d1",
+                    "inverse-on-surface": "#2c3135",
+                    "surface": "#0f1418",
+                    "surface-dim": "#0f1418",
+                    "background": "#0f1418",
+                    "inverse-surface": "#dee3e8",
+                    "primary-container": "#38bdf8",
+                    "primary": "#8ed5ff",
+                    "inverse-primary": "#00668a",
+                    "surface-container-high": "#252b2e",
+                    "on-tertiary-container": "#613b00",
+                    "on-tertiary": "#472a00",
+                    "surface-container-low": "#171c20",
+                    "surface-tint": "#7bd0ff",
+                    "error": "#ffb4ab",
+                    "secondary-fixed": "#e4e1e6",
+                    "on-primary-container": "#004965",
+                    "secondary-fixed-dim": "#c8c5ca",
+                    "tertiary-fixed": "#ffddb8",
+                    "secondary": "#c8c5ca",
+                    "on-surface": "#dee3e8",
+                    "on-error-container": "#ffdad6",
+                    "on-tertiary-fixed": "#2a1700",
+                    "on-secondary-container": "#b6b4b8",
+                    "tertiary-fixed-dim": "#ffb960",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-background": "#dee3e8",
+                    "secondary-container": "#47464a",
+                    "surface-bright": "#343a3e",
+                    "on-primary-fixed-variant": "#004c69",
+                    "surface-container-lowest": "#0a0f12",
+                    "outline-variant": "#3e484f",
+                    "on-secondary": "#303033",
+                    "surface-container": "#1b2024",
+                    "error-container": "#93000a",
+                    "primary-fixed": "#c4e7ff",
+                    "on-error": "#690005"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "xl": "32px",
+                    "lg": "24px",
+                    "xs": "4px",
+                    "unit": "4px",
+                    "margin": "24px",
+                    "md": "16px",
+                    "sm": "8px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Geist"],
+                    "body-sm": ["Geist"],
+                    "body-md": ["Geist"],
+                    "headline-lg": ["Geist"],
+                    "mono-code": ["JetBrains Mono"],
+                    "label-caps": ["Geist"],
+                    "display": ["Geist"]
+            },
+            "fontSize": {
+                    "headline-md": ["clamp(16px, 3vw, 18px)", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "mono-code": ["13px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "display": ["clamp(24px, 5vw, 32px)", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Geist', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .log-entry-row:hover { background-color: #27272a; }
+        .stream-progress { animation: progress-flow 2s infinite ease-in-out; }
+        @keyframes progress-flow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(200%); }
+        }
+        .bento-card {
+            background-color: #18181b;
+            border: 1px solid #27272a;
+            transition: border-color 0.2s ease;
+        }
+        .bento-card:hover {
+            border-color: #38bdf8;
+        }
+        .code-block {
+            scrollbar-width: thin;
+            scrollbar-color: #3e484f #0f1418;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary/30 antialiased overflow-hidden h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface dark:bg-surface border-b border-outline-variant dark:border-outline-variant">
+<div class="flex items-center gap-xl">
+<span class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary">Gaspol Log Viewer</span>
+<div class="hidden md:flex gap-md">
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary transition-colors" href="#">API Logs</a>
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary transition-colors" href="#">PM2 Logs</a>
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary transition-colors" href="#">Windows Logs</a>
+<a class="font-headline-md text-headline-md text-primary dark:text-primary border-b-2 border-primary pb-1" href="#">Complaints</a>
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary transition-colors" href="#">API Docs</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="bg-surface-container-low border border-outline-variant px-sm py-xs flex items-center gap-xs rounded-lg">
+<span class="material-symbols-outlined text-outline text-body-md" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-48 text-on-surface" placeholder="Global search..." type="text"/>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer" data-icon="dark_mode">dark_mode</span>
+<span class="font-body-sm text-body-sm text-outline">v0.1.0</span>
+</div>
+</nav>
+<div class="flex flex-1 pt-16 h-full overflow-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-[260px] flex flex-col gap-sm py-md bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant dark:border-outline-variant">
+<div class="px-md mb-md">
+<h3 class="font-label-caps text-label-caps text-outline uppercase tracking-wider">Navigation</h3>
+<p class="text-[10px] text-on-surface-variant">Drill-down views</p>
+</div>
+<div class="flex flex-col">
+<button class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span class="font-body-md text-body-md">Client Logs</span>
+</button>
+<button class="flex items-center gap-md px-md py-sm text-primary dark:text-primary font-bold bg-surface-container-highest dark:bg-surface-container-highest border-l-4 border-primary transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined" data-icon="system_update">system_update</span>
+<span class="font-body-md text-body-md">Update Confirmation</span>
+</button>
+<button class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-body-md text-body-md">Reference Guide</span>
+</button>
+<button class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+<span class="font-body-md text-body-md">Auth Docs</span>
+</button>
+</div>
+<div class="mt-auto px-md py-md flex items-center gap-sm border-t border-outline-variant/30">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs">SO</div>
+<div class="overflow-hidden">
+<p class="font-body-md text-body-md text-on-surface truncate">System Operator</p>
+<p class="text-[10px] text-outline truncate">admin@gaspol.io</p>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-[260px] flex-1 overflow-y-auto bg-background pb-16">
+<!-- Header Section with Streaming Indicator -->
+<div class="sticky top-0 z-30 bg-background/80 backdrop-blur-md px-lg pt-lg pb-md border-b border-outline-variant/50">
+<div class="flex justify-between items-end mb-md">
+<div>
+<h1 class="font-display text-display text-on-surface">Complaints Monitoring</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Real-time incoming complaint streams from nationwide outlets.</p>
+</div>
+<div class="flex gap-sm">
+<div class="flex flex-col items-end">
+<span class="font-label-caps text-label-caps text-primary">STREAMING DATA</span>
+<span class="font-mono-code text-mono-code text-outline">BATCH: 1029-X8</span>
+</div>
+</div>
+</div>
+<!-- Simulating Streaming Loader -->
+<div class="w-full h-[2px] bg-surface-container-highest overflow-hidden relative">
+<div class="stream-progress absolute top-0 left-0 h-full w-1/3 bg-primary shadow-[0_0_8px_rgba(56,189,248,0.5)]"></div>
+</div>
+<!-- Search & Filters -->
+<div class="flex flex-wrap gap-md mt-lg">
+<div class="flex-1 min-w-[300px] flex items-center gap-sm bg-surface-container-low border border-outline-variant px-md py-sm rounded-lg focus-within:border-primary transition-all">
+<span class="material-symbols-outlined text-outline" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-full text-on-surface" placeholder="Filter by Ticket ID, Content or Outlet..." type="text"/>
+</div>
+<div class="flex items-center gap-sm">
+<select class="bg-surface-container-low border border-outline-variant px-md py-sm rounded-lg text-body-md text-on-surface focus:border-primary">
+<option>All Outlets</option>
+<option>JKT-CENTRAL-01</option>
+<option>SBY-NORTH-04</option>
+<option>BDG-WEST-02</option>
+</select>
+<select class="bg-surface-container-low border border-outline-variant px-md py-sm rounded-lg text-body-md text-on-surface focus:border-primary">
+<option>All Categories</option>
+<option>Payment Issue</option>
+<option>Hardware Failure</option>
+<option>Personnel</option>
+<option>System Sync</option>
+</select>
+<button class="bg-primary hover:bg-primary-container text-on-primary font-bold px-md py-sm rounded-lg transition-colors flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="refresh">refresh</span>
+<span class="font-body-md text-body-md">Refresh</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Complaint Feed -->
+<div class="px-lg py-lg space-y-md max-w-7xl mx-auto">
+<!-- Complaint Card 1 -->
+<div class="bento-card overflow-hidden group">
+<div class="flex flex-col md:flex-row cursor-pointer" onclick="toggleExpand('ticket-001')">
+<div class="w-1 bg-primary self-stretch"></div>
+<div class="flex-1 p-md flex flex-wrap items-center gap-xl">
+<div class="flex-shrink-0">
+<span class="font-label-caps text-label-caps text-outline">TICKET ID</span>
+<p class="font-mono-code text-mono-code text-primary">#GPL-2023-9841</p>
+</div>
+<div class="flex-shrink-0">
+<span class="font-label-caps text-label-caps text-outline">DATE / TIME</span>
+<p class="font-body-md text-body-md text-on-surface">Oct 24, 2023 14:22:10</p>
+</div>
+<div class="flex-shrink-0">
+<span class="font-label-caps text-label-caps text-outline">OUTLET</span>
+<p class="font-body-md text-body-md text-on-surface">JKT-CENTRAL-01</p>
+</div>
+<div class="flex-shrink-0">
+<span class="font-label-caps text-label-caps text-outline">CATEGORY</span>
+<span class="px-xs py-[2px] bg-primary-container/20 text-primary-container text-[10px] font-bold rounded border border-primary-container/30 uppercase tracking-tighter">Payment Issue</span>
+</div>
+<div class="flex-1 min-w-[200px]">
+<span class="font-label-caps text-label-caps text-outline">PREVIEW</span>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">Customer reported transaction timeout during QRIS payment, status still pending on app...</p>
+</div>
+<span class="material-symbols-outlined text-outline transition-transform duration-300" data-icon="expand_more" id="icon-ticket-001">expand_more</span>
+</div>
+</div>
+<!-- Expanded Section -->
+<div class="hidden border-t border-outline-variant/30 bg-surface-container-lowest/50 p-lg" id="ticket-001">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+<div>
+<div class="flex justify-between items-center mb-sm">
+<h4 class="font-label-caps text-label-caps text-primary">JSON PAYLOAD</h4>
+<button class="text-primary hover:text-white transition-colors flex items-center gap-xs" onclick="copyToClipboard('json-1')">
+<span class="material-symbols-outlined text-[14px]" data-icon="content_copy">content_copy</span>
+<span class="text-[10px] font-bold">COPY JSON</span>
+</button>
+</div>
+<pre class="code-block font-mono-code text-mono-code bg-surface p-md rounded overflow-x-auto text-primary border border-outline-variant/20 h-64" id="json-1">{
+  "ticket_id": "GPL-2023-9841",
+  "status": "OPEN",
+  "severity": "CRITICAL",
+  "metadata": {
+    "device_id": "POS-01-JKTC",
+    "firmware": "v2.4.1",
+    "network_latency": "45ms"
+  },
+  "content": {
+    "msg": "Payment timeout at gateway",
+    "ref_id": "TXN_7721882X",
+    "method": "QRIS_GOPAY"
+  }
+}</pre>
+</div>
+<div>
+<h4 class="font-label-caps text-label-caps text-outline mb-sm">ATTACHED SYSTEM INFO</h4>
+<div class="space-y-sm">
+<div class="bg-surface p-sm border border-outline-variant/20 rounded flex justify-between items-center">
+<span class="font-body-sm text-body-sm text-on-surface-variant">OS Architecture</span>
+<span class="font-mono-code text-mono-code text-on-surface">linux/amd64</span>
+</div>
+<div class="bg-surface p-sm border border-outline-variant/20 rounded flex justify-between items-center">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Worker ID</span>
+<span class="font-mono-code text-mono-code text-on-surface">node_cluster_04</span>
+</div>
+<div class="bg-surface p-sm border border-outline-variant/20 rounded flex justify-between items-center">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Active Memory Usage</span>
+<span class="font-mono-code text-mono-code text-on-surface">428.4 MB</span>
+</div>
+<div class="mt-md">
+<button class="w-full py-sm bg-primary-container/10 border border-primary-container/30 text-primary hover:bg-primary-container/20 font-bold rounded transition-all">VIEW FULL STACK TRACE</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Complaint Card 2 -->
+<div class="bento-card overflow-hidden group">
+<div class="flex flex-col md:flex-row cursor-pointer" onclick="toggleExpand('ticket-002')">
+<div class="w-1 bg-tertiary-container self-stretch"></div>
+<div class="flex-1 p-md flex flex-wrap items-center gap-xl">
+<div class="flex-shrink-0">
+<span class="font-label-caps text-label-caps text-outline">TICKET ID</span>
+<p class="font-mono-code text-mono-code text-primary">#GPL-2023-9842</p>
+</div>
+<div class="flex-shrink-0">
+<span class="font-label-caps text-label-caps text-outline">DATE / TIME</span>
+<p class="font-body-md text-body-md text-on-surface">Oct 24, 2023 14:25:01</p>
+</div>
+<div class="flex-shrink-0">
+<span class="font-label-caps text-label-caps text-outline">OUTLET</span>
+<p class="font-body-md text-body-md text-on-surface">SBY-NORTH-04</p>
+</div>
+<div class="flex-shrink-0">
+<span class="font-label-caps text-label-caps text-outline">CATEGORY</span>
+<span class="px-xs py-[2px] bg-tertiary-container/20 text-tertiary-container text-[10px] font-bold rounded border border-tertiary-container/30 uppercase tracking-tighter">Hardware Failure</span>
+</div>
+<div class="flex-1 min-w-[200px]">
+<span class="font-label-caps text-label-caps text-outline">PREVIEW</span>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">Receipt printer jammed for the third time in 2 hours. Self-reset didn't work...</p>
+</div>
+<span class="material-symbols-outlined text-outline transition-transform duration-300" data-icon="expand_more" id="icon-ticket-002">expand_more</span>
+</div>
+</div>
+<div class="hidden border-t border-outline-variant/30 bg-surface-container-lowest/50 p-lg" id="ticket-002">
+<!-- Content similar to Ticket 1 -->
+<p class="font-mono-code text-mono-code text-primary-fixed-dim">Hardware diagnostic data loading...</p>
+</div>
+</div>
+<!-- Complaint Card 3 -->
+<div class="bento-card overflow-hidden group">
+<div class="flex flex-col md:flex-row cursor-pointer" onclick="toggleExpand('ticket-003')">
+<div class="w-1 bg-primary self-stretch"></div>
+<div class="flex-1 p-md flex flex-wrap items-center gap-xl">
+<div class="flex-shrink-0">
+<span class="font-label-caps text-label-caps text-outline">TICKET ID</span>
+<p class="font-mono-code text-mono-code text-primary">#GPL-2023-9845</p>
+</div>
+<div class="flex-shrink-0">
+<span class="font-label-caps text-label-caps text-outline">DATE / TIME</span>
+<p class="font-body-md text-body-md text-on-surface">Oct 24, 2023 14:30:15</p>
+</div>
+<div class="flex-shrink-0">
+<span class="font-label-caps text-label-caps text-outline">OUTLET</span>
+<p class="font-body-md text-body-md text-on-surface">BDG-WEST-02</p>
+</div>
+<div class="flex-shrink-0">
+<span class="font-label-caps text-label-caps text-outline">CATEGORY</span>
+<span class="px-xs py-[2px] bg-primary-container/20 text-primary-container text-[10px] font-bold rounded border border-primary-container/30 uppercase tracking-tighter">Personnel</span>
+</div>
+<div class="flex-1 min-w-[200px]">
+<span class="font-label-caps text-label-caps text-outline">PREVIEW</span>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">User "STAFF_22" reported unable to login after password reset. Permission denied...</p>
+</div>
+<span class="material-symbols-outlined text-outline transition-transform duration-300" data-icon="expand_more" id="icon-ticket-003">expand_more</span>
+</div>
+</div>
+<div class="hidden border-t border-outline-variant/30 bg-surface-container-lowest/50 p-lg" id="ticket-003">
+<p class="font-mono-code text-mono-code text-primary-fixed-dim">Auth module logs retrieved. Awaiting analysis...</p>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="fixed bottom-0 w-full z-40 flex justify-between items-center px-margin py-xs bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant dark:border-outline-variant">
+<div class="flex items-center gap-md">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">System Status: Operational</span>
+<div class="flex gap-xs items-center">
+<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+<span class="text-[10px] text-outline">Syncing...</span>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<span class="font-body-sm text-body-sm text-on-surface-variant">v0.1.0</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Last update: 2 mins ago</span>
+</div>
+</footer>
+<script>
+        function toggleExpand(id) {
+            const el = document.getElementById(id);
+            const icon = document.getElementById('icon-' + id);
+            
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+                // Simple animation effect for "batch rendering" feel
+                el.style.opacity = '0';
+                setTimeout(() => {
+                    el.style.transition = 'opacity 0.3s ease';
+                    el.style.opacity = '1';
+                }, 10);
+            } else {
+                el.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function copyToClipboard(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('JSON copied to clipboard');
+            });
+        }
+
+        // Simulating auto-refreshing logs in the background
+        setInterval(() => {
+            console.log('Stream heartbeat active...');
+        }, 5000);
+    </script>
+</body></html>

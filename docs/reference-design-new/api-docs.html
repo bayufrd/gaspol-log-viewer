@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>API Documentation | Gaspol Log Viewer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#7bd0ff",
+                        "surface-container-highest": "#303539",
+                        "tertiary-container": "#f1a02b",
+                        "surface-variant": "#303539",
+                        "on-secondary-fixed-variant": "#47464a",
+                        "tertiary": "#ffc176",
+                        "on-secondary-fixed": "#1b1b1e",
+                        "on-primary": "#00354a",
+                        "on-primary-fixed": "#001e2c",
+                        "outline": "#87929a",
+                        "on-surface-variant": "#bdc8d1",
+                        "inverse-on-surface": "#2c3135",
+                        "surface": "#0f1418",
+                        "surface-dim": "#0f1418",
+                        "background": "#0f1418",
+                        "inverse-surface": "#dee3e8",
+                        "primary-container": "#38bdf8",
+                        "primary": "#8ed5ff",
+                        "inverse-primary": "#00668a",
+                        "surface-container-high": "#252b2e",
+                        "on-tertiary-container": "#613b00",
+                        "on-tertiary": "#472a00",
+                        "surface-container-low": "#171c20",
+                        "surface-tint": "#7bd0ff",
+                        "error": "#ffb4ab",
+                        "secondary-fixed": "#e4e1e6",
+                        "on-primary-container": "#004965",
+                        "secondary-fixed-dim": "#c8c5ca",
+                        "tertiary-fixed": "#ffddb8",
+                        "secondary": "#c8c5ca",
+                        "on-surface": "#dee3e8",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-secondary-container": "#b6b4b8",
+                        "tertiary-fixed-dim": "#ffb960",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-background": "#dee3e8",
+                        "secondary-container": "#47464a",
+                        "surface-bright": "#343a3e",
+                        "on-primary-fixed-variant": "#004c69",
+                        "surface-container-lowest": "#0a0f12",
+                        "outline-variant": "#3e484f",
+                        "on-secondary": "#303033",
+                        "surface-container": "#1b2024",
+                        "error-container": "#93000a",
+                        "primary-fixed": "#c4e7ff",
+                        "on-error": "#690005"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "unit": "4px",
+                        "margin": "24px",
+                        "md": "16px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Geist"],
+                        "body-sm": ["Geist"],
+                        "body-md": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "mono-code": ["JetBrains Mono"],
+                        "label-caps": ["Geist"],
+                        "display": ["Geist"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["clamp(16px, 3vw, 18px)", { "lineHeight": "24px", "fontWeight": "500" }],
+                        "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "mono-code": ["13px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "label-caps": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "display": ["clamp(24px, 5vw, 32px)", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #0f1418;
+            color: #dee3e8;
+            font-family: 'Geist', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .code-block {
+            background-color: #0a0f12;
+            border: 1px solid #3e484f;
+            border-radius: 0.25rem;
+        }
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: #3e484f;
+            border-radius: 10px;
+        }
+        .sidebar-active {
+            border-left: 4px solid #8ed5ff;
+            background-color: #303539;
+            color: #8ed5ff;
+            font-weight: 700;
+        }
+        .method-get { color: #8ed5ff; }
+        .method-post { color: #4ade80; }
+        .method-put { color: #facc15; }
+        .method-delete { color: #f87171; }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface dark:bg-surface border-b border-outline-variant dark:border-outline-variant">
+<div class="flex items-center gap-md">
+<span class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary">Gaspol Log Viewer</span>
+<div class="hidden md:flex items-center gap-lg ml-xl">
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary transition-colors" href="#">API Logs</a>
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary transition-colors" href="#">PM2 Logs</a>
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary transition-colors" href="#">Windows Logs</a>
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary transition-colors" href="#">Complaints</a>
+<a class="font-headline-md text-headline-md text-primary dark:text-primary border-b-2 border-primary pb-1" href="#">API Docs</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-body-sm text-body-sm text-on-surface-variant">v0.1.0</span>
+<button class="p-xs hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+</div>
+</nav>
+<div class="flex flex-1 mt-16 overflow-hidden">
+<!-- SideNavBar (ApiDocLayout Sidebar) -->
+<aside class="fixed left-0 h-[calc(100vh-64px)] w-[260px] bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant dark:border-outline-variant flex flex-col gap-sm py-md overflow-y-auto sidebar-scroll">
+<div class="px-md mb-md">
+<span class="font-label-caps text-label-caps text-outline">API DOCUMENTATION</span>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">v0.1.0-stable</p>
+</div>
+<!-- Group: Logs -->
+<div class="flex flex-col">
+<div class="px-md py-xs flex items-center gap-sm">
+<span class="material-symbols-outlined text-sm opacity-50" data-icon="terminal">terminal</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">LOGS ENGINE</span>
+</div>
+<a class="sidebar-active px-md py-sm font-body-md text-body-md flex items-center gap-sm transition-all duration-200" href="#summary">
+<span class="text-[10px] font-bold method-get">GET</span> summary/all
+                </a>
+<a class="px-md py-sm font-body-md text-body-md text-on-surface-variant hover:bg-surface-variant transition-all duration-200 flex items-center gap-sm" href="#post-logs">
+<span class="text-[10px] font-bold method-post">POST</span> ingest
+                </a>
+<a class="px-md py-sm font-body-md text-body-md text-on-surface-variant hover:bg-surface-variant transition-all duration-200 flex items-center gap-sm" href="#stream">
+<span class="text-[10px] font-bold method-get">GET</span> stream
+                </a>
+</div>
+<!-- Group: Updates -->
+<div class="flex flex-col mt-md">
+<div class="px-md py-xs flex items-center gap-sm">
+<span class="material-symbols-outlined text-sm opacity-50" data-icon="system_update">system_update</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">SYSTEM UPDATES</span>
+</div>
+<a class="px-md py-sm font-body-md text-body-md text-on-surface-variant hover:bg-surface-variant transition-all duration-200 flex items-center gap-sm" href="#check-update">
+<span class="text-[10px] font-bold method-get">GET</span> check
+                </a>
+<a class="px-md py-sm font-body-md text-body-md text-on-surface-variant hover:bg-surface-variant transition-all duration-200 flex items-center gap-sm" href="#trigger-update">
+<span class="text-[10px] font-bold method-post">POST</span> trigger
+                </a>
+</div>
+<!-- Group: Complaints -->
+<div class="flex flex-col mt-md">
+<div class="px-md py-xs flex items-center gap-sm">
+<span class="material-symbols-outlined text-sm opacity-50" data-icon="security">security</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">COMPLAINTS &amp; AUTH</span>
+</div>
+<a class="px-md py-sm font-body-md text-body-md text-on-surface-variant hover:bg-surface-variant transition-all duration-200 flex items-center gap-sm" href="#auth-validate">
+<span class="text-[10px] font-bold method-post">POST</span> validate
+                </a>
+<a class="px-md py-sm font-body-md text-body-md text-on-surface-variant hover:bg-surface-variant transition-all duration-200 flex items-center gap-sm" href="#report">
+<span class="text-[10px] font-bold method-put">PUT</span> report/issue
+                </a>
+<a class="px-md py-sm font-body-md text-body-md text-on-surface-variant hover:bg-surface-variant transition-all duration-200 flex items-center gap-sm" href="#delete-log">
+<span class="text-[10px] font-bold method-delete">DELETE</span> purge
+                </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[260px] flex-1 overflow-y-auto px-lg py-xl pb-32">
+<div class="max-w-5xl mx-auto">
+<!-- Documentation Header -->
+<header class="mb-xl">
+<div class="flex items-center gap-sm mb-xs">
+<span class="bg-primary-container text-on-primary-container px-sm py-0.5 rounded font-label-caps text-label-caps">STABLE RELEASE</span>
+<span class="text-on-surface-variant font-body-sm text-body-sm">Last update: 2 mins ago</span>
+</div>
+<h1 class="font-display text-display text-on-surface mb-sm">Gaspol API Reference</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl leading-relaxed">
+                        Welcome to the official Gaspol Log Viewer documentation. Our RESTful API allows you to programmatically ingest, retrieve, and monitor system logs across distributed environments. Follow the endpoints below to integrate Gaspol into your DevOps pipeline.
+                    </p>
+</header>
+<!-- Endpoint Card: GET /logsummary/all -->
+<section class="mb-xl bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden" id="summary">
+<div class="p-md flex items-center justify-between bg-surface-container">
+<div class="flex items-center gap-md">
+<span class="font-bold text-headline-md method-get">GET</span>
+<span class="font-mono-code text-mono-code text-on-surface">/api/v1/logsummary/all</span>
+</div>
+<button class="bg-primary text-on-primary font-label-caps text-label-caps px-md py-sm rounded-lg hover:opacity-90 transition-opacity">
+                            TRY IT OUT
+                        </button>
+</div>
+<div class="p-lg grid grid-cols-1 lg:grid-cols-2 gap-lg">
+<!-- Technical Specs -->
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-md">Retrieve All Summaries</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">
+                                Returns a paginated list of all log summaries aggregated by service type and severity level.
+                            </p>
+<h4 class="font-label-caps text-label-caps text-outline mb-sm">REQUEST PARAMETERS</h4>
+<table class="w-full text-left font-body-sm text-body-sm mb-lg">
+<thead class="border-b border-outline-variant">
+<tr>
+<th class="py-sm">Parameter</th>
+<th class="py-sm">Type</th>
+<th class="py-sm">Required</th>
+</tr>
+</thead>
+<tbody class="text-on-surface-variant">
+<tr class="border-b border-outline-variant">
+<td class="py-sm font-mono-code text-primary">limit</td>
+<td class="py-sm">integer</td>
+<td class="py-sm">Optional</td>
+</tr>
+<tr class="border-b border-outline-variant">
+<td class="py-sm font-mono-code text-primary">offset</td>
+<td class="py-sm">integer</td>
+<td class="py-sm">Optional</td>
+</tr>
+<tr>
+<td class="py-sm font-mono-code text-primary">service</td>
+<td class="py-sm">string</td>
+<td class="py-sm">No</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Code Example -->
+<div class="flex flex-col gap-sm">
+<h4 class="font-label-caps text-label-caps text-outline">EXAMPLE RESPONSE</h4>
+<div class="code-block p-md font-mono-code text-mono-code text-on-surface-variant overflow-x-auto">
+<pre class="text-sky-300">{
+  <span class="text-amber-200">"status"</span>: <span class="text-white">"success"</span>,
+  <span class="text-amber-200">"data"</span>: [
+    {
+      <span class="text-amber-200">"id"</span>: <span class="text-white">"LOG_8821"</span>,
+      <span class="text-amber-200">"severity"</span>: <span class="text-red-400">"ERROR"</span>,
+      <span class="text-amber-200">"timestamp"</span>: <span class="text-white">"2023-10-27T10:20:00Z"</span>,
+      <span class="text-amber-200">"message"</span>: <span class="text-white">"Timeout at node_01"</span>
+    }
+  ],
+  <span class="text-amber-200">"pagination"</span>: {
+    <span class="text-amber-200">"total"</span>: <span class="text-white">1240</span>,
+    <span class="text-amber-200">"next_offset"</span>: <span class="text-white">50</span>
+  }
+}</pre>
+</div>
+</div>
+</div>
+</section>
+<!-- Endpoint Card: POST /logs -->
+<section class="mb-xl bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden" id="post-logs">
+<div class="p-md flex items-center justify-between bg-surface-container">
+<div class="flex items-center gap-md">
+<span class="font-bold text-headline-md method-post">POST</span>
+<span class="font-mono-code text-mono-code text-on-surface">/api/v1/logs/ingest</span>
+</div>
+<button class="bg-primary text-on-primary font-label-caps text-label-caps px-md py-sm rounded-lg hover:opacity-90 transition-opacity">
+                            TRY IT OUT
+                        </button>
+</div>
+<div class="p-lg grid grid-cols-1 lg:grid-cols-2 gap-lg">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-md">Ingest Log Entry</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">
+                                Send single or bulk log objects to the Gaspol ingestion engine for processing and indexing.
+                            </p>
+<h4 class="font-label-caps text-label-caps text-outline mb-sm">BODY JSON</h4>
+<div class="code-block p-md font-mono-code text-mono-code text-on-surface-variant mb-lg">
+<pre>{
+  <span class="text-amber-200">"app_name"</span>: <span class="text-white">string</span>,
+  <span class="text-amber-200">"payload"</span>: <span class="text-white">object</span>,
+  <span class="text-amber-200">"tags"</span>: <span class="text-white">string[]</span>
+}</pre>
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-label-caps text-label-caps text-outline">CURL REQUEST</h4>
+<div class="code-block p-md font-mono-code text-mono-code text-on-surface-variant overflow-x-auto">
+<pre class="text-green-300">curl -X POST \
+  https://api.gaspol.sys/v1/logs/ingest \
+  -H 'Authorization: Bearer [TOKEN]' \
+  -d '{
+    "app_name": "checkout-svc",
+    "payload": {"evt": "purchase"}
+  }'</pre>
+</div>
+</div>
+</div>
+</section>
+<!-- Additional Placeholder for Visual Richness -->
+<div class="mt-xl p-lg rounded-xl border border-dashed border-outline-variant bg-surface-container-lowest flex flex-col items-center justify-center text-center">
+<div class="w-16 h-16 rounded-full bg-surface-variant flex items-center justify-center mb-md">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="menu_book">menu_book</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-sm">Need a PDF version?</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md max-w-sm">
+                        Download the full technical reference for offline reading or integration into internal knowledge bases.
+                    </p>
+<button class="font-label-caps text-label-caps text-primary border border-primary px-xl py-md rounded hover:bg-primary hover:text-on-primary transition-all">
+                        DOWNLOAD API DOCS (PDF)
+                    </button>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="fixed bottom-0 w-full z-40 flex justify-between items-center px-margin py-xs bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant dark:border-outline-variant">
+<div class="flex items-center gap-md">
+<span class="font-label-caps text-label-caps text-on-surface-variant">GASPOL SYSTEM</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">System Status: Operational</span>
+</div>
+<div class="flex items-center gap-lg">
+<span class="font-body-sm text-body-sm text-on-surface-variant">v0.1.0</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Last update: 2 mins ago</span>
+</div>
+</footer>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelectorAll('aside a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                // If it's a hash link, prevent default and smooth scroll
+                if(link.getAttribute('href').startsWith('#')) {
+                    document.querySelectorAll('aside a').forEach(l => l.classList.remove('sidebar-active', 'bg-surface-container-highest', 'text-primary', 'font-bold'));
+                    document.querySelectorAll('aside l').forEach(l => l.classList.add('text-on-surface-variant'));
+                    
+                    link.classList.add('sidebar-active');
+                    link.classList.remove('text-on-surface-variant');
+                }
+            });
+        });
+
+        // Simple visibility observer for active state on scroll
+        const observerOptions = {
+            root: document.querySelector('main'),
+            rootMargin: '0px',
+            threshold: 0.5
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    document.querySelectorAll('aside a').forEach(link => {
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('sidebar-active');
+                            link.classList.remove('text-on-surface-variant');
+                        } else {
+                            link.classList.remove('sidebar-active');
+                            link.classList.add('text-on-surface-variant');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section[id]').forEach((section) => {
+            observer.observe(section);
+        });
+    </script>
+</body></html>

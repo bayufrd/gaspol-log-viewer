@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;family=Geist:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .log-scroll-hide::-webkit-scrollbar { display: none; }
+        .log-scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .beveled-overlay {
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#3e484f",
+                    "on-primary-fixed": "#001e2c",
+                    "on-secondary-fixed-variant": "#47464a",
+                    "on-primary-fixed-variant": "#004c69",
+                    "surface-container-low": "#171c20",
+                    "on-surface-variant": "#bdc8d1",
+                    "on-surface": "#dee3e8",
+                    "on-secondary-container": "#b6b4b8",
+                    "surface-bright": "#343a3e",
+                    "surface-container": "#1b2024",
+                    "on-secondary-fixed": "#1b1b1e",
+                    "secondary-container": "#47464a",
+                    "inverse-surface": "#dee3e8",
+                    "surface": "#0f1418",
+                    "on-primary": "#00354a",
+                    "on-secondary": "#303033",
+                    "on-tertiary": "#472a00",
+                    "primary": "#8ed5ff",
+                    "on-tertiary-container": "#613b00",
+                    "surface-tint": "#7bd0ff",
+                    "tertiary-fixed": "#ffddb8",
+                    "on-tertiary-fixed": "#2a1700",
+                    "surface-container-high": "#252b2e",
+                    "tertiary": "#ffc176",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "primary-fixed-dim": "#7bd0ff",
+                    "outline": "#87929a",
+                    "surface-container-lowest": "#0a0f12",
+                    "secondary-fixed": "#e4e1e6",
+                    "surface-container-highest": "#303539",
+                    "secondary": "#c8c5ca",
+                    "error-container": "#93000a",
+                    "on-error-container": "#ffdad6",
+                    "surface-variant": "#303539",
+                    "primary-container": "#38bdf8",
+                    "on-primary-container": "#004965",
+                    "inverse-primary": "#00668a",
+                    "on-error": "#690005",
+                    "background": "#0f1418",
+                    "tertiary-fixed-dim": "#ffb960",
+                    "inverse-on-surface": "#2c3135",
+                    "error": "#ffb4ab",
+                    "tertiary-container": "#f1a02b",
+                    "surface-dim": "#0f1418",
+                    "secondary-fixed-dim": "#c8c5ca",
+                    "on-background": "#dee3e8",
+                    "primary-fixed": "#c4e7ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "gutter": "16px",
+                    "xs": "4px",
+                    "xl": "32px",
+                    "unit": "4px",
+                    "margin": "24px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Geist"],
+                    "body-sm": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "mono-code": ["JetBrains Mono"],
+                    "label-caps": ["Geist"],
+                    "display": ["Geist"],
+                    "body-md": ["Geist"]
+            },
+            "fontSize": {
+                    "headline-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-md": ["clamp(16px, 3vw, 18px)", {"lineHeight": "24px", "fontWeight": "500"}],
+                    "mono-code": ["13px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "display": ["clamp(24px, 5vw, 32px)", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="font-headline-lg text-headline-lg font-bold text-primary">Gaspol Log Viewer</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-body-sm text-body-sm text-on-surface-variant">v0.1.0</span>
+<button class="flex items-center justify-center p-xs hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+</button>
+</div>
+</header>
+<main class="pt-20 pb-24 px-md">
+<!-- Outlet Summaries -->
+<section class="mb-lg">
+<div class="flex justify-between items-end mb-sm">
+<h2 class="font-label-caps text-label-caps text-outline uppercase">Outlet Status</h2>
+<span class="flex items-center gap-xs text-primary font-body-sm text-body-sm">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse-subtle"></span>
+                    Live Updates
+                </span>
+</div>
+<div class="grid grid-cols-3 gap-sm overflow-x-auto log-scroll-hide">
+<!-- Outlet A -->
+<div class="bg-surface-container-low border border-outline-variant p-sm flex flex-col gap-xs min-w-[100px]">
+<span class="font-label-caps text-label-caps text-on-surface-variant">OUTLET A</span>
+<div class="flex items-baseline gap-xs">
+<span class="font-headline-lg text-headline-lg text-primary">98%</span>
+<span class="material-symbols-outlined text-sm text-primary" data-icon="check_circle">check_circle</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest">
+<div class="h-full bg-primary w-[98%]"></div>
+</div>
+</div>
+<!-- Outlet B -->
+<div class="bg-surface-container-low border border-outline-variant p-sm flex flex-col gap-xs min-w-[100px]">
+<span class="font-label-caps text-label-caps text-on-surface-variant">OUTLET B</span>
+<div class="flex items-baseline gap-xs">
+<span class="font-headline-lg text-headline-lg text-tertiary">74%</span>
+<span class="material-symbols-outlined text-sm text-tertiary" data-icon="warning">warning</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest">
+<div class="h-full bg-tertiary w-[74%]"></div>
+</div>
+</div>
+<!-- Outlet C -->
+<div class="bg-surface-container-low border border-outline-variant p-sm flex flex-col gap-xs min-w-[100px]">
+<span class="font-label-caps text-label-caps text-on-surface-variant">OUTLET C</span>
+<div class="flex items-baseline gap-xs">
+<span class="font-headline-lg text-headline-lg text-on-surface">100%</span>
+<span class="material-symbols-outlined text-sm text-primary" data-icon="verified">verified</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest">
+<div class="h-full bg-primary w-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Log Selector & Search -->
+<section class="flex flex-col gap-md mb-lg">
+<div class="flex flex-col gap-xs">
+<label class="font-label-caps text-label-caps text-outline uppercase">Active Source</label>
+<div class="relative">
+<select class="w-full bg-surface-container-lowest border border-outline-variant text-on-surface py-sm px-md appearance-none focus:outline-none focus:border-primary transition-colors">
+<option>API Logs (main_api_v2)</option>
+<option>PM2 Logs (cluster_node_01)</option>
+<option>Windows Logs (system_event_log)</option>
+<option>Complaints DB (sync_service)</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors" data-icon="search">search</span>
+<input class="w-full bg-background border border-outline-variant py-sm pl-11 pr-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Filter logs by keyword, PID, or status..." type="text"/>
+</div>
+</section>
+<!-- Main Log Stream -->
+<section class="flex flex-col bg-surface-container-lowest border border-outline-variant overflow-hidden">
+<div class="p-sm border-b border-outline-variant bg-surface-container flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-outline uppercase">Log Stream — cluster_node_01</span>
+<div class="flex gap-sm">
+<span class="material-symbols-outlined text-sm text-outline cursor-pointer hover:text-on-surface" data-icon="pause_circle">pause_circle</span>
+<span class="material-symbols-outlined text-sm text-outline cursor-pointer hover:text-on-surface" data-icon="delete">delete</span>
+</div>
+</div>
+<!-- Log Entries -->
+<div class="flex flex-col max-h-[500px] overflow-y-auto log-scroll-hide" id="log-container">
+<!-- Error Entry -->
+<div class="group border-b border-outline-variant hover:bg-surface-container-highest transition-colors cursor-pointer" onclick="this.classList.toggle('bg-surface-container-highest')">
+<div class="flex">
+<div class="w-1 bg-error min-h-full"></div>
+<div class="p-sm flex flex-col gap-xs w-full">
+<div class="flex justify-between items-center">
+<span class="font-mono-code text-mono-code text-error font-bold">ERROR</span>
+<span class="font-mono-code text-mono-code text-outline text-[11px]">14:22:01.452</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-mono-code text-mono-code text-primary-fixed-dim shrink-0">auth_service</span>
+<span class="font-mono-code text-mono-code text-on-surface truncate">Failed to validate JWT: signature mismatch for user_id: 8842...</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Warning Entry -->
+<div class="group border-b border-outline-variant hover:bg-surface-container-highest transition-colors cursor-pointer">
+<div class="flex">
+<div class="w-1 bg-tertiary min-h-full"></div>
+<div class="p-sm flex flex-col gap-xs w-full">
+<div class="flex justify-between items-center">
+<span class="font-mono-code text-mono-code text-tertiary font-bold">WARN</span>
+<span class="font-mono-code text-mono-code text-outline text-[11px]">14:21:58.120</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-mono-code text-mono-code text-primary-fixed-dim shrink-0">db_pool</span>
+<span class="font-mono-code text-mono-code text-on-surface truncate">Connection timeout warning: connection pool reaching 85% capacity...</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Info Entry -->
+<div class="group border-b border-outline-variant hover:bg-surface-container-highest transition-colors cursor-pointer">
+<div class="flex">
+<div class="w-1 bg-primary min-h-full"></div>
+<div class="p-sm flex flex-col gap-xs w-full">
+<div class="flex justify-between items-center">
+<span class="font-mono-code text-mono-code text-primary font-bold">INFO</span>
+<span class="font-mono-code text-mono-code text-outline text-[11px]">14:21:55.003</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-mono-code text-mono-code text-primary-fixed-dim shrink-0">gateway</span>
+<span class="font-mono-code text-mono-code text-on-surface truncate">Inbound POST /v1/auth/login from 192.168.1.42 (Edge/114.0)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Detailed/Expanded Entry -->
+<div class="group border-b border-outline-variant bg-surface-container-highest transition-colors">
+<div class="flex">
+<div class="w-1 bg-error min-h-full"></div>
+<div class="p-sm flex flex-col gap-sm w-full">
+<div class="flex justify-between items-center">
+<span class="font-mono-code text-mono-code text-error font-bold">ERROR</span>
+<span class="font-mono-code text-mono-code text-outline text-[11px]">14:21:40.992</span>
+</div>
+<div class="flex flex-col gap-sm">
+<span class="font-mono-code text-mono-code text-primary-fixed-dim">upstream_cluster</span>
+<p class="font-mono-code text-mono-code text-on-surface leading-relaxed">
+                                    [FatalError] 502 Bad Gateway: Upstream service 'payment_provider' is unreachable.
+                                    <br/><br/>
+                                    Stack Trace:<br/>
+                                    at payment_logic.js:144:20<br/>
+                                    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+                                </p>
+</div>
+<div class="flex gap-md border-t border-outline-variant pt-sm">
+<button class="text-primary font-label-caps text-label-caps uppercase flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm" data-icon="content_copy">content_copy</span> Copy
+                                </button>
+<button class="text-on-surface-variant font-label-caps text-label-caps uppercase flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm" data-icon="share">share</span> Trace
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- More Info Entries -->
+<div class="group border-b border-outline-variant hover:bg-surface-container-highest transition-colors cursor-pointer">
+<div class="flex">
+<div class="w-1 bg-primary min-h-full"></div>
+<div class="p-sm flex flex-col gap-xs w-full">
+<div class="flex justify-between items-center">
+<span class="font-mono-code text-mono-code text-primary font-bold">INFO</span>
+<span class="font-mono-code text-mono-code text-outline text-[11px]">14:21:35.412</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="font-mono-code text-mono-code text-primary-fixed-dim shrink-0">scheduler</span>
+<span class="font-mono-code text-mono-code text-on-surface truncate">Running daily cleanup task: purged 4.2GB from /tmp/uploads</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface-container-low flex items-center justify-around h-16 border-t border-outline-variant md:hidden">
+<button class="flex flex-col items-center gap-xs text-primary font-bold bg-surface-container-highest border-l-4 border-primary px-md h-full justify-center">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span class="font-body-sm text-[10px]">Client Logs</span>
+</button>
+<button class="flex flex-col items-center gap-xs text-on-surface-variant hover:bg-surface-variant transition-all h-full justify-center px-md">
+<span class="material-symbols-outlined" data-icon="system_update">system_update</span>
+<span class="font-body-sm text-[10px]">Update</span>
+</button>
+<button class="flex flex-col items-center gap-xs text-on-surface-variant hover:bg-surface-variant transition-all h-full justify-center px-md">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-body-sm text-[10px]">Guide</span>
+</button>
+<button class="flex flex-col items-center gap-xs text-on-surface-variant hover:bg-surface-variant transition-all h-full justify-center px-md">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+<span class="font-body-sm text-[10px]">Auth</span>
+</button>
+</nav>
+<!-- Floating FAB (Only for Home/Dashboard) -->
+<button class="fixed bottom-20 right-lg w-14 h-14 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform z-40">
+<span class="material-symbols-outlined" data-icon="download" data-weight="fill">download</span>
+</button>
+<script>
+        // Micro-interactions: Auto-scrolling simulation
+        const logContainer = document.getElementById('log-container');
+        let autoScroll = true;
+
+        logContainer.addEventListener('scroll', () => {
+            const atBottom = logContainer.scrollHeight - logContainer.scrollTop === logContainer.clientHeight;
+            autoScroll = atBottom;
+        });
+
+        // Simple function to toggle log expansion (visual only)
+        document.querySelectorAll('#log-container > div').forEach(entry => {
+            entry.addEventListener('click', () => {
+                const message = entry.querySelector('.truncate');
+                if (message) {
+                    message.classList.toggle('truncate');
+                    message.classList.toggle('whitespace-normal');
+                }
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gaspol Log Viewer - Windows Logs</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;family=Geist:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f1418;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3e484f;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "outline-variant": "#3e484f",
+                "on-primary-fixed": "#001e2c",
+                "on-secondary-fixed-variant": "#47464a",
+                "on-primary-fixed-variant": "#004c69",
+                "surface-container-low": "#171c20",
+                "on-surface-variant": "#bdc8d1",
+                "on-surface": "#dee3e8",
+                "on-secondary-container": "#b6b4b8",
+                "surface-bright": "#343a3e",
+                "surface-container": "#1b2024",
+                "on-secondary-fixed": "#1b1b1e",
+                "secondary-container": "#47464a",
+                "inverse-surface": "#dee3e8",
+                "surface": "#0f1418",
+                "on-primary": "#00354a",
+                "on-secondary": "#303033",
+                "on-tertiary": "#472a00",
+                "primary": "#8ed5ff",
+                "on-tertiary-container": "#613b00",
+                "surface-tint": "#7bd0ff",
+                "tertiary-fixed": "#ffddb8",
+                "on-tertiary-fixed": "#2a1700",
+                "surface-container-high": "#252b2e",
+                "tertiary": "#ffc176",
+                "on-tertiary-fixed-variant": "#653e00",
+                "primary-fixed-dim": "#7bd0ff",
+                "outline": "#87929a",
+                "surface-container-lowest": "#0a0f12",
+                "secondary-fixed": "#e4e1e6",
+                "surface-container-highest": "#303539",
+                "secondary": "#c8c5ca",
+                "error-container": "#93000a",
+                "on-error-container": "#ffdad6",
+                "surface-variant": "#303539",
+                "primary-container": "#38bdf8",
+                "on-primary-container": "#004965",
+                "inverse-primary": "#00668a",
+                "on-error": "#690005",
+                "background": "#0f1418",
+                "tertiary-fixed-dim": "#ffb960",
+                "inverse-on-surface": "#2c3135",
+                "error": "#ffb4ab",
+                "tertiary-container": "#f1a02b",
+                "surface-dim": "#0f1418",
+                "secondary-fixed-dim": "#c8c5ca",
+                "on-background": "#dee3e8",
+                "primary-fixed": "#c4e7ff"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "md": "16px",
+                "lg": "24px",
+                "sm": "8px",
+                "gutter": "16px",
+                "xs": "4px",
+                "xl": "32px",
+                "unit": "4px",
+                "margin": "24px"
+        },
+        "fontFamily": {
+                "headline-lg": ["Geist"],
+                "body-sm": ["Geist"],
+                "headline-md": ["Geist"],
+                "mono-code": ["JetBrains Mono"],
+                "label-caps": ["Geist"],
+                "display": ["Geist"],
+                "body-md": ["Geist"]
+        },
+        "fontSize": {
+                "headline-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                "headline-md": ["clamp(16px, 3vw, 18px)", {"lineHeight": "24px", "fontWeight": "500"}],
+                "mono-code": ["13px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                "display": ["clamp(24px, 5vw, 32px)", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+        }
+      },
+    },
+  }
+</script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary/30">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="font-headline-lg text-headline-lg font-bold text-primary">Gaspol Log Viewer</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-body-sm text-body-sm text-on-surface-variant">v0.1.0</span>
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-all">dark_mode</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-16 pb-20 px-gutter">
+<!-- Outlet Selection Chips (Horizontal Scroll) -->
+<section class="mt-lg">
+<h2 class="font-label-caps text-label-caps text-outline mb-sm">Select Outlet</h2>
+<div class="flex gap-sm overflow-x-auto pb-xs no-scrollbar">
+<button class="flex-none px-md py-xs bg-surface-container-highest border-l-4 border-primary text-primary font-bold transition-all">All Outlets</button>
+<button class="flex-none px-md py-xs bg-surface-container border border-outline-variant text-on-surface-variant hover:bg-surface-variant transition-all">JKT-01</button>
+<button class="flex-none px-md py-xs bg-surface-container border border-outline-variant text-on-surface-variant hover:bg-surface-variant transition-all">SUB-04</button>
+<button class="flex-none px-md py-xs bg-surface-container border border-outline-variant text-on-surface-variant hover:bg-surface-variant transition-all">BDG-12</button>
+<button class="flex-none px-md py-xs bg-surface-container border border-outline-variant text-on-surface-variant hover:bg-surface-variant transition-all">MDN-02</button>
+<button class="flex-none px-md py-xs bg-surface-container border border-outline-variant text-on-surface-variant hover:bg-surface-variant transition-all">YGY-07</button>
+</div>
+</section>
+<!-- Field Visibility Toggles -->
+<section class="mt-lg">
+<div class="flex items-center justify-between mb-sm">
+<h2 class="font-label-caps text-label-caps text-outline">Visibility Toggles</h2>
+<div class="flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-caps text-label-caps text-primary uppercase">Live</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-sm">
+<label class="flex items-center gap-xs px-sm py-1 bg-surface-container-low border border-outline-variant rounded-lg">
+<input checked="" class="w-4 h-4 bg-background border-outline-variant text-primary rounded-sm focus:ring-primary focus:ring-offset-0" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface">ID</span>
+</label>
+<label class="flex items-center gap-xs px-sm py-1 bg-surface-container-low border border-outline-variant rounded-lg">
+<input checked="" class="w-4 h-4 bg-background border-outline-variant text-primary rounded-sm focus:ring-primary focus:ring-offset-0" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface">Time</span>
+</label>
+<label class="flex items-center gap-xs px-sm py-1 bg-surface-container-low border border-outline-variant rounded-lg">
+<input checked="" class="w-4 h-4 bg-background border-outline-variant text-primary rounded-sm focus:ring-primary focus:ring-offset-0" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface">Level</span>
+</label>
+<label class="flex items-center gap-xs px-sm py-1 bg-surface-container-low border border-outline-variant rounded-lg">
+<input checked="" class="w-4 h-4 bg-background border-outline-variant text-primary rounded-sm focus:ring-primary focus:ring-offset-0" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface">Source</span>
+</label>
+</div>
+</section>
+<!-- Dense Log Cards Feed -->
+<section class="mt-lg flex flex-col gap-sm">
+<!-- Error Log Card -->
+<div class="bg-surface-container border border-outline-variant p-sm relative hover:bg-surface-variant transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-error"></div>
+<div class="flex justify-between items-start mb-1">
+<div class="flex items-center gap-sm">
+<span class="font-mono-code text-mono-code text-error bg-error/10 px-xs rounded">ERROR</span>
+<span class="font-label-caps text-label-caps text-outline">JKT-01</span>
+</div>
+<span class="font-mono-code text-mono-code text-on-surface-variant">14:22:01.442</span>
+</div>
+<p class="font-mono-code text-mono-code text-on-surface leading-tight">System.NullReferenceException: Object reference not set to an instance of an object at Gaspol.Service.Windows.EventLogReader.Start()</p>
+</div>
+<!-- Warning Log Card -->
+<div class="bg-surface-container border border-outline-variant p-sm relative hover:bg-surface-variant transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary"></div>
+<div class="flex justify-between items-start mb-1">
+<div class="flex items-center gap-sm">
+<span class="font-mono-code text-mono-code text-tertiary bg-tertiary/10 px-xs rounded">WARN</span>
+<span class="font-label-caps text-label-caps text-outline">SUB-04</span>
+</div>
+<span class="font-mono-code text-mono-code text-on-surface-variant">14:21:58.210</span>
+</div>
+<p class="font-mono-code text-mono-code text-on-surface leading-tight">Disk space low on volume C:\. Remaining: 4.2 GB. System performance may be affected.</p>
+</div>
+<!-- Info Log Card -->
+<div class="bg-surface-container border border-outline-variant p-sm relative hover:bg-surface-variant transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex justify-between items-start mb-1">
+<div class="flex items-center gap-sm">
+<span class="font-mono-code text-mono-code text-primary bg-primary/10 px-xs rounded">INFO</span>
+<span class="font-label-caps text-label-caps text-outline">BDG-12</span>
+</div>
+<span class="font-mono-code text-mono-code text-on-surface-variant">14:21:55.004</span>
+</div>
+<p class="font-mono-code text-mono-code text-on-surface leading-tight">Service state transitioned: STOPPED -&gt; START_PENDING (Initiated by SystemOperator)</p>
+</div>
+<!-- Info Log Card -->
+<div class="bg-surface-container border border-outline-variant p-sm relative hover:bg-surface-variant transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex justify-between items-start mb-1">
+<div class="flex items-center gap-sm">
+<span class="font-mono-code text-mono-code text-primary bg-primary/10 px-xs rounded">INFO</span>
+<span class="font-label-caps text-label-caps text-outline">JKT-01</span>
+</div>
+<span class="font-mono-code text-mono-code text-on-surface-variant">14:21:52.991</span>
+</div>
+<p class="font-mono-code text-mono-code text-on-surface leading-tight">Heartbeat received from agent version 1.4.2-stable</p>
+</div>
+<!-- Error Log Card -->
+<div class="bg-surface-container border border-outline-variant p-sm relative hover:bg-surface-variant transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-error"></div>
+<div class="flex justify-between items-start mb-1">
+<div class="flex items-center gap-sm">
+<span class="font-mono-code text-mono-code text-error bg-error/10 px-xs rounded">ERROR</span>
+<span class="font-label-caps text-label-caps text-outline">MDN-02</span>
+</div>
+<span class="font-mono-code text-mono-code text-on-surface-variant">14:21:48.115</span>
+</div>
+<p class="font-mono-code text-mono-code text-on-surface leading-tight">Critical failure in SQL Server connection pool. Connection timeout expired during handshake.</p>
+</div>
+</section>
+<!-- Loading State Observer -->
+<div class="mt-lg flex justify-center items-center py-md">
+<span class="material-symbols-outlined animate-spin text-primary">sync</span>
+<span class="ml-sm font-body-sm text-body-sm text-on-surface-variant">Streaming incoming logs...</span>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="fixed bottom-0 w-full z-40 bg-surface border-t border-outline-variant flex justify-around items-center h-16 md:hidden">
+<button class="flex flex-col items-center justify-center gap-1 group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">terminal</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary">Client</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-1 group relative">
+<span class="material-symbols-outlined text-primary font-bold">system_update</span>
+<span class="font-body-sm text-body-sm text-primary font-bold">Windows</span>
+<div class="absolute -top-1 right-1 w-2 h-2 bg-error rounded-full border-2 border-surface"></div>
+</button>
+<button class="flex flex-col items-center justify-center gap-1 group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">menu_book</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary">Guide</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-1 group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">security</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant group-hover:text-primary">Auth</span>
+</button>
+</nav>
+<!-- Footer Meta (Hidden on small mobile, visible on tablet-ish) -->
+<footer class="fixed bottom-0 w-full z-40 hidden md:flex justify-between items-center px-margin py-xs bg-surface-container-lowest border-t border-outline-variant">
+<span class="font-label-caps text-label-caps text-on-surface-variant">System Status: Operational</span>
+<div class="flex gap-md">
+<span class="font-body-sm text-body-sm text-on-surface-variant">v0.1.0</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Last update: 2 mins ago</span>
+</div>
+</footer>
+<script>
+        // Micro-interaction: Log entry hover effect / tap focus
+        document.querySelectorAll('section.mt-lg.flex.flex-col.gap-sm > div').forEach(card => {
+            card.addEventListener('touchstart', () => {
+                card.classList.add('bg-surface-container-highest');
+            });
+            card.addEventListener('touchend', () => {
+                setTimeout(() => card.classList.remove('bg-surface-container-highest'), 200);
+            });
+        });
+
+        // Simulate "Live" effect
+        const liveIndicator = document.querySelector('.animate-pulse');
+        setInterval(() => {
+            liveIndicator.style.opacity = Math.random() > 0.5 ? '1' : '0.5';
+        }, 1000);
+    </script>
+</body></html>

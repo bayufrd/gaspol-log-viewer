@@ -2,15 +2,21 @@ import React from 'react';
 
 const LogFileButton = ({ fileName, onClick }) => {
     return (
-        <button 
+        <button
             onClick={onClick}
-            className="btn btn-outline-primary btn-sm m-1 text-truncate"
+            className="chip-button"
             style={{
-                maxWidth: '250px',
+                maxWidth: '280px',
                 cursor: 'pointer',
+                justifyContent: 'space-between',
+                width: '100%',
+                minHeight: 44,
             }}
         >
-            {fileName}
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {fileName}
+            </span>
+            <i className="bi bi-arrow-up-right-circle" style={{ flexShrink: 0 }}></i>
         </button>
     );
 };

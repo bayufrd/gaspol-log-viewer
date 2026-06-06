@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Windows Client Logs - Gaspol Log Viewer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;family=Geist:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed-dim": "#7bd0ff",
+                      "surface-container-highest": "#303539",
+                      "tertiary-container": "#f1a02b",
+                      "surface-variant": "#303539",
+                      "on-secondary-fixed-variant": "#47464a",
+                      "tertiary": "#ffc176",
+                      "on-secondary-fixed": "#1b1b1e",
+                      "on-primary": "#00354a",
+                      "on-primary-fixed": "#001e2c",
+                      "outline": "#87929a",
+                      "on-surface-variant": "#bdc8d1",
+                      "inverse-on-surface": "#2c3135",
+                      "surface": "#0f1418",
+                      "surface-dim": "#0f1418",
+                      "background": "#0f1418",
+                      "inverse-surface": "#dee3e8",
+                      "primary-container": "#38bdf8",
+                      "primary": "#8ed5ff",
+                      "inverse-primary": "#00668a",
+                      "surface-container-high": "#252b2e",
+                      "on-tertiary-container": "#613b00",
+                      "on-tertiary": "#472a00",
+                      "surface-container-low": "#171c20",
+                      "surface-tint": "#7bd0ff",
+                      "error": "#ffb4ab",
+                      "secondary-fixed": "#e4e1e6",
+                      "on-primary-container": "#004965",
+                      "secondary-fixed-dim": "#c8c5ca",
+                      "tertiary-fixed": "#ffddb8",
+                      "secondary": "#c8c5ca",
+                      "on-surface": "#dee3e8",
+                      "on-error-container": "#ffdad6",
+                      "on-tertiary-fixed": "#2a1700",
+                      "on-secondary-container": "#b6b4b8",
+                      "tertiary-fixed-dim": "#ffb960",
+                      "on-tertiary-fixed-variant": "#653e00",
+                      "on-background": "#dee3e8",
+                      "secondary-container": "#47464a",
+                      "surface-bright": "#343a3e",
+                      "on-primary-fixed-variant": "#004c69",
+                      "surface-container-lowest": "#0a0f12",
+                      "outline-variant": "#3e484f",
+                      "on-secondary": "#303033",
+                      "surface-container": "#1b2024",
+                      "error-container": "#93000a",
+                      "primary-fixed": "#c4e7ff",
+                      "on-error": "#690005"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "xl": "32px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "unit": "4px",
+                      "margin": "24px",
+                      "md": "16px",
+                      "sm": "8px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Geist"],
+                      "body-sm": ["Geist"],
+                      "body-md": ["Geist"],
+                      "headline-lg": ["Geist"],
+                      "mono-code": ["JetBrains Mono"],
+                      "label-caps": ["Geist"],
+                      "display": ["Geist"]
+              },
+              "fontSize": {
+                      "headline-md": ["clamp(16px, 3vw, 18px)", {"lineHeight": "24px", "fontWeight": "500"}],
+                      "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "mono-code": ["13px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                      "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                      "display": ["clamp(24px, 5vw, 32px)", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .log-line:hover {
+            background-color: #27272a;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0f1418;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #3e484f;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-hidden h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface dark:bg-surface border-b border-outline-variant dark:border-outline-variant">
+<div class="flex items-center gap-xl">
+<span class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary">Gaspol Log Viewer</span>
+<nav class="hidden md:flex gap-md">
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors" href="#">API Logs</a>
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors" href="#">PM2 Logs</a>
+<a class="font-headline-md text-headline-md text-primary dark:text-primary border-b-2 border-primary pb-1" href="#">Windows Logs</a>
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors" href="#">Complaints</a>
+<a class="font-headline-md text-headline-md text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors" href="#">API Docs</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="bg-surface-container-lowest border border-outline-variant rounded-lg pl-xl pr-md py-xs text-body-sm focus:border-primary outline-none transition-all w-64" placeholder="Search events..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">dark_mode</button>
+<span class="text-body-sm font-label-caps text-on-surface-variant px-sm py-1 border border-outline-variant rounded">v0.1.0</span>
+</div>
+</header>
+<div class="flex flex-1 mt-16 overflow-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-[260px] bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant dark:border-outline-variant flex flex-col gap-sm py-md">
+<div class="px-md mb-md">
+<h3 class="font-label-caps text-label-caps text-outline">Navigation</h3>
+<p class="text-body-sm text-on-surface-variant">Drill-down views</p>
+</div>
+<a class="flex items-center gap-md px-md py-sm text-primary dark:text-primary font-bold bg-surface-container-highest dark:bg-surface-container-highest border-l-4 border-primary transition-all duration-200 nav-item" href="#" id="nav-client-logs" onclick="switchTab('client-logs')">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span class="font-body-md text-body-md">Client Logs</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant transition-all duration-200 nav-item" href="#" id="nav-update-confirm" onclick="switchTab('update-confirm')">
+<span class="material-symbols-outlined" data-icon="system_update">system_update</span>
+<span class="font-body-md text-body-md">Update Confirmation</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-body-md text-body-md">Reference Guide</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-variant transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+<span class="font-body-md text-body-md">Auth Docs</span>
+</a>
+<div class="mt-auto px-md flex items-center gap-sm pt-md border-t border-outline-variant">
+<div class="w-8 h-8 rounded bg-primary-fixed-dim flex items-center justify-center text-on-primary-fixed text-xs font-bold">SO</div>
+<div>
+<p class="text-body-sm font-bold">System Operator</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Online</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-[260px] flex-1 overflow-y-auto custom-scrollbar p-lg pb-20">
+<!-- Section: Client Logs View -->
+<div class="space-y-lg" id="view-client-logs">
+<div class="flex flex-col gap-sm">
+<h1 class="font-display text-display text-on-surface">Windows Logs Monitoring</h1>
+<p class="text-on-surface-variant font-body-md">Real-time Windows client events and system logs aggregation.</p>
+</div>
+<!-- Filters Shell -->
+<div class="bg-surface-container-low border border-outline-variant p-md rounded-lg space-y-md">
+<div>
+<span class="font-label-caps text-label-caps text-outline mb-sm block">Outlet Selection</span>
+<div class="flex flex-wrap gap-sm">
+<button class="px-md py-1 rounded-full text-body-sm bg-primary text-on-primary font-bold">All Outlets</button>
+<button class="px-md py-1 rounded-full text-body-sm border border-outline-variant hover:border-primary transition-colors text-on-surface-variant">Outlet-011</button>
+<button class="px-md py-1 rounded-full text-body-sm border border-outline-variant hover:border-primary transition-colors text-on-surface-variant">Outlet-045</button>
+<button class="px-md py-1 rounded-full text-body-sm border border-outline-variant hover:border-primary transition-colors text-on-surface-variant">Outlet-102</button>
+<button class="px-md py-1 rounded-full text-body-sm border border-outline-variant hover:border-primary transition-colors text-on-surface-variant">Jakarta-Central</button>
+<button class="px-md py-1 rounded-full text-body-sm border border-outline-variant hover:border-primary transition-colors text-on-surface-variant">Bandung-Main</button>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-outline-variant pt-md">
+<div class="flex gap-lg">
+<label class="flex items-center gap-sm cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded-sm border-2 border-outline-variant bg-transparent text-primary focus:ring-0 checked:bg-primary" type="checkbox"/>
+<span class="text-body-sm text-on-surface-variant group-hover:text-primary">Outlet ID</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded-sm border-2 border-outline-variant bg-transparent text-primary focus:ring-0 checked:bg-primary" type="checkbox"/>
+<span class="text-body-sm text-on-surface-variant group-hover:text-primary">Timestamp</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded-sm border-2 border-outline-variant bg-transparent text-primary focus:ring-0 checked:bg-primary" type="checkbox"/>
+<span class="text-body-sm text-on-surface-variant group-hover:text-primary">Level</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded-sm border-2 border-outline-variant bg-transparent text-primary focus:ring-0 checked:bg-primary" type="checkbox"/>
+<span class="text-body-sm text-on-surface-variant group-hover:text-primary">Message</span>
+</label>
+</div>
+<div class="flex items-center gap-sm">
+<span class="text-body-sm text-on-surface-variant">Stream:</span>
+<span class="flex items-center gap-xs px-sm py-0.5 rounded bg-error-container text-error text-[10px] font-bold animate-pulse">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span> LIVE
+                            </span>
+</div>
+</div>
+</div>
+<!-- Log Viewer Table -->
+<div class="bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden flex flex-col h-[500px]">
+<div class="grid grid-cols-[120px_180px_100px_1fr] px-md py-sm bg-surface-container-high border-b border-outline-variant text-label-caps text-outline font-bold">
+<div>OUTLET ID</div>
+<div>TIMESTAMP</div>
+<div>LEVEL</div>
+<div>MESSAGE</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar font-mono-code text-mono-code divide-y divide-outline-variant/30">
+<!-- Error Entry -->
+<div class="grid grid-cols-[120px_180px_100px_1fr] px-md py-2 log-line border-l-4 border-error group relative">
+<div class="text-on-surface-variant">Outlet-011</div>
+<div class="text-on-surface-variant opacity-70">2023-11-20 14:02:11</div>
+<div class="text-error font-bold">ERROR</div>
+<div class="text-on-surface truncate">Exception: Could not connect to printer spooler. System.Net.Sockets.SocketException</div>
+</div>
+<!-- Info Entry -->
+<div class="grid grid-cols-[120px_180px_100px_1fr] px-md py-2 log-line border-l-4 border-primary group relative">
+<div class="text-on-surface-variant">Outlet-102</div>
+<div class="text-on-surface-variant opacity-70">2023-11-20 14:01:55</div>
+<div class="text-primary">INFO</div>
+<div class="text-on-surface truncate">Session initialized for user 'operator_id_44' at register-02.</div>
+</div>
+<!-- Warning Entry -->
+<div class="grid grid-cols-[120px_180px_100px_1fr] px-md py-2 log-line border-l-4 border-tertiary group relative">
+<div class="text-on-surface-variant">Bandung-Main</div>
+<div class="text-on-surface-variant opacity-70">2023-11-20 14:01:30</div>
+<div class="text-tertiary">WARN</div>
+<div class="text-on-surface truncate">Update available: Client version mismatch (v0.1.0 vs v0.1.1). Auto-sync pending.</div>
+</div>
+<!-- More entries... -->
+<div class="grid grid-cols-[120px_180px_100px_1fr] px-md py-2 log-line border-l-4 border-primary group relative">
+<div class="text-on-surface-variant">Outlet-011</div>
+<div class="text-on-surface-variant opacity-70">2023-11-20 14:00:11</div>
+<div class="text-primary">INFO</div>
+<div class="text-on-surface truncate">Background sync completed. 14 items updated.</div>
+</div>
+<div class="grid grid-cols-[120px_180px_100px_1fr] px-md py-2 log-line border-l-4 border-primary group relative">
+<div class="text-on-surface-variant">Jakarta-C</div>
+<div class="text-on-surface-variant opacity-70">2023-11-20 13:59:45</div>
+<div class="text-primary">INFO</div>
+<div class="text-on-surface truncate">Application launched successfully. Modules: CORE, POS, INVENTORY.</div>
+</div>
+<div class="grid grid-cols-[120px_180px_100px_1fr] px-md py-2 log-line border-l-4 border-error group relative">
+<div class="text-on-surface-variant">Outlet-045</div>
+<div class="text-on-surface-variant opacity-70">2023-11-20 13:58:22</div>
+<div class="text-error font-bold">CRITICAL</div>
+<div class="text-on-surface truncate">Memory limit exceeded. Garbage collection triggered but failed to reclaim sufficient heap.</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Update Confirmation View (Hidden by default) -->
+<div class="hidden space-y-lg" id="view-update-confirm">
+<div class="flex flex-col gap-sm">
+<h1 class="font-display text-display text-on-surface">Client Version Reconciliation</h1>
+<p class="text-on-surface-variant font-body-md">Compare and confirm client application updates across distributed outlets.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-md">
+<!-- UpdateConfirmCard: Success -->
+<div class="bg-surface-container-low border border-outline-variant p-md rounded-lg relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2">
+<span class="flex items-center gap-xs text-[10px] font-bold text-[#4ade80] bg-[#1a2e21] px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">check_circle</span> OPERATIONAL
+                            </span>
+</div>
+<div class="mb-md">
+<h4 class="font-headline-md text-headline-md text-on-surface">Outlet-011 (Jakarta)</h4>
+<p class="text-body-sm text-on-surface-variant">Last ping: 12s ago</p>
+</div>
+<div class="grid grid-cols-2 gap-sm pt-md border-t border-outline-variant">
+<div>
+<span class="font-label-caps text-[9px] text-outline block">CURRENT VERSION</span>
+<span class="text-body-md font-bold text-on-surface">v0.1.0</span>
+</div>
+<div>
+<span class="font-label-caps text-[9px] text-outline block">REMOTE VERSION</span>
+<span class="text-body-md font-bold text-on-surface">v0.1.0</span>
+</div>
+</div>
+</div>
+<!-- UpdateConfirmCard: Mismatch -->
+<div class="bg-surface-container-low border border-tertiary p-md rounded-lg relative overflow-hidden bg-gradient-to-br from-transparent to-tertiary/5">
+<div class="absolute top-0 right-0 p-2">
+<span class="flex items-center gap-xs text-[10px] font-bold text-tertiary bg-tertiary-container/10 px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">sync</span> SYNCING
+                            </span>
+</div>
+<div class="mb-md">
+<h4 class="font-headline-md text-headline-md text-on-surface">Bandung-Central-02</h4>
+<p class="text-body-sm text-on-surface-variant">Last ping: 1m ago</p>
+</div>
+<div class="grid grid-cols-2 gap-sm pt-md border-t border-outline-variant">
+<div>
+<span class="font-label-caps text-[9px] text-outline block">CURRENT VERSION</span>
+<span class="text-body-md font-bold text-tertiary">v0.0.9</span>
+</div>
+<div>
+<span class="font-label-caps text-[9px] text-outline block">REMOTE VERSION</span>
+<span class="text-body-md font-bold text-on-surface">v0.1.0</span>
+</div>
+</div>
+<button class="mt-md w-full py-2 bg-primary text-on-primary font-bold text-body-sm rounded hover:opacity-90 transition-opacity">Push Force Update</button>
+</div>
+<!-- UpdateConfirmCard: Success -->
+<div class="bg-surface-container-low border border-outline-variant p-md rounded-lg relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2">
+<span class="flex items-center gap-xs text-[10px] font-bold text-[#4ade80] bg-[#1a2e21] px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">check_circle</span> OPERATIONAL
+                            </span>
+</div>
+<div class="mb-md">
+<h4 class="font-headline-md text-headline-md text-on-surface">Surabaya-Wholesale</h4>
+<p class="text-body-sm text-on-surface-variant">Last ping: 45s ago</p>
+</div>
+<div class="grid grid-cols-2 gap-sm pt-md border-t border-outline-variant">
+<div>
+<span class="font-label-caps text-[9px] text-outline block">CURRENT VERSION</span>
+<span class="text-body-md font-bold text-on-surface">v0.1.0</span>
+</div>
+<div>
+<span class="font-label-caps text-[9px] text-outline block">REMOTE VERSION</span>
+<span class="text-body-md font-bold text-on-surface">v0.1.0</span>
+</div>
+</div>
+</div>
+<!-- UpdateConfirmCard: Success -->
+<div class="bg-surface-container-low border border-outline-variant p-md rounded-lg relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2">
+<span class="flex items-center gap-xs text-[10px] font-bold text-[#4ade80] bg-[#1a2e21] px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">check_circle</span> OPERATIONAL
+                            </span>
+</div>
+<div class="mb-md">
+<h4 class="font-headline-md text-headline-md text-on-surface">Outlet-045 (Medan)</h4>
+<p class="text-body-sm text-on-surface-variant">Last ping: 5s ago</p>
+</div>
+<div class="grid grid-cols-2 gap-sm pt-md border-t border-outline-variant">
+<div>
+<span class="font-label-caps text-[9px] text-outline block">CURRENT VERSION</span>
+<span class="text-body-md font-bold text-on-surface">v0.1.0</span>
+</div>
+<div>
+<span class="font-label-caps text-[9px] text-outline block">REMOTE VERSION</span>
+<span class="text-body-md font-bold text-on-surface">v0.1.0</span>
+</div>
+</div>
+</div>
+<!-- UpdateConfirmCard: Pending/Warning -->
+<div class="bg-surface-container-low border border-outline-variant p-md rounded-lg relative overflow-hidden border-dashed">
+<div class="absolute top-0 right-0 p-2">
+<span class="flex items-center gap-xs text-[10px] font-bold text-on-surface-variant bg-surface-container-highest px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]">offline_bolt</span> OFFLINE
+                            </span>
+</div>
+<div class="mb-md">
+<h4 class="font-headline-md text-headline-md text-on-surface opacity-50">Makassar-Store-01</h4>
+<p class="text-body-sm text-on-surface-variant">Last ping: 2h ago</p>
+</div>
+<div class="grid grid-cols-2 gap-sm pt-md border-t border-outline-variant">
+<div>
+<span class="font-label-caps text-[9px] text-outline block">CURRENT VERSION</span>
+<span class="text-body-md font-bold text-on-surface-variant opacity-50">v0.1.0</span>
+</div>
+<div>
+<span class="font-label-caps text-[9px] text-outline block">REMOTE VERSION</span>
+<span class="text-body-md font-bold text-on-surface-variant opacity-50">v0.1.0</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="fixed bottom-0 w-full z-40 flex justify-between items-center px-margin py-xs bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant dark:border-outline-variant">
+<div class="flex items-center gap-md">
+<span class="font-label-caps text-label-caps text-on-surface-variant">System Status: Operational</span>
+<div class="flex items-center gap-xs text-body-sm text-[#4ade80]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#4ade80]"></span>
+                Connected to Central Server
+            </div>
+</div>
+<div class="flex gap-lg">
+<span class="text-body-sm text-on-surface-variant hover:text-primary cursor-default transition-colors">v0.1.0</span>
+<span class="text-body-sm text-on-surface-variant hover:text-primary cursor-default transition-colors">Last update: 2 mins ago</span>
+</div>
+</footer>
+<script>
+        function switchTab(viewId) {
+            // Hide all views
+            document.getElementById('view-client-logs').classList.add('hidden');
+            document.getElementById('view-update-confirm').classList.add('hidden');
+            
+            // Remove active styles from nav
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('text-primary', 'dark:text-primary', 'font-bold', 'bg-surface-container-highest', 'dark:bg-surface-container-highest', 'border-l-4', 'border-primary');
+                item.classList.add('text-on-surface-variant', 'dark:text-on-surface-variant');
+            });
+
+            // Show target view
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            
+            // Add active styles to clicked nav
+            const activeNav = document.getElementById(`nav-${viewId}`);
+            activeNav.classList.add('text-primary', 'dark:text-primary', 'font-bold', 'bg-surface-container-highest', 'dark:bg-surface-container-highest', 'border-l-4', 'border-primary');
+            activeNav.classList.remove('text-on-surface-variant', 'dark:text-on-surface-variant');
+        }
+
+        // Add periodic "new log" flash effect
+        setInterval(() => {
+            const logs = document.querySelectorAll('.log-line');
+            const randomLog = logs[Math.floor(Math.random() * logs.length)];
+            randomLog.style.transition = 'background-color 0.2s';
+            randomLog.style.backgroundColor = '#1e293b';
+            setTimeout(() => {
+                randomLog.style.backgroundColor = '';
+            }, 300);
+        }, 5000);
+    </script>
+</body></html>

@@ -6,7 +6,7 @@ import LogFileButton from '../components/LogFileButton';
 import LogWindowsViewer from '../components/LogWindowsViewer';
 import ModernSubTabs from '../components/ModernSubTabs';
 
-function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisibleFields, windowsLogsData, loading }) {
+function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisibleFields, windowsLogsData, loading, outletLogs }) {
     const [active, setActive] = React.useState('client');
     return (
         <ModernSubTabs
@@ -15,56 +15,79 @@ function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisi
                     key: 'client',
                     label: 'Log Client Windows',
                     content: (
-                        <div style={{
-                            width: '100%',
-                            height: 'calc(90vh - 80px)',
-                            minHeight: '30vh',
-                            maxHeight: '90vh',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            overflow: 'hidden',
-                        }}>
-                            <h5 className="mb-2 text-center" style={{fontSize: 18}}>Log Client Windows</h5>
-                            <div className="d-flex flex-wrap gap-2 mb-2" style={{fontSize: 13}}>
-                                <button
-                                    className="btn btn-outline-light btn-sm"
-                                    onClick={() => fetchLogsByOutlet("ALL")}
-                                >
-                                    All Outlet
-                                </button>
-                                {summaryData.map((item) => (
-                                    <button
-                                        key={item.outlet_id}
-                                        className="btn btn-outline-light btn-sm"
-                                        onClick={() => fetchLogsByOutlet(item.outlet_id)}
-                                    >
-                                        {item.outlet_name} ({item.total_logs})
-                                    </button>
-                                ))}
+                        <div style={{ width: '100%', minHeight: '30vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', gap: 16 }}>
+                            <div className="filter-panel">
+                                <div className="toolbar-card" style={{ marginBottom: 0 }}>
+                                    <div>
+                                        <div className="section-heading__eyebrow">
+                                            <i className="bi bi-sliders"></i>
+                                            Outlet Filters
+                                        </div>
+                                        <p style={{ margin: '10px 0 0', color: '#94a3b8' }}>
+                                            Select an outlet stream and control which metadata fields are visible in each log card.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="filter-panel__block">
+                                    <div className="filter-panel__label">
+                                        <i className="bi bi-buildings"></i>
+                                        Outlet stream
+                                    </div>
+                                    <div className="chip-row chip-row--scroll">
+                                        <button
+                                            className={`chip-button ${outletLogs === 'ALL' ? 'is-active' : ''}`}
+                                            onClick={() => fetchLogsByOutlet('ALL')}
+                                            style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
+                                        >
+                                            <i className="bi bi-grid-3x3-gap-fill"></i>
+                                            <span>All Outlet</span>
+                                        </button>
+                                        {summaryData.map((item) => (
+                                            <button
+                                                key={item.outlet_id}
+                                                className={`chip-button ${String(outletLogs) === String(item.outlet_id) ? 'is-active' : ''}`}
+                                                onClick={() => fetchLogsByOutlet(item.outlet_id)}
+                                                style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
+                                            >
+                                                <i className="bi bi-building"></i>
+                                                <span>{item.outlet_name}</span>
+                                                <span className="chip-button__meta">{item.total_logs}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="filter-panel__block">
+                                    <div className="filter-panel__label">
+                                        <i className="bi bi-eye"></i>
+                                        Visible fields
+                                    </div>
+                                    <div className="chip-row chip-row--scroll">
+                                        {Object.keys(visibleFields).map((field) => (
+                                            <button
+                                                key={field}
+                                                type="button"
+                                                className={`chip-button ${visibleFields[field] ? 'is-active' : ''}`}
+                                                onClick={() =>
+                                                    setVisibleFields((prev) => ({
+                                                        ...prev,
+                                                        [field]: !prev[field],
+                                                    }))
+                                                }
+                                                style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
+                                            >
+                                                <i className={`bi ${visibleFields[field] ? 'bi-eye-fill' : 'bi-eye-slash'}`}></i>
+                                                <span>{field.replace('_', ' ')}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
-                            <div className="mb-1 d-flex flex-wrap gap-2" style={{fontSize: 13}}>
-                                {Object.keys(visibleFields).map((field) => (
-                                    <label key={field} className="text-light me-2">
-                                        <input
-                                            type="checkbox"
-                                            checked={visibleFields[field]}
-                                            onChange={() =>
-                                                setVisibleFields((prev) => ({
-                                                    ...prev,
-                                                    [field]: !prev[field],
-                                                }))
-                                            }
-                                        />{' '}
-                                        {field.replace('_', ' ')}
-                                    </label>
-                                ))}
-                            </div>
-                            <div style={{flex: 1, minHeight: 0, overflow: 'auto', display: 'flex', flexDirection: 'column'}}>
+                            <div style={{ flex: 1, minHeight: 0, overflow: 'auto', display: 'flex', flexDirection: 'column', WebkitOverflowScrolling: 'touch' }}>
                                 <LogWindowsViewer
                                     windowsLogsData={windowsLogsData}
                                     loading={loading}
                                     visibleFields={visibleFields}
-                                    style={{flex: 1, minHeight: 0, height: '100%'}}
+                                    style={{ flex: 1, minHeight: 0, height: '100%' }}
                                 />
                             </div>
                         </div>
@@ -74,23 +97,25 @@ function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisi
                     key: 'update',
                     label: 'Log Update Confirm Client Windows',
                     content: (
-                        <div style={{
-                            width: '100%',
-                            height: 'calc(90vh - 80px)',
-                            minHeight: '30vh',
-                            maxHeight: '90vh',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            overflow: 'hidden',
-                        }}>
-                            <h5 className="mb-3 text-center">Log Update Confirm Client Windows</h5>
-                            <div style={{flex: 1, minHeight: 0, maxHeight: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column'}}>
+                        <div style={{ width: '100%', minHeight: '30vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', gap: 16 }}>
+                            <div className="toolbar-card" style={{ marginBottom: 0 }}>
+                                <div>
+                                    <div className="section-heading__eyebrow">
+                                        <i className="bi bi-arrow-repeat"></i>
+                                        Update Sync Status
+                                    </div>
+                                    <p style={{ margin: '10px 0 0', color: '#94a3b8' }}>
+                                        Monitor version rollout status for each Windows client outlet.
+                                    </p>
+                                </div>
+                            </div>
+                            <div style={{ flex: 1, minHeight: 0, maxHeight: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
                                 <LogWindowsViewer
                                     windowsLogsData={[]}
                                     loading={loading}
                                     visibleFields={visibleFields}
                                     onlyUpdateConfirm={true}
-                                    style={{flex: 1, minHeight: 0, height: '100%'}}
+                                    style={{ flex: 1, minHeight: 0, height: '100%' }}
                                 />
                             </div>
                         </div>
@@ -609,243 +634,255 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
     // Jika belum login, tampilkan form login
     if (!isAuthenticated) {
         return (
-            <div style={{
-                minHeight: '100vh',
-                width: '100vw',
-                background: 'linear-gradient(120deg, #101014 0%, #18181c 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-            }}>
-                <form
-                    onSubmit={handleLogin}
-                    style={{
-                        minWidth: 350,
-                        maxWidth: 400,
-                        padding: '2.5rem 2rem',
-                        borderRadius: 18,
-                        background: 'rgba(30, 30, 35, 0.55)',
-                        boxShadow: '0 8px 32px 0 rgba(0,0,0,0.37)',
-                        backdropFilter: 'blur(12px)',
-                        WebkitBackdropFilter: 'blur(12px)',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        color: '#fff',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 18,
-                        alignItems: 'center',
-                    }}
-                >
-                    <div style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        marginBottom: 10,
-                    }}>
-                        <div style={{
-                            width: 64,
-                            height: 64,
-                            borderRadius: 18,
-                            background: 'rgba(255,255,255,0.10)',
-                            border: '2px solid rgba(255,255,255,0.45)',
-                            boxShadow: '0 2px 12px #0006',
+            <div className="app-shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="app-shell__container" style={{ maxWidth: 480, width: '100%' }}>
+                    <form
+                        onSubmit={handleLogin}
+                        className="glass-panel"
+                        style={{
+                            padding: '32px 28px',
+                            color: '#fff',
                             display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginBottom: 10,
-                            backdropFilter: 'blur(6px)',
-                            WebkitBackdropFilter: 'blur(6px)',
-                        }}>
-                            <img
-                                src="/favicon.ico"
-                                alt="Logo"
-                                style={{ width: 38, height: 38, borderRadius: 10, filter: 'drop-shadow(0 2px 8px #0008)' }}
-                            />
-                        </div>
-                        <h3 style={{
-                            marginBottom: 0,
-                            textAlign: 'center',
-                            fontWeight: 700,
-                            letterSpacing: 1,
-                            fontSize: 22,
-                            color: '#fff',
-                            textShadow: '0 2px 8px #0008',
-                        }}>
-                            Auth Logs Dastrevas x GASPOLL
-                        </h3>
-                    </div>
-                    <input
-                        type="password"
-                        className="form-control mb-2"
-                        placeholder="Masukkan password Access"
-                        value={passwordInput}
-                        onChange={(e) => setPasswordInput(e.target.value)}
-                        style={{
-                            background: 'rgba(20,20,25,0.7)',
-                            color: '#fff',
-                            border: '1px solid #333',
-                            borderRadius: 8,
-                            padding: '0.75rem 1rem',
-                            fontSize: 16,
-                            textAlign: 'center',
-                        }}
-                        // Inline placeholder color for React
-                        onFocus={e => e.target.style.setProperty('color', '#fff', 'important')}
-                    />
-                    <style>{`
-                        input::placeholder {
-                            color: #fff !important;
-                            opacity: 1;
-                        }
-                    `}</style>
-                    <button
-                        className="btn btn-primary w-100"
-                        type="submit"
-                        style={{
-                            background: 'rgba(0,0,0,0.7)',
-                            border: 'none',
-                            borderRadius: 8,
-                            fontWeight: 600,
-                            fontSize: 16,
-                            letterSpacing: 1,
-                            boxShadow: '0 2px 8px #0006',
+                            flexDirection: 'column',
+                            gap: 20,
+                            alignItems: 'stretch',
                         }}
                     >
-                        Login
-                    </button>
-                </form>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                            <div
+                                style={{
+                                    width: 72,
+                                    height: 72,
+                                    borderRadius: 22,
+                                    background: 'rgba(8, 47, 73, 0.62)',
+                                    border: '1px solid rgba(56, 189, 248, 0.28)',
+                                    boxShadow: '0 18px 40px rgba(8, 47, 73, 0.3)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    marginBottom: 16,
+                                }}
+                            >
+                                <img
+                                    src="/favicon.ico"
+                                    alt="Logo"
+                                    style={{ width: 40, height: 40, borderRadius: 12, filter: 'drop-shadow(0 2px 8px #0008)' }}
+                                />
+                            </div>
+                            <div className="section-heading__eyebrow">
+                                <i className="bi bi-shield-lock-fill"></i>
+                                Protected Access
+                            </div>
+                            <h3 style={{ margin: '16px 0 8px', fontWeight: 700, letterSpacing: 0.4, fontSize: 28, color: '#fff' }}>
+                                Gaspol Log Viewer
+                            </h3>
+                            <p style={{ margin: 0, color: '#94a3b8' }}>
+                                Authenticate to open the redesigned monitoring workspace for API, Windows, complaints, and docs.
+                            </p>
+                        </div>
+                        <input
+                            type="password"
+                            className="form-control"
+                            placeholder="Masukkan password access"
+                            value={passwordInput}
+                            onChange={(e) => setPasswordInput(e.target.value)}
+                            style={{ textAlign: 'center', minHeight: 52 }}
+                        />
+                        <button
+                            className="btn w-100"
+                            type="submit"
+                            style={{
+                                background: 'linear-gradient(135deg, #0891b2, #2563eb)',
+                                border: 'none',
+                                borderRadius: 14,
+                                fontWeight: 700,
+                                fontSize: 15,
+                                letterSpacing: 0.4,
+                                color: '#eff6ff',
+                                minHeight: 50,
+                                boxShadow: '0 14px 30px rgba(37, 99, 235, 0.28)',
+                            }}
+                        >
+                            Login
+                        </button>
+                    </form>
+                </div>
             </div>
         );
     }
 
-    // Modern tab layout
     const ModernTabs = require('../components/ModernTabs').default;
     return (
-        <div className="container-fluid px-0 py-0 bg-dark text-light" style={{minHeight: '100vh'}}>
-            <div className="d-flex flex-column align-items-center w-100" style={{paddingTop: 32}}>
-                <ModernTabs
-                    tabs={[
-                        {
-                            key: 'api',
-                            label: 'API Logs',
-                            content: (
-                                <div className="p-3">
-                                    <h5 className="mb-3 text-center">API Regular Logs</h5>
-                                    <div className="d-flex flex-wrap gap-2 mb-3">
-                                        {logFiles.map(fileName => (
-                                            <LogFileButton
-                                                key={fileName}
-                                                fileName={fileName}
-                                                onClick={() => readLogFile(fileName, false)}
-                                            />
-                                        ))}
-                                    </div>
-                                    <div ref={logViewerRef} style={{background: '#222', borderRadius: 8, padding: 16, minHeight: 250}}>
-                                        <LogViewer logs={currentLogs} />
-                                    </div>
-                                </div>
-                            )
-                        },
-                        {
-                            key: 'pm2',
-                            label: 'PM2 Logs',
-                            content: (
-                                <div className="p-3">
-                                    <h5 className="mb-3 text-center">PM2 Gaspoll Logs</h5>
-                                    <div className="d-flex flex-wrap gap-2 mb-3">
-                                        {pm2Logs.map(fileName => (
-                                            <LogFileButton
-                                                key={fileName}
-                                                fileName={fileName}
-                                                onClick={() => readLogFile(fileName, true)}
-                                            />
-                                        ))}
-                                    </div>
-                                    <div ref={logViewerRef} style={{background: '#222', borderRadius: 8, padding: 16, minHeight: 250}}>
-                                        <LogViewer logs={currentLogs} />
-                                    </div>
-                                </div>
-                            )
-                        },
-                        {
-                            key: 'windows',
-                            label: 'Windows Logs',
-                            content: (
-                                <div className="p-3" style={{width: '100%', minHeight: 400, display: 'flex', flexDirection: 'column'}}>
-                                    <WindowsSubTabs
-                                        summaryData={summaryData}
-                                        fetchLogsByOutlet={fetchLogsByOutlet}
-                                        visibleFields={visibleFields}
-                                        setVisibleFields={setVisibleFields}
-                                        windowsLogsData={windowsLogsData}
-                                        loading={loading}
-                                    />
-                                </div>
-                            )
-                        },
-                        {
-                            key: 'complaints',
-                            label: 'Complaint Report',
-                            content: (
-                                <div className="p-0" style={{width: '100%', height: '70vh', display: 'flex', flexDirection: 'column', overflow: 'auto'}}>
-                                    {/* Lazy load component to keep bundle small */}
-                                    <React.Suspense fallback={<div className="p-3">Loading complaint UI...</div>}>
-                                        {/* Import dynamically to avoid SSR issues */}
-                                        {typeof window !== 'undefined' && (() => {
-                                            const C = require('../components/ComplaintReport').default;
-                                            return (
-                                                <C
-                                                    complaints={complaintsData}
-                                                    loading={complaintLoading}
-                                                    onRefetch={() => fetchComplaints({ force: true })}
-                                                    progress={complaintProgress}
-                                                    cardsLoaded={complaintCardsLoaded}
-                                                />
-                                            );
-                                        })()}
-                                    </React.Suspense>
-                                </div>
-                            )
-                        },
-                        {
-                            key: 'docs',
-                            label: 'API Docs',
-                            content: (
-                                <div className="p-0" style={{width: '100%', height: '70vh', display: 'flex', flexDirection: 'column', overflow: 'auto'}}>
-                                    <iframe
-                                        src={process.env.NEXT_PUBLIC_SWAGGER_URL || 'http://localhost:3001/api-docs'}
-                                        style={{width: '100%', height: '100%', border: 'none', borderRadius: 8, background: '#18181b', overflow: 'auto'}}
-                                        title="API Documentation"
-                                        scrolling="yes"
-                                    />
-                                </div>
-                            )
-                        }
-                    ]}
-                    active={activeTab}
-                    onChange={setActiveTab}
-                />
-                {/* Floating progress snackbar for complaint fetch */}
-                {(!complaintProgress.done || complaintProgress.loaded > 0) && (
-                    <div style={{position: 'fixed', right: 16, bottom: 16, zIndex: 1200}}>
-                        <div className="badge bg-dark text-light shadow-sm" style={{padding: '10px 14px', border: '1px solid rgba(255,255,255,0.04)'}}>
-                            <div style={{fontSize: 12}}>
-                                {complaintProgress.error ? (
-                                    <span style={{color: '#fca5a5'}}>Error: {complaintProgress.error}</span>
-                                ) : (
-                                    <>
-                                        <strong>Complaint fetch</strong>
-                                        <div style={{fontSize: 11, color: '#9ca3af'}}>
-                                            {complaintProgress.loaded ? `${Math.round(complaintProgress.loaded/1024)} KB` : '0 KB'}
-                                            {complaintProgress.total ? ` / ${Math.round(complaintProgress.total/1024)} KB` : ''}
-                                            {complaintProgress.total ? ` (${Math.round((complaintProgress.loaded/complaintProgress.total)*100)}%)` : ''}
+        <div className="app-shell">
+            <div className="app-shell__container">
+                <div className="glass-panel" style={{ padding: 24 }}>
+                    <ModernTabs
+                        tabs={[
+                            {
+                                key: 'api',
+                                label: 'API Logs',
+                                content: (
+                                    <div className="p-2 p-md-3">
+                                        <div className="section-heading" style={{ marginBottom: 18 }}>
+                                            <div>
+                                                <div className="section-heading__eyebrow">
+                                                    <i className="bi bi-server"></i>
+                                                    API Regular Logs
+                                                </div>
+                                                <p className="section-heading__description" style={{ marginTop: 10 }}>
+                                                    Browse backend log files and inspect the latest lines in the redesigned live viewer.
+                                                </p>
+                                            </div>
                                         </div>
-                                    </>
-                                )}
+                                        <div className="chip-row" style={{ marginBottom: 18 }}>
+                                            {logFiles.map((fileName) => (
+                                                <LogFileButton
+                                                    key={fileName}
+                                                    fileName={fileName}
+                                                    onClick={() => readLogFile(fileName, false)}
+                                                />
+                                            ))}
+                                        </div>
+                                        <div ref={logViewerRef} className="viewer-panel" style={{ minHeight: 280 }}>
+                                            <LogViewer logs={currentLogs} />
+                                        </div>
+                                    </div>
+                                )
+                            },
+                            {
+                                key: 'pm2',
+                                label: 'PM2 Logs',
+                                content: (
+                                    <div className="p-2 p-md-3">
+                                        <div className="section-heading" style={{ marginBottom: 18 }}>
+                                            <div>
+                                                <div className="section-heading__eyebrow">
+                                                    <i className="bi bi-cpu-fill"></i>
+                                                    PM2 Process Logs
+                                                </div>
+                                                <p className="section-heading__description" style={{ marginTop: 10 }}>
+                                                    Open PM2 log outputs with the same searchable high-contrast viewer experience.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="chip-row" style={{ marginBottom: 18 }}>
+                                            {pm2Logs.map((fileName) => (
+                                                <LogFileButton
+                                                    key={fileName}
+                                                    fileName={fileName}
+                                                    onClick={() => readLogFile(fileName, true)}
+                                                />
+                                            ))}
+                                        </div>
+                                        <div ref={logViewerRef} className="viewer-panel" style={{ minHeight: 280 }}>
+                                            <LogViewer logs={currentLogs} />
+                                        </div>
+                                    </div>
+                                )
+                            },
+                            {
+                                key: 'windows',
+                                label: 'Windows Logs',
+                                content: (
+                                    <div className="p-2 p-md-3" style={{ width: '100%', minHeight: 400, display: 'flex', flexDirection: 'column' }}>
+                                        <WindowsSubTabs
+                                            summaryData={summaryData}
+                                            fetchLogsByOutlet={fetchLogsByOutlet}
+                                            visibleFields={visibleFields}
+                                            setVisibleFields={setVisibleFields}
+                                            windowsLogsData={windowsLogsData}
+                                            loading={loading}
+                                            outletLogs={outletLogs}
+                                        />
+                                    </div>
+                                )
+                            },
+                            {
+                                key: 'complaints',
+                                label: 'Complaint Report',
+                                content: (
+                                    <div className="p-0" style={{ width: '100%', height: '70vh', display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
+                                        <React.Suspense fallback={<div className="p-3">Loading complaint UI...</div>}>
+                                            {typeof window !== 'undefined' && (() => {
+                                                const C = require('../components/ComplaintReport').default;
+                                                return (
+                                                    <C
+                                                        complaints={complaintsData}
+                                                        loading={complaintLoading}
+                                                        onRefetch={() => fetchComplaints({ force: true })}
+                                                        progress={complaintProgress}
+                                                        cardsLoaded={complaintCardsLoaded}
+                                                    />
+                                                );
+                                            })()}
+                                        </React.Suspense>
+                                    </div>
+                                )
+                            },
+                            {
+                                key: 'docs',
+                                label: 'API Docs',
+                                content: (
+                                    <div className="p-2 p-md-3" style={{ width: '100%', minHeight: '70vh', display: 'flex', flexDirection: 'column', gap: 18 }}>
+                                        <div className="toolbar-card" style={{ marginBottom: 0 }}>
+                                            <div>
+                                                <div className="section-heading__eyebrow">
+                                                    <i className="bi bi-code-square"></i>
+                                                    API Documentation
+                                                </div>
+                                                <p style={{ margin: '10px 0 0', color: '#94a3b8' }}>
+                                                    Integrated Swagger reference framed with the new desktop and mobile shell direction.
+                                                </p>
+                                            </div>
+                                            <Link href="/apiDocs" className="btn btn-outline-light">
+                                                Open standalone docs
+                                            </Link>
+                                        </div>
+                                        <div className="surface-card" style={{ padding: 16, borderRadius: 24, minHeight: '60vh' }}>
+                                            <iframe
+                                                src={process.env.NEXT_PUBLIC_SWAGGER_URL || 'http://localhost:3001/api-docs'}
+                                                style={{ width: '100%', height: '100%', minHeight: '58vh', border: 'none', borderRadius: 16, background: '#ffffff', overflow: 'auto' }}
+                                                title="API Documentation"
+                                                scrolling="yes"
+                                            />
+                                        </div>
+                                    </div>
+                                )
+                            }
+                        ]}
+                        active={activeTab}
+                        onChange={setActiveTab}
+                    />
+
+                    {(!complaintProgress.done || complaintProgress.loaded > 0) && (
+                        <div style={{ position: 'fixed', right: 16, bottom: 16, zIndex: 1200 }}>
+                            <div
+                                className="surface-card"
+                                style={{
+                                    padding: '12px 14px',
+                                    borderRadius: 18,
+                                    border: '1px solid rgba(148, 163, 184, 0.14)',
+                                    minWidth: 220,
+                                }}
+                            >
+                                <div style={{ fontSize: 12 }}>
+                                    {complaintProgress.error ? (
+                                        <span style={{ color: '#fca5a5' }}>Error: {complaintProgress.error}</span>
+                                    ) : (
+                                        <>
+                                            <strong style={{ color: '#f8fafc' }}>Complaint fetch</strong>
+                                            <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 6 }}>
+                                                {complaintProgress.loaded ? `${Math.round(complaintProgress.loaded / 1024)} KB` : '0 KB'}
+                                                {complaintProgress.total ? ` / ${Math.round(complaintProgress.total / 1024)} KB` : ''}
+                                                {complaintProgress.total ? ` (${Math.round((complaintProgress.loaded / complaintProgress.total) * 100)}%)` : ''}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );

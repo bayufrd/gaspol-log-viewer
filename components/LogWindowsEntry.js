@@ -16,94 +16,200 @@ const LogWindowsEntry = ({
     mergedItems = [],
 }) => {
     const [expanded, setExpanded] = useState(false);
+
     const levelColors = {
-        error: { bg: 'bg-black', text: 'text-danger' },
-        warn: { bg: 'bg-warning', text: 'text-dark' },
-        info: { bg: 'bg-dark', text: 'text-success' }
+        error: {
+            color: '#fca5a5',
+            border: 'rgba(239, 68, 68, 0.26)',
+            glow: 'rgba(239, 68, 68, 0.12)',
+            icon: 'bi-x-octagon-fill',
+        },
+        warn: {
+            color: '#fcd34d',
+            border: 'rgba(245, 158, 11, 0.26)',
+            glow: 'rgba(245, 158, 11, 0.12)',
+            icon: 'bi-exclamation-diamond-fill',
+        },
+        info: {
+            color: '#86efac',
+            border: 'rgba(34, 197, 94, 0.24)',
+            glow: 'rgba(34, 197, 94, 0.12)',
+            icon: 'bi-check-circle-fill',
+        },
+        debug: {
+            color: '#7dd3fc',
+            border: 'rgba(56, 189, 248, 0.24)',
+            glow: 'rgba(56, 189, 248, 0.12)',
+            icon: 'bi-terminal-fill',
+        },
     };
 
-    const { bg, text } = levelColors[level] || levelColors['info'];
+    const tone = levelColors[level] || levelColors.debug;
 
-    const handleCopy = () => {
-        const logText = `
-            ${visibleFields?.log_level ? `${level.toUpperCase()} [${logCode}]` : ''}
-            ${visibleFields?.outlet_id ? `⚠️ Outlet ID: ${outlet_id} (${outletName})` : ''}
-            ${visibleFields?.message ? `⚠️ msg: ${message}` : ''}
-            ${visibleFields?.exception ? `⚠️ ex: ${exception}` : ''}
-            ${visibleFields?.source ? `⚠️ sc: ${source}` : ''}
-            ${visibleFields?.additional_info ? `⚠️ adtinfo: ${additionalInfo}` : ''}
-        `.trim();
+    const handleCopy = async () => {
+        const logText = [
+            visibleFields?.log_level ? `${String(level || '').toUpperCase()} [${logCode || '-'}]` : null,
+            visibleFields?.outlet_id ? `Outlet ID: ${outlet_id} (${outletName || '-'})` : null,
+            visibleFields?.message ? `Message: ${message || '-'}` : null,
+            visibleFields?.exception ? `Exception: ${exception || '-'}` : null,
+            visibleFields?.source ? `Source: ${source || '-'}` : null,
+            visibleFields?.additional_info ? `Additional Info: ${additionalInfo || '-'}` : null,
+        ].filter(Boolean).join('\n');
 
-        navigator.clipboard.writeText(logText)
-            .then(() => alert('Log entry copied to clipboard!'))
-            .catch(err => console.error('Error copying log entry:', err));
+        try {
+            await navigator.clipboard.writeText(logText);
+        } catch (err) {
+            console.error('Error copying log entry:', err);
+        }
     };
 
     return (
-        <div className={`log-entry p-2 mb-2 rounded shadow-sm ${bg}`} style={{border: 'none', fontSize: 13}}>
-            <div className="d-flex justify-content-between align-items-center mb-1" style={{ fontFamily: 'GeistMono, Courier New, Courier, monospace' }}>
-                <div>
-                    {visibleFields?.created_at && (
-                        <small className="text-white-300">{timestamp}</small>
-                    )}
-                    {visibleFields?.log_level && (
-                        <span className={`badge ${text} text-uppercase`} style={{fontSize: 11}}>
-                            {level.toUpperCase()}
-                        </span>
-                    )}
+        <div
+            className="log-entry"
+            style={{
+                border: `1px solid ${tone.border}`,
+                borderRadius: 20,
+                fontSize: 13,
+                background: '#0f172a',
+                boxShadow: '0 12px 28px rgba(2, 6, 23, 0.24)',
+                overflow: 'hidden',
+            }}
+        >
+            <div
+                className="d-flex justify-content-between align-items-start"
+                style={{
+                    padding: '16px 16px 12px',
+                    gap: 12,
+                    borderBottom: '1px solid rgba(148, 163, 184, 0.1)',
+                }}
+            >
+                <div style={{ display: 'flex', gap: 12, minWidth: 0 }}>
+                    <span
+                        style={{
+                            width: 38,
+                            height: 38,
+                            borderRadius: 14,
+                            background: 'rgba(2, 6, 23, 0.38)',
+                            color: tone.color,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                        }}
+                    >
+                        <i className={`bi ${tone.icon}`}></i>
+                    </span>
+                    <div style={{ minWidth: 0 }}>
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+                            {visibleFields?.log_level && (
+                                <span
+                                    style={{
+                                        fontSize: 10,
+                                        letterSpacing: '0.12em',
+                                        textTransform: 'uppercase',
+                                        color: tone.color,
+                                        padding: '7px 10px',
+                                        borderRadius: 999,
+                                        border: `1px solid ${tone.border}`,
+                                        background: 'rgba(2, 6, 23, 0.35)',
+                                    }}
+                                >
+                                    {String(level || 'info').toUpperCase()}
+                                </span>
+                            )}
+                            {logCode && (
+                                <span className="chip-button" style={{ cursor: 'default', padding: '7px 10px' }}>
+                                    #{logCode}
+                                </span>
+                            )}
+                            {mergedCount > 1 && (
+                                <span className="chip-button is-active" style={{ cursor: 'default', padding: '7px 10px' }}>
+                                    {mergedCount} merged
+                                </span>
+                            )}
+                        </div>
+                        <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: 15 }}>
+                            Outlet {outlet_id || '-'}{outletName ? ` · ${outletName}` : ''}
+                        </div>
+                        {visibleFields?.created_at && (
+                            <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 4, fontFamily: 'GeistMono, Courier New, monospace' }}>
+                                {timestamp}
+                            </div>
+                        )}
+                    </div>
                 </div>
-                <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                     {mergedCount > 1 && (
                         <button
                             className="btn btn-outline-light btn-sm"
-                            style={{fontSize: 11, padding: '2px 8px', minWidth: 30}}
                             onClick={() => setExpanded((v) => !v)}
                             aria-label={expanded ? 'Hide merged items' : 'Show merged items'}
                         >
-                            {expanded ? '▾' : '▸'}
+                            {expanded ? 'Hide merged logs' : 'Show merged logs'}
                         </button>
                     )}
-                    {mergedCount > 1 && (
-                        <span className="badge bg-secondary" style={{fontSize: 11}}>
-                            {mergedCount} logs merged
-                        </span>
-                    )}
-                    {/* Tombol Salin */}
-                    <button className="btn btn-outline-light btn-sm" style={{fontSize: 11, padding: '2px 8px'}} onClick={handleCopy}>
+                    <button className="btn btn-outline-light btn-sm" onClick={handleCopy}>
                         Copy
                     </button>
                 </div>
             </div>
-            {expanded && mergedItems && mergedItems.length > 1 && (
-                <div className="merged-items-list mt-2" style={{fontSize: 12, color: '#cbd5e1', paddingLeft: 8}}>
-                    {mergedItems.map((it, i) => (
-                        <div key={`${it.id || i}_${i}`} style={{padding: '4px 0', borderBottom: '1px dashed rgba(255,255,255,0.04)'}}>
-                            <div style={{display: 'flex', justifyContent: 'space-between', gap: 8}}>
-                                <div style={{fontFamily: 'GeistMono, Courier New, monospace'}}>
-                                    {visibleFields?.created_at ? new Date(it.created_at).toLocaleString() : ''}
-                                    {visibleFields?.source && ` — ${it.source || ''}`}
+
+            <div style={{ padding: '14px 16px 16px' }}>
+                <div
+                    className="log-message"
+                    style={{
+                        fontFamily: 'GeistMono, Courier New, Courier, monospace',
+                        whiteSpace: 'pre-line',
+                        color: '#dbeafe',
+                        lineHeight: 1.7,
+                        wordBreak: 'break-word',
+                    }}
+                >
+                    {visibleFields?.message && `Message: ${message || '-'}\n`}
+                    {visibleFields?.exception && exception ? `Exception: ${exception}\n` : ''}
+                    {visibleFields?.source && source ? `Source: ${source}\n` : ''}
+                    {visibleFields?.additional_info && additionalInfo ? `Additional Info: ${additionalInfo}\n` : ''}
+                </div>
+
+                {expanded && mergedItems && mergedItems.length > 1 && (
+                    <div
+                        className="viewer-scroll"
+                        style={{
+                            marginTop: 16,
+                            borderRadius: 16,
+                            border: '1px solid rgba(148, 163, 184, 0.14)',
+                            background: 'rgba(2, 6, 23, 0.34)',
+                            padding: 12,
+                            maxHeight: 220,
+                            overflowY: 'auto',
+                        }}
+                    >
+                        {mergedItems.map((it, i) => (
+                            <div
+                                key={`${it.id || i}_${i}`}
+                                style={{
+                                    padding: '10px 0',
+                                    borderBottom: i === mergedItems.length - 1 ? 'none' : '1px dashed rgba(148, 163, 184, 0.14)',
+                                }}
+                            >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
+                                    <div style={{ fontFamily: 'GeistMono, Courier New, monospace', color: '#cbd5e1', fontSize: 12 }}>
+                                        {visibleFields?.created_at ? new Date(it.created_at).toLocaleString() : ''}
+                                    </div>
+                                    {visibleFields?.source && it.source ? (
+                                        <div style={{ color: '#7dd3fc', fontSize: 12 }}>
+                                            {it.source}
+                                        </div>
+                                    ) : null}
                                 </div>
-                                <div>
-                                    {/* optional per-item small copy could go here */}
+                                <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 6, whiteSpace: 'pre-line' }}>
+                                    {it.message}
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-            <div
-                className="log-message"
-                style={{
-                    fontFamily: "GeistMono, Courier New, Courier, monospace",
-                    whiteSpace: "pre-line",
-                }}
-            >
-                {visibleFields?.log_level && `${level.toUpperCase()}[${logCode}]\n`}
-                {visibleFields?.outlet_id && `⚠️ Outlet ID : ${outlet_id} (${outletName})\n`}
-                {visibleFields?.message && `⚠️ msg: ${message}\n`}
-                {visibleFields?.exception && `⚠️ ex: ${exception}\n`}
-                {visibleFields?.source && `⚠️ sc: ${source}\n`}
-                {visibleFields?.additional_info && `⚠️ adtinfo: ${additionalInfo}\n`}
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
