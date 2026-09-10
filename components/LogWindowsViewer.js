@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import LogEntry from './LogWindowsEntry';
 
-const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUpdateConfirm = false }) => {
+const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUpdateConfirm = false, error = '' }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredLogs, setFilteredLogs] = useState([]);
     const [updateConfirmData, setUpdateConfirmData] = useState([]);
@@ -39,24 +39,22 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUp
         setFilteredLogs(groups);
     }, [windowsLogsData, searchTerm]);
 
-    const fetchUpdateConfirmData = async () => {
+    const fetchUpdateConfirmData = useCallback(async () => {
         try {
             const baseUri = process.env.NEXT_PUBLIC_API_URL;
             const response = await fetch(`${baseUri}/update-confirm`);
             if (!response.ok) throw new Error('Data tidak ditemukan');
             const data = await response.json();
-            setUpdateConfirmData(data.data);
+            setUpdateConfirmData(data.data || []);
         } catch (error) {
             console.error('Error fetching update confirm data:', error);
             setUpdateConfirmData([]);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchUpdateConfirmData();
-        const interval = setInterval(fetchUpdateConfirmData, 10000);
-        return () => clearInterval(interval);
-    }, []);
+    }, [fetchUpdateConfirmData]);
 
     useEffect(() => {
         const fetchRemoteVersion = async () => {
@@ -150,100 +148,41 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUp
         );
     }
 
+    const clearSearch = () => setSearchTerm('');
+
     return (
-        <div className="modern-log-windows-viewer" style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 16 }}>
-            <div className="toolbar-card" style={{ marginBottom: 0 }}>
+        <section className="windows-log-viewer" aria-labelledby="windows-log-list-title">
+            <div className="windows-log-viewer__header">
                 <div>
-                    <div className="section-heading__eyebrow">
-                        <i className="bi bi-pc-display"></i>
-                        Windows Client Logs
-                    </div>
-                    <div style={{ marginTop: 10 }}>
-                        <h6 style={{ margin: 0, color: '#f8fafc', fontSize: 18, fontWeight: 700 }}>Grouped outlet diagnostics</h6>
-                        <p style={{ margin: '6px 0 0', color: '#94a3b8' }}>
-                            Similar logs are merged automatically so recent incidents are easier to review.
-                        </p>
-                    </div>
+                    <span className="windows-log-viewer__eyebrow"><i className="bi bi-list-nested"></i> Event stream</span>
+                    <h2 id="windows-log-list-title">Windows Client Logs</h2>
                 </div>
-                <div className="chip-row">
-                    <div className="chip-button is-active" style={{ cursor: 'default' }}>
-                        <i className="bi bi-stack"></i>
-                        <span>Groups</span>
-                        <span className="chip-button__meta">{filteredLogs.length}</span>
-                    </div>
-                    <div className="chip-button" style={{ cursor: 'default' }}>
-                        <i className="bi bi-list-ol"></i>
-                        <span>Logs</span>
-                        <span className="chip-button__meta">{windowsLogsData.length}</span>
-                    </div>
+                <div className="windows-summary-cards" aria-label="Log summary">
+                    <div className="windows-summary-card"><span>Groups</span><strong>{filteredLogs.length}</strong></div>
+                    <div className="windows-summary-card"><span>Logs</span><strong>{windowsLogsData.length}</strong></div>
                 </div>
             </div>
-
-            <div className="search-shell">
-                <span className="search-shell__icon">
-                    <i className="bi bi-search"></i>
-                </span>
-                <input
-                    type="text"
-                    placeholder="Search outlet, source, exception, or message"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="form-control border-0"
-                    style={{ flex: 1, background: 'transparent', paddingLeft: 0 }}
-                />
+            <div className="windows-log-search">
+                <i className="bi bi-search" aria-hidden="true"></i>
+                <label className="visually-hidden" htmlFor="windows-log-search-input">Search logs</label>
+                <input id="windows-log-search-input" type="search" placeholder="Search outlet, source, exception, or message" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                {searchTerm && <button type="button" onClick={clearSearch} aria-label="Clear search"><i className="bi bi-x-lg"></i></button>}
             </div>
-
-            <div
-                ref={logContainerRef}
-                className="viewer-panel viewer-scroll"
-                style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}
-            >
-                {loading && (
-                    <div className="text-center" style={{ padding: '18px 0' }}>
-                        <div className="spinner-border text-info" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
+            <div ref={logContainerRef} className="windows-log-list" aria-live="polite">
+                {error ? (
+                    <div className="windows-state windows-state--error"><i className="bi bi-exclamation-triangle"></i><strong>Unable to load logs</strong><span>{error}</span></div>
+                ) : loading ? (
+                    <div className="windows-state"><span className="spinner-border spinner-border-sm" role="status"></span><strong>Loading Windows client logs</strong><span>Fetching the latest outlet events…</span></div>
+                ) : filteredLogs.length > 0 ? (
+                    filteredLogs.map((group, idx) => {
+                        const rep = group.representative || {};
+                        return <LogEntry key={`${group._groupKey || idx}`} timestamp={new Date(group.representativeTimestamp || rep.created_at).toLocaleString()} outlet_id={rep.outlet_id} outletName={rep.outlet_name} level={rep.log_level} message={rep.message} logCode={rep.log_code} exception={rep.exception} source={rep.source} additionalInfo={rep.additional_info} visibleFields={visibleFields} mergedCount={group.mergedCount || 1} mergedItems={group.mergedItems || [rep]} />;
+                    })
+                ) : (
+                    <div className="windows-state windows-state--empty"><i className="bi bi-search"></i><strong>No logs found</strong><span>{searchTerm ? 'Try a different search term or clear the filter.' : 'No Windows client logs are available for this stream.'}</span>{searchTerm && <button type="button" className="windows-secondary-button" onClick={clearSearch}>Clear search</button>}</div>
                 )}
-                <div className="log-entries" style={{ marginTop: 0, display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 'none' }}>
-                    {filteredLogs.length > 0 ? (
-                        filteredLogs.map((group, idx) => {
-                            const rep = group.representative || {};
-                            return (
-                                <LogEntry
-                                    key={`${group._groupKey || idx}`}
-                                    timestamp={new Date(group.representativeTimestamp || rep.created_at).toLocaleString()}
-                                    outlet_id={rep.outlet_id}
-                                    outletName={rep.outlet_name}
-                                    level={rep.log_level}
-                                    message={rep.message}
-                                    logCode={rep.log_code}
-                                    exception={rep.exception}
-                                    source={rep.source}
-                                    additionalInfo={rep.additional_info}
-                                    visibleFields={visibleFields}
-                                    mergedCount={group.mergedCount || 1}
-                                    mergedItems={group.mergedItems || [rep]}
-                                />
-                            );
-                        })
-                    ) : (
-                        <div
-                            className="alert text-info text-center rounded shadow-sm"
-                            style={{
-                                fontSize: 13,
-                                padding: 14,
-                                marginBottom: 0,
-                                background: 'rgba(56, 189, 248, 0.08)',
-                                borderColor: 'rgba(56, 189, 248, 0.22)',
-                            }}
-                        >
-                            Tidak ada log untuk ditampilkan
-                        </div>
-                    )}
-                </div>
             </div>
-        </div>
+        </section>
     );
 };
 

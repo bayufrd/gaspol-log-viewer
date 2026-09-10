@@ -64,56 +64,14 @@ const LogWindowsEntry = ({
     };
 
     return (
-        <div
-            className="log-entry"
-            style={{
-                border: `1px solid ${tone.border}`,
-                borderRadius: 20,
-                fontSize: 13,
-                background: '#0f172a',
-                boxShadow: '0 12px 28px rgba(2, 6, 23, 0.24)',
-                overflow: 'hidden',
-            }}
-        >
-            <div
-                className="d-flex justify-content-between align-items-start"
-                style={{
-                    padding: '16px 16px 12px',
-                    gap: 12,
-                    borderBottom: '1px solid rgba(148, 163, 184, 0.1)',
-                }}
-            >
-                <div style={{ display: 'flex', gap: 12, minWidth: 0 }}>
-                    <span
-                        style={{
-                            width: 38,
-                            height: 38,
-                            borderRadius: 14,
-                            background: 'rgba(2, 6, 23, 0.38)',
-                            color: tone.color,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0,
-                        }}
-                    >
-                        <i className={`bi ${tone.icon}`}></i>
-                    </span>
-                    <div style={{ minWidth: 0 }}>
-                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+        <article className="windows-log-entry" style={{ '--log-tone': tone.color, '--log-border': tone.border }}>
+            <div className="windows-log-entry__header">
+                <div className="windows-log-entry__identity">
+                    <span className="windows-log-entry__icon"><i className={`bi ${tone.icon}`}></i></span>
+                    <div className="windows-log-entry__identity-copy">
+                        <div className="windows-log-entry__badges">
                             {visibleFields?.log_level && (
-                                <span
-                                    style={{
-                                        fontSize: 10,
-                                        letterSpacing: '0.12em',
-                                        textTransform: 'uppercase',
-                                        color: tone.color,
-                                        padding: '7px 10px',
-                                        borderRadius: 999,
-                                        border: `1px solid ${tone.border}`,
-                                        background: 'rgba(2, 6, 23, 0.35)',
-                                    }}
-                                >
+                                <span className="windows-level-badge">
                                     {String(level || 'info').toUpperCase()}
                                 </span>
                             )}
@@ -128,18 +86,13 @@ const LogWindowsEntry = ({
                                 </span>
                             )}
                         </div>
-                        <div style={{ color: '#f8fafc', fontWeight: 700, fontSize: 15 }}>
-                            Outlet {outlet_id || '-'}{outletName ? ` · ${outletName}` : ''}
-                        </div>
-                        {visibleFields?.created_at && (
-                            <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 4, fontFamily: 'GeistMono, Courier New, monospace' }}>
-                                {timestamp}
-                            </div>
-                        )}
+                        <div className="windows-log-entry__outlet">{outletName || `Outlet ${outlet_id || '-'}`}</div>
+                        {visibleFields?.outlet_id && <div className="windows-log-entry__outlet-id">ID {outlet_id || '-'}</div>}
+                        {visibleFields?.created_at && <div className="windows-log-entry__timestamp"><i className="bi bi-clock"></i> {timestamp}</div>}
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                <div className="windows-log-entry__actions">
                     {mergedCount > 1 && (
                         <button
                             className="btn btn-outline-light btn-sm"
@@ -155,21 +108,12 @@ const LogWindowsEntry = ({
                 </div>
             </div>
 
-            <div style={{ padding: '14px 16px 16px' }}>
-                <div
-                    className="log-message"
-                    style={{
-                        fontFamily: 'GeistMono, Courier New, Courier, monospace',
-                        whiteSpace: 'pre-line',
-                        color: '#dbeafe',
-                        lineHeight: 1.7,
-                        wordBreak: 'break-word',
-                    }}
-                >
-                    {visibleFields?.message && `Message: ${message || '-'}\n`}
-                    {visibleFields?.exception && exception ? `Exception: ${exception}\n` : ''}
-                    {visibleFields?.source && source ? `Source: ${source}\n` : ''}
-                    {visibleFields?.additional_info && additionalInfo ? `Additional Info: ${additionalInfo}\n` : ''}
+            <div className="windows-log-entry__body">
+                {visibleFields?.message && <p className="windows-log-entry__message">{message || '-'}</p>}
+                <div className="windows-log-entry__metadata">
+                    {visibleFields?.exception && exception && <span><b>Exception</b> {exception}</span>}
+                    {visibleFields?.source && source && <span><b>Source</b> {source}</span>}
+                    {visibleFields?.additional_info && additionalInfo && <span><b>Additional info</b> {additionalInfo}</span>}
                 </div>
 
                 {expanded && mergedItems && mergedItems.length > 1 && (
@@ -211,7 +155,7 @@ const LogWindowsEntry = ({
                     </div>
                 )}
             </div>
-        </div>
+        </article>
     );
 };
 

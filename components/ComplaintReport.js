@@ -121,19 +121,19 @@ const ComplaintReport = ({ complaints = [], loading, onRefetch, progress, cardsL
         const step = 5;
         const interval = 120;
         if (showCount === 0) setShowCount(Math.min(total, step));
-        const id = setInterval(() => {
+        let timeoutId;
+        const revealNext = () => {
             if (!mounted) return;
             setShowCount((prev) => {
-                if (prev >= total) {
-                    clearInterval(id);
-                    return prev;
-                }
+                if (prev >= total) return prev;
+                timeoutId = setTimeout(revealNext, interval);
                 return Math.min(total, prev + step);
             });
-        }, interval);
+        };
+        timeoutId = setTimeout(revealNext, interval);
         return () => {
             mounted = false;
-            clearInterval(id);
+            clearTimeout(timeoutId);
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filtered.length]);

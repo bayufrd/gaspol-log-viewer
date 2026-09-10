@@ -6,7 +6,7 @@ import LogFileButton from '../components/LogFileButton';
 import LogWindowsViewer from '../components/LogWindowsViewer';
 import ModernSubTabs from '../components/ModernSubTabs';
 
-function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisibleFields, windowsLogsData, loading, outletLogs }) {
+function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisibleFields, windowsLogsData, loading, outletLogs, error, autoRefreshEnabled, setAutoRefreshEnabled, lastLogsFetchAt }) {
     const [active, setActive] = React.useState('client');
     return (
         <ModernSubTabs
@@ -15,81 +15,60 @@ function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisi
                     key: 'client',
                     label: 'Log Client Windows',
                     content: (
-                        <div style={{ width: '100%', minHeight: '30vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', gap: 16 }}>
-                            <div className="filter-panel">
-                                <div className="toolbar-card" style={{ marginBottom: 0 }}>
-                                    <div>
-                                        <div className="section-heading__eyebrow">
-                                            <i className="bi bi-sliders"></i>
-                                            Outlet Filters
+                        <div className="windows-logs-layout">
+                            <div className="windows-page-heading">
+                                <div>
+                                    <span className="windows-kicker"><i className="bi bi-terminal"></i> Client diagnostics</span>
+                                    <h1>Windows Client Logs</h1>
+                                    <p>Grouped outlet diagnostics</p>
+                                </div>
+                                <span className="windows-live-status"><span></span> LIVE</span>
+                            </div>
+                            <p className="windows-supporting-copy">Similar logs are merged automatically so recent incidents are easier to review.</p>
+                            <div className="windows-filter-panel" aria-label="Windows log filters">
+                                <div className="windows-filter-row">
+                                    <div className="windows-filter-group windows-outlet-group">
+                                        <label htmlFor="outlet-stream">Outlet stream</label>
+                                        <select id="outlet-stream" value={outletLogs || 'ALL'} onChange={(event) => fetchLogsByOutlet(event.target.value)}>
+                                            <option value="ALL">All outlets</option>
+                                            {summaryData.map((item) => <option key={item.outlet_id} value={item.outlet_id}>{item.outlet_name} · {item.total_logs}</option>)}
+                                        </select>
+                                        <span className="windows-selected-stream"><i className="bi bi-broadcast-pin"></i> {outletLogs === 'ALL' ? 'All outlets' : summaryData.find((item) => String(item.outlet_id) === String(outletLogs))?.outlet_name || `Outlet ${outletLogs}`}</span>
+                                    </div>
+                                    <div className="windows-filter-group windows-fields-group">
+                                        <div className="windows-refresh-header">
+                                            <span className="windows-filter-label">Log refresh</span>
+                                            <button type="button" className="windows-refresh-button" onClick={() => fetchLogsByOutlet(outletLogs)} disabled={loading}>
+                                                <i className="bi bi-arrow-clockwise" aria-hidden="true"></i>
+                                                {loading ? 'Loading…' : 'Refresh'}
+                                            </button>
                                         </div>
-                                        <p style={{ margin: '10px 0 0', color: '#94a3b8' }}>
-                                            Select an outlet stream and control which metadata fields are visible in each log card.
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="filter-panel__block">
-                                    <div className="filter-panel__label">
-                                        <i className="bi bi-buildings"></i>
-                                        Outlet stream
-                                    </div>
-                                    <div className="chip-row chip-row--scroll">
-                                        <button
-                                            className={`chip-button ${outletLogs === 'ALL' ? 'is-active' : ''}`}
-                                            onClick={() => fetchLogsByOutlet('ALL')}
-                                            style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
-                                        >
-                                            <i className="bi bi-grid-3x3-gap-fill"></i>
-                                            <span>All Outlet</span>
-                                        </button>
-                                        {summaryData.map((item) => (
-                                            <button
-                                                key={item.outlet_id}
-                                                className={`chip-button ${String(outletLogs) === String(item.outlet_id) ? 'is-active' : ''}`}
-                                                onClick={() => fetchLogsByOutlet(item.outlet_id)}
-                                                style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
-                                            >
-                                                <i className="bi bi-building"></i>
-                                                <span>{item.outlet_name}</span>
-                                                <span className="chip-button__meta">{item.total_logs}</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div className="filter-panel__block">
-                                    <div className="filter-panel__label">
-                                        <i className="bi bi-eye"></i>
-                                        Visible fields
-                                    </div>
-                                    <div className="chip-row chip-row--scroll">
-                                        {Object.keys(visibleFields).map((field) => (
-                                            <button
-                                                key={field}
-                                                type="button"
-                                                className={`chip-button ${visibleFields[field] ? 'is-active' : ''}`}
-                                                onClick={() =>
-                                                    setVisibleFields((prev) => ({
-                                                        ...prev,
-                                                        [field]: !prev[field],
-                                                    }))
-                                                }
-                                                style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
-                                            >
-                                                <i className={`bi ${visibleFields[field] ? 'bi-eye-fill' : 'bi-eye-slash'}`}></i>
-                                                <span>{field.replace('_', ' ')}</span>
-                                            </button>
-                                        ))}
+                                        <div className="windows-refresh-options" role="radiogroup" aria-label="Automatic log refresh">
+                                            <label className="windows-radio-option">
+                                                <input type="radio" name="windows-auto-refresh" checked={!autoRefreshEnabled} onChange={() => setAutoRefreshEnabled(false)} />
+                                                <span>OFF</span>
+                                            </label>
+                                            <label className="windows-radio-option">
+                                                <input type="radio" name="windows-auto-refresh" checked={autoRefreshEnabled} onChange={() => setAutoRefreshEnabled(true)} />
+                                                <span>ON · 15s</span>
+                                            </label>
+                                        </div>
+                                        <span className="windows-refresh-status" role="status">
+                                            {lastLogsFetchAt ? `Last fetched ${lastLogsFetchAt.toLocaleTimeString()}` : 'Not fetched yet'}
+                                        </span>
+                                        <span className="windows-filter-label">Visible fields</span>
+                                        <div className="windows-field-options">
+                                            {Object.keys(visibleFields).map((field) => (
+                                                <label key={field} className="windows-field-option">
+                                                    <input type="checkbox" checked={visibleFields[field]} onChange={() => setVisibleFields((prev) => ({ ...prev, [field]: !prev[field] }))} />
+                                                    <span>{field.replace('_', ' ')}</span>
+                                                </label>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div style={{ flex: 1, minHeight: 0, overflow: 'auto', display: 'flex', flexDirection: 'column', WebkitOverflowScrolling: 'touch' }}>
-                                <LogWindowsViewer
-                                    windowsLogsData={windowsLogsData}
-                                    loading={loading}
-                                    visibleFields={visibleFields}
-                                    style={{ flex: 1, minHeight: 0, height: '100%' }}
-                                />
-                            </div>
+                            <LogWindowsViewer windowsLogsData={windowsLogsData} loading={loading} visibleFields={visibleFields} error={error} />
                         </div>
                     )
                 },
@@ -132,6 +111,11 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
     const [currentLogs, setCurrentLogs] = React.useState([]);
     const [windowsLogsData, setWindowsLogsData] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
+    const [windowsLogsError, setWindowsLogsError] = React.useState('');
+    const [autoRefreshEnabled, setAutoRefreshEnabled] = React.useState(false);
+    const [lastLogsFetchAt, setLastLogsFetchAt] = React.useState(null);
+    const logsRequestRef = React.useRef(null);
+    const logsTimerRef = React.useRef(null);
     const [passwordInput, setPasswordInput] = React.useState('');
     const [isAuthenticated, setIsAuthenticated] = React.useState(false);
     const logViewerRef = React.useRef(null);
@@ -540,25 +524,36 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
         fetchComplaints({ force: false });
     }, [fetchComplaints]);
 
-    const fetchLogsByOutlet = async (outletId) => {
+    const fetchLogsByOutlet = React.useCallback(async (outletId) => {
+        if (logsRequestRef.current) return false;
+
         setLoading(true);
+        setWindowsLogsError('');
+        const controller = new AbortController();
+        logsRequestRef.current = controller;
+
         try {
             const baseUri = process.env.NEXT_PUBLIC_API_URL;
-            const endpoint =
-                outletId === "ALL"
-                    ? `${baseUri}/logs` // all outlet
-                    : `${baseUri}/logs/${outletId}`;
+            const endpoint = outletId === 'ALL' ? `${baseUri}/logs` : `${baseUri}/logs/${outletId}`;
             setOutletLogs(outletId);
-            const response = await fetch(endpoint);
-            if (!response.ok) throw new Error("Gagal ambil logs");
+            const response = await fetch(endpoint, { signal: controller.signal });
+            if (!response.ok) throw new Error('Gagal ambil logs');
             const data = await response.json();
             setWindowsLogsData(data.data || []);
+            setLastLogsFetchAt(new Date());
+            return true;
         } catch (err) {
-            console.error("Error fetch outlet logs:", err);
-            setWindowsLogsData([]);
+            if (err.name !== 'AbortError') {
+                console.error('Error fetch outlet logs:', err);
+                setWindowsLogsData([]);
+                setWindowsLogsError('Unable to load Windows client logs. Check the connection and try again.');
+            }
+            return false;
+        } finally {
+            if (logsRequestRef.current === controller) logsRequestRef.current = null;
+            setLoading(false);
         }
-        setLoading(false);
-    };
+    }, []);
 
 
     const fetchWindowsLogs = async () => {
@@ -581,19 +576,46 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
     // }, []);
 
     useEffect(() => {
-        localStorage.setItem("selectedOutlet", outletLogs); // simpan setiap kali berubah
+        localStorage.setItem('selectedOutlet', outletLogs);
     }, [outletLogs]);
 
     useEffect(() => {
-        if (!outletLogs) return;
+        if (!isAuthenticated || !outletLogs) return undefined;
         fetchLogsByOutlet(outletLogs);
+        return () => {
+            if (logsTimerRef.current) {
+                window.clearTimeout(logsTimerRef.current);
+                logsTimerRef.current = null;
+            }
+            if (logsRequestRef.current) {
+                logsRequestRef.current.abort();
+                logsRequestRef.current = null;
+            }
+        };
+    }, [isAuthenticated, outletLogs, fetchLogsByOutlet]);
 
-        const interval = setInterval(() => {
-            fetchLogsByOutlet(outletLogs);
-        }, 10000);
+    useEffect(() => {
+        if (!isAuthenticated || !autoRefreshEnabled || !outletLogs) return undefined;
 
-        return () => clearInterval(interval);
-    }, [outletLogs]);
+        let cancelled = false;
+        const scheduleNext = () => {
+            if (cancelled) return;
+            logsTimerRef.current = window.setTimeout(async () => {
+                logsTimerRef.current = null;
+                await fetchLogsByOutlet(outletLogs);
+                scheduleNext();
+            }, 15000);
+        };
+
+        scheduleNext();
+        return () => {
+            cancelled = true;
+            if (logsTimerRef.current) {
+                window.clearTimeout(logsTimerRef.current);
+                logsTimerRef.current = null;
+            }
+        };
+    }, [autoRefreshEnabled, fetchLogsByOutlet, isAuthenticated, outletLogs]);
 
     const readLogFile = async (filePath, ispm2Log = false) => {
         setLoading(true);
@@ -713,28 +735,26 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
 
     const ModernTabs = require('../components/ModernTabs').default;
     return (
-        <div className="app-shell">
-            <div className="app-shell__container">
-                <div className="glass-panel" style={{ padding: 24 }}>
+        <div className="app-shell app-shell--reference">
+            <div className="app-shell__container app-shell__container--fluid">
                     <ModernTabs
                         tabs={[
                             {
                                 key: 'api',
                                 label: 'API Logs',
                                 content: (
-                                    <div className="p-2 p-md-3">
-                                        <div className="section-heading" style={{ marginBottom: 18 }}>
+                                    <section className="reference-page-section">
+                                        <div className="reference-page-hero">
                                             <div>
-                                                <div className="section-heading__eyebrow">
-                                                    <i className="bi bi-server"></i>
-                                                    API Regular Logs
-                                                </div>
-                                                <p className="section-heading__description" style={{ marginTop: 10 }}>
-                                                    Browse backend log files and inspect the latest lines in the redesigned live viewer.
-                                                </p>
+                                                <span className="section-heading__eyebrow"><i className="bi bi-server"></i> API Regular Logs</span>
+                                                <h1>API Logs Monitoring</h1>
+                                                <p>Browse backend log files and inspect the latest lines in the redesigned live viewer.</p>
                                             </div>
+                                            <span className="windows-live-status"><span></span> LIVE</span>
                                         </div>
-                                        <div className="chip-row" style={{ marginBottom: 18 }}>
+                                        <div className="reference-source-panel">
+                                            <span className="filter-panel__label">Active log files</span>
+                                            <div className="chip-row chip-row--scroll">
                                             {logFiles.map((fileName) => (
                                                 <LogFileButton
                                                     key={fileName}
@@ -742,30 +762,30 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
                                                     onClick={() => readLogFile(fileName, false)}
                                                 />
                                             ))}
+                                            </div>
                                         </div>
-                                        <div ref={logViewerRef} className="viewer-panel" style={{ minHeight: 280 }}>
+                                        <div ref={logViewerRef}>
                                             <LogViewer logs={currentLogs} />
                                         </div>
-                                    </div>
+                                    </section>
                                 )
                             },
                             {
                                 key: 'pm2',
                                 label: 'PM2 Logs',
                                 content: (
-                                    <div className="p-2 p-md-3">
-                                        <div className="section-heading" style={{ marginBottom: 18 }}>
+                                    <section className="reference-page-section">
+                                        <div className="reference-page-hero">
                                             <div>
-                                                <div className="section-heading__eyebrow">
-                                                    <i className="bi bi-cpu-fill"></i>
-                                                    PM2 Process Logs
-                                                </div>
-                                                <p className="section-heading__description" style={{ marginTop: 10 }}>
-                                                    Open PM2 log outputs with the same searchable high-contrast viewer experience.
-                                                </p>
+                                                <span className="section-heading__eyebrow"><i className="bi bi-cpu-fill"></i> PM2 Process Logs</span>
+                                                <h1>PM2 Runtime Logs</h1>
+                                                <p>Open PM2 log outputs with the same searchable high-contrast viewer experience.</p>
                                             </div>
+                                            <span className="windows-live-status"><span></span> LIVE</span>
                                         </div>
-                                        <div className="chip-row" style={{ marginBottom: 18 }}>
+                                        <div className="reference-source-panel">
+                                            <span className="filter-panel__label">Active process files</span>
+                                            <div className="chip-row chip-row--scroll">
                                             {pm2Logs.map((fileName) => (
                                                 <LogFileButton
                                                     key={fileName}
@@ -773,18 +793,19 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
                                                     onClick={() => readLogFile(fileName, true)}
                                                 />
                                             ))}
+                                            </div>
                                         </div>
-                                        <div ref={logViewerRef} className="viewer-panel" style={{ minHeight: 280 }}>
+                                        <div ref={logViewerRef}>
                                             <LogViewer logs={currentLogs} />
                                         </div>
-                                    </div>
+                                    </section>
                                 )
                             },
                             {
                                 key: 'windows',
                                 label: 'Windows Logs',
                                 content: (
-                                    <div className="p-2 p-md-3" style={{ width: '100%', minHeight: 400, display: 'flex', flexDirection: 'column' }}>
+                                    <section className="reference-page-section" style={{ minHeight: 400 }}>
                                         <WindowsSubTabs
                                             summaryData={summaryData}
                                             fetchLogsByOutlet={fetchLogsByOutlet}
@@ -793,15 +814,19 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
                                             windowsLogsData={windowsLogsData}
                                             loading={loading}
                                             outletLogs={outletLogs}
+                                            error={windowsLogsError}
+                                            autoRefreshEnabled={autoRefreshEnabled}
+                                            setAutoRefreshEnabled={setAutoRefreshEnabled}
+                                            lastLogsFetchAt={lastLogsFetchAt}
                                         />
-                                    </div>
+                                    </section>
                                 )
                             },
                             {
                                 key: 'complaints',
                                 label: 'Complaint Report',
                                 content: (
-                                    <div className="p-0" style={{ width: '100%', height: '70vh', display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
+                                    <section className="reference-page-section reference-page-section--flush">
                                         <React.Suspense fallback={<div className="p-3">Loading complaint UI...</div>}>
                                             {typeof window !== 'undefined' && (() => {
                                                 const C = require('../components/ComplaintReport').default;
@@ -816,14 +841,14 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
                                                 );
                                             })()}
                                         </React.Suspense>
-                                    </div>
+                                    </section>
                                 )
                             },
                             {
                                 key: 'docs',
                                 label: 'API Docs',
                                 content: (
-                                    <div className="p-2 p-md-3" style={{ width: '100%', minHeight: '70vh', display: 'flex', flexDirection: 'column', gap: 18 }}>
+                                    <section className="reference-page-section" style={{ minHeight: '70vh' }}>
                                         <div className="toolbar-card" style={{ marginBottom: 0 }}>
                                             <div>
                                                 <div className="section-heading__eyebrow">
@@ -846,7 +871,7 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
                                                 scrolling="yes"
                                             />
                                         </div>
-                                    </div>
+                                    </section>
                                 )
                             }
                         ]}
@@ -882,7 +907,6 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
                             </div>
                         </div>
                     )}
-                </div>
             </div>
         </div>
     );

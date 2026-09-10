@@ -8,14 +8,6 @@ const nextConfig = {
           destination: 'http://localhost:3001/swagger-docs'  
         }  
       ]  
-    },
-    theme: {
-      extend: {
-        fontFamily: {
-          sans: ['var(--font-geist-sans)'],
-          mono: ['var(--font-geist-mono)']
-        }
-      }
     }
   };
   
