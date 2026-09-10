@@ -6,7 +6,7 @@ import LogFileButton from '../components/LogFileButton';
 import LogWindowsViewer from '../components/LogWindowsViewer';
 import ModernSubTabs from '../components/ModernSubTabs';
 
-function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisibleFields, windowsLogsData, loading, outletLogs, error, autoRefreshEnabled, setAutoRefreshEnabled, lastLogsFetchAt }) {
+function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisibleFields, windowsLogsData, loading, loadingMore, hasMore, paginationSupported, loadMoreError, retryLoadMore, loadMoreLogs, outletLogs, error, autoRefreshEnabled, setAutoRefreshEnabled, lastLogsFetchAt }) {
     const [active, setActive] = React.useState('client');
     return (
         <ModernSubTabs
@@ -38,7 +38,7 @@ function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisi
                                     <div className="windows-filter-group windows-fields-group">
                                         <div className="windows-refresh-header">
                                             <span className="windows-filter-label">Log refresh</span>
-                                            <button type="button" className="windows-refresh-button" onClick={() => fetchLogsByOutlet(outletLogs)} disabled={loading}>
+                                            <button type="button" className="windows-refresh-button" onClick={() => fetchLogsByOutlet(outletLogs, { refresh: true })} disabled={loading}>
                                                 <i className="bi bi-arrow-clockwise" aria-hidden="true"></i>
                                                 {loading ? 'Loading…' : 'Refresh'}
                                             </button>
@@ -68,7 +68,18 @@ function WindowsSubTabs({ summaryData, fetchLogsByOutlet, visibleFields, setVisi
                                     </div>
                                 </div>
                             </div>
-                            <LogWindowsViewer windowsLogsData={windowsLogsData} loading={loading} visibleFields={visibleFields} error={error} />
+                            <LogWindowsViewer
+                                windowsLogsData={windowsLogsData}
+                                loading={loading}
+                                loadingMore={loadingMore}
+                                hasMore={hasMore}
+                                loadMoreError={loadMoreError}
+                                onLoadMore={loadMoreLogs}
+                                onRetryLoadMore={retryLoadMore}
+                                paginationSupported={paginationSupported}
+                                visibleFields={visibleFields}
+                                error={error}
+                            />
                         </div>
                     )
                 },
@@ -115,7 +126,15 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
     const [autoRefreshEnabled, setAutoRefreshEnabled] = React.useState(false);
     const [lastLogsFetchAt, setLastLogsFetchAt] = React.useState(null);
     const logsRequestRef = React.useRef(null);
+    const logsRequestIdRef = React.useRef(0);
     const logsTimerRef = React.useRef(null);
+    const logsCursorRef = React.useRef(null);
+    const logsHasMoreRef = React.useRef(false);
+    const logsLoadingMoreRef = React.useRef(false);
+    const [loadingMore, setLoadingMore] = React.useState(false);
+    const [loadMoreError, setLoadMoreError] = React.useState('');
+    const [hasMore, setHasMore] = React.useState(false);
+    const [paginationSupported, setPaginationSupported] = React.useState(true);
     const [passwordInput, setPasswordInput] = React.useState('');
     const [isAuthenticated, setIsAuthenticated] = React.useState(false);
     const logViewerRef = React.useRef(null);
@@ -524,36 +543,92 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
         fetchComplaints({ force: false });
     }, [fetchComplaints]);
 
-    const fetchLogsByOutlet = React.useCallback(async (outletId) => {
-        if (logsRequestRef.current) return false;
-
+    const fetchLogsByOutlet = React.useCallback(async (outletId, options = {}) => {
+        const isRefresh = Boolean(options.refresh);
+        const requestId = ++logsRequestIdRef.current;
+        if (logsRequestRef.current) logsRequestRef.current.abort();
+        logsCursorRef.current = null;
+        logsHasMoreRef.current = false;
+        setHasMore(false);
+        setPaginationSupported(true);
+        setLoadMoreError('');
         setLoading(true);
         setWindowsLogsError('');
+        setWindowsLogsData([]);
+        setOutletLogs(outletId);
         const controller = new AbortController();
         logsRequestRef.current = controller;
 
         try {
             const baseUri = process.env.NEXT_PUBLIC_API_URL;
-            const endpoint = outletId === 'ALL' ? `${baseUri}/logs` : `${baseUri}/logs/${outletId}`;
-            setOutletLogs(outletId);
-            const response = await fetch(endpoint, { signal: controller.signal });
+            const endpoint = outletId === 'ALL' ? `${baseUri}/logs` : `${baseUri}/logs/${encodeURIComponent(outletId)}`;
+            const url = new URL(endpoint);
+            url.searchParams.set('limit', '40');
+            const response = await fetch(url.toString(), { signal: controller.signal, cache: isRefresh ? 'no-store' : 'default' });
             if (!response.ok) throw new Error('Gagal ambil logs');
             const data = await response.json();
-            setWindowsLogsData(data.data || []);
+            if (requestId !== logsRequestIdRef.current) return false;
+            setWindowsLogsData(Array.isArray(data.data) ? data.data : []);
+            const hasPagination = Boolean(data.pagination && typeof data.pagination === 'object');
+            setPaginationSupported(hasPagination);
+            logsCursorRef.current = data.pagination?.next_cursor || null;
+            logsHasMoreRef.current = hasPagination && Boolean(data.pagination?.has_more && data.pagination?.next_cursor);
+            setHasMore(logsHasMoreRef.current);
             setLastLogsFetchAt(new Date());
             return true;
         } catch (err) {
-            if (err.name !== 'AbortError') {
+            if (err.name !== 'AbortError' && requestId === logsRequestIdRef.current) {
                 console.error('Error fetch outlet logs:', err);
-                setWindowsLogsData([]);
                 setWindowsLogsError('Unable to load Windows client logs. Check the connection and try again.');
             }
             return false;
         } finally {
             if (logsRequestRef.current === controller) logsRequestRef.current = null;
-            setLoading(false);
+            if (requestId === logsRequestIdRef.current) setLoading(false);
         }
     }, []);
+
+    const loadMoreLogs = React.useCallback(async () => {
+        if (!logsHasMoreRef.current || !logsCursorRef.current || logsLoadingMoreRef.current || loading || !outletLogs) return false;
+        const requestId = logsRequestIdRef.current;
+        const cursor = logsCursorRef.current;
+        logsLoadingMoreRef.current = true;
+        setLoadingMore(true);
+        setLoadMoreError('');
+        const controller = new AbortController();
+        try {
+            const baseUri = process.env.NEXT_PUBLIC_API_URL;
+            const endpoint = outletLogs === 'ALL' ? `${baseUri}/logs` : `${baseUri}/logs/${encodeURIComponent(outletLogs)}`;
+            const url = new URL(endpoint);
+            url.searchParams.set('limit', '40');
+            url.searchParams.set('cursor', cursor);
+            const response = await fetch(url.toString(), { signal: controller.signal });
+            if (!response.ok) throw new Error('Gagal memuat halaman berikutnya');
+            const data = await response.json();
+            if (requestId !== logsRequestIdRef.current) return false;
+            setWindowsLogsData((previous) => {
+                const byId = new Map(previous.map((log) => [String(log.id), log]));
+                (data.data || []).forEach((log) => byId.set(String(log.id), log));
+                return Array.from(byId.values()).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            });
+            const hasPagination = Boolean(data.pagination && typeof data.pagination === 'object');
+            setPaginationSupported(hasPagination);
+            logsCursorRef.current = data.pagination?.next_cursor || null;
+            logsHasMoreRef.current = hasPagination && Boolean(data.pagination?.has_more && data.pagination?.next_cursor);
+            setHasMore(logsHasMoreRef.current);
+            return true;
+        } catch (err) {
+            if (err.name !== 'AbortError' && requestId === logsRequestIdRef.current) {
+                setLoadMoreError('Unable to load more Windows client logs.');
+            }
+            return false;
+        } finally {
+            logsLoadingMoreRef.current = false;
+            setLoadingMore(false);
+        }
+    }, [loading, outletLogs]);
+
+    const retryLoadMore = React.useCallback(() => loadMoreLogs(), [loadMoreLogs]);
 
 
     const fetchWindowsLogs = async () => {
@@ -602,7 +677,7 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
             if (cancelled) return;
             logsTimerRef.current = window.setTimeout(async () => {
                 logsTimerRef.current = null;
-                await fetchLogsByOutlet(outletLogs);
+                await fetchLogsByOutlet(outletLogs, { refresh: true });
                 scheduleNext();
             }, 15000);
         };
@@ -815,9 +890,15 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
                                             loading={loading}
                                             outletLogs={outletLogs}
                                             error={windowsLogsError}
+                                            paginationSupported={paginationSupported}
                                             autoRefreshEnabled={autoRefreshEnabled}
                                             setAutoRefreshEnabled={setAutoRefreshEnabled}
                                             lastLogsFetchAt={lastLogsFetchAt}
+                                            loadingMore={loadingMore}
+                                            hasMore={hasMore}
+                                            loadMoreError={loadMoreError}
+                                            loadMoreLogs={loadMoreLogs}
+                                            retryLoadMore={retryLoadMore}
                                         />
                                     </section>
                                 )

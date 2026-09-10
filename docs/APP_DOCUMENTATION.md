@@ -162,16 +162,20 @@ Dashboard Load
     ↓
 fetchSummary() → GET /logsummary/all (Summary data per outlet)
     ↓
-summaryData displayed as buttons
+summaryData displayed in the outlet selector
     ↓
-User clicks outlet button
+User selects an outlet
     ↓
-fetchLogsByOutlet(outletId) → GET /logs?outlet_id={id}
+GET /logs?limit=40 or GET /logs/{outlet_id}?limit=40
     ↓
-Data stored in windowsLogsData state
+API returns one cursor page (at most 40 rows)
     ↓
-LogWindowsViewer renders & groups identical logs
+LogWindowsViewer groups the loaded rows
+    ↓
+IntersectionObserver requests the next page with pagination.next_cursor
 ```
+
+Windows Logs use keyset/cursor pagination rather than offsets. Changing the outlet or refreshing cancels the previous request, clears the cursor, and loads a new first page. Additional pages are appended and deduplicated by `id`; a stale response cannot replace the currently selected outlet.
 
 ### 3. Complaint Data Flow
 ```
@@ -382,10 +386,59 @@ const [complaintCardsLoaded, setComplaintCardsLoaded] = useState(0);
 | Method | Endpoint | Purpose | Response |
 |--------|----------|---------|----------|
 | GET | `/logsummary/all` | Get log count per outlet | `{ data: [{ outlet_id, outlet_name, total_logs }] }` |
-| GET | `/logs?outlet_id={id}` | Get logs for specific outlet | `{ data: [{ id, outlet_id, message, log_level, created_at, ... }] }` |
+| GET | `/logs?limit=40&outlet_id={id}` | First page for an outlet; `/logs/{id}` remains supported | Paginated Windows Logs response |
+| GET | `/logs?limit=40&cursor={cursor}` | Next cursor page; keep the same filters as the first request | Paginated Windows Logs response |
 | GET | `/update-confirm` | Get update confirmations | `{ data: [{ outlet_id, status, version, ... }] }` |
 | GET | `/complaints` | Get complaints data | Streaming JSON objects |
 | GET | `/version` | Get current version | `{ version: "x.y.z" }` |
+
+#### Windows Logs pagination contract
+
+`GET /logs` and the compatible `GET /logs/:id` route accept these validated query parameters:
+
+| Parameter | Rules |
+|-----------|-------|
+| `limit` | Optional integer from `1` to `100`; default `40` |
+| `cursor` | Optional opaque cursor returned by the previous response; do not modify or reuse it with different filters |
+| `outlet_id` | Optional positive integer or `ALL`; `/logs/:id` takes the outlet from the path |
+| `from`, `to` | Optional ISO dates. If omitted, logs from the full available history are returned through cursor pages |
+| `search` | Optional case-insensitive search across ID, outlet, level, code, message, exception, source, and metadata; maximum 100 characters |
+| `level` | Optional `INFO`, `WARN`, or `ERROR` |
+| `sort` | Optional `created_at_desc`; results are ordered by `created_at DESC, id DESC` |
+
+The API selects only the fields used by the viewer: `id`, `outlet_id`, `outlet_name`, `log_code`, `log_level`, `message`, `exception`, `source`, `additional_info`, and `created_at`. It fetches `limit + 1` rows internally to produce metadata without a count query. `limit` is only the maximum rows in one HTTP response; it is not a total-history limit. Continue requesting pages with `pagination.next_cursor` until `has_more` is `false`.
+
+Example first request:
+
+```text
+GET /logs/5?limit=40&level=ERROR&search=timeout
+```
+
+Example response:
+
+```json
+{
+  "data": [{
+    "id": 123,
+    "outlet_id": 5,
+    "outlet_name": "Outlet 5",
+    "log_code": "SYNC_ERROR",
+    "log_level": "ERROR",
+    "message": "Timeout",
+    "exception": null,
+    "source": "desktop-client",
+    "additional_info": null,
+    "created_at": "2026-09-10T10:00:00.000Z"
+  }],
+  "pagination": {
+    "limit": 40,
+    "has_more": true,
+    "next_cursor": "opaque-cursor"
+  }
+}
+```
+
+Use `pagination.next_cursor` unchanged for the next request, for example `GET /logs/5?limit=40&level=ERROR&search=timeout&cursor=opaque-cursor`. Empty results return HTTP `200` with `data: []` and `has_more: false`; invalid parameters return `400`. Existing callers that only read `response.data` remain compatible. The deployed API must be restarted/released after this pagination change; an older server may ignore `limit` and return no `pagination` metadata.
 
 ### Local Proxy APIs (pages/api/)
 

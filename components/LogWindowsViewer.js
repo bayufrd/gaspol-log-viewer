@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import LogEntry from './LogWindowsEntry';
 
-const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUpdateConfirm = false, error = '' }) => {
+const LogWindowsViewer = ({ windowsLogsData = [], loading, loadingMore = false, hasMore = false, paginationSupported = true, onLoadMore, loadMoreError = '', onRetryLoadMore, visibleFields, onlyUpdateConfirm = false, error = '' }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredLogs, setFilteredLogs] = useState([]);
     const [updateConfirmData, setUpdateConfirmData] = useState([]);
@@ -38,6 +38,18 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUp
         groups.sort((a, b) => new Date(b.representativeTimestamp) - new Date(a.representativeTimestamp));
         setFilteredLogs(groups);
     }, [windowsLogsData, searchTerm]);
+
+    useEffect(() => {
+        if (onlyUpdateConfirm || !onLoadMore || !hasMore) return undefined;
+        const container = logContainerRef.current;
+        const sentinel = container?.querySelector('[data-log-load-more]');
+        if (!sentinel || typeof IntersectionObserver === 'undefined') return undefined;
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0]?.isIntersecting) onLoadMore();
+        }, { root: container, rootMargin: '400px' });
+        observer.observe(sentinel);
+        return () => observer.disconnect();
+    }, [filteredLogs.length, hasMore, onLoadMore, onlyUpdateConfirm]);
 
     const fetchUpdateConfirmData = useCallback(async () => {
         try {
@@ -174,12 +186,30 @@ const LogWindowsViewer = ({ windowsLogsData = [], loading, visibleFields, onlyUp
                 ) : loading ? (
                     <div className="windows-state"><span className="spinner-border spinner-border-sm" role="status"></span><strong>Loading Windows client logs</strong><span>Fetching the latest outlet events…</span></div>
                 ) : filteredLogs.length > 0 ? (
-                    filteredLogs.map((group, idx) => {
-                        const rep = group.representative || {};
-                        return <LogEntry key={`${group._groupKey || idx}`} timestamp={new Date(group.representativeTimestamp || rep.created_at).toLocaleString()} outlet_id={rep.outlet_id} outletName={rep.outlet_name} level={rep.log_level} message={rep.message} logCode={rep.log_code} exception={rep.exception} source={rep.source} additionalInfo={rep.additional_info} visibleFields={visibleFields} mergedCount={group.mergedCount || 1} mergedItems={group.mergedItems || [rep]} />;
-                    })
+                    <>
+                        {filteredLogs.map((group, idx) => {
+                            const rep = group.representative || {};
+                            return <LogEntry key={`${group._groupKey || idx}`} timestamp={new Date(group.representativeTimestamp || rep.created_at).toLocaleString()} outlet_id={rep.outlet_id} outletName={rep.outlet_name} level={rep.log_level} message={rep.message} logCode={rep.log_code} exception={rep.exception} source={rep.source} additionalInfo={rep.additional_info} visibleFields={visibleFields} mergedCount={group.mergedCount || 1} mergedItems={group.mergedItems || [rep]} />;
+                        })}
+                        <div data-log-load-more className="windows-state" style={{ minHeight: 72 }}>
+                            {loadMoreError ? (
+                                <><span>{loadMoreError}</span><button type="button" className="windows-secondary-button" onClick={onRetryLoadMore}>Retry</button></>
+                            ) : loadingMore ? (
+                                <><span className="spinner-border spinner-border-sm" role="status"></span><span>Loading more logs…</span></>
+                            ) : hasMore ? (
+                                <span>Scroll to load more logs</span>
+                            ) : paginationSupported ? (
+                                <span>No more logs in this time range.</span>
+                            ) : (
+                                <><strong>Pagination is not available on the server.</strong><span>{windowsLogsData.length} logs were returned. Deploy the updated API to load additional pages.</span></>
+                            )}
+                        </div>
+                    </>
                 ) : (
-                    <div className="windows-state windows-state--empty"><i className="bi bi-search"></i><strong>No logs found</strong><span>{searchTerm ? 'Try a different search term or clear the filter.' : 'No Windows client logs are available for this stream.'}</span>{searchTerm && <button type="button" className="windows-secondary-button" onClick={clearSearch}>Clear search</button>}</div>
+                    <>
+                        <div className="windows-state windows-state--empty"><i className="bi bi-search"></i><strong>No logs found</strong><span>{searchTerm ? 'Try a different search term or clear the filter.' : 'No Windows client logs are available for this stream.'}</span>{searchTerm && <button type="button" className="windows-secondary-button" onClick={clearSearch}>Clear search</button>}</div>
+                        {hasMore && <div data-log-load-more className="windows-state" style={{ minHeight: 72 }}><span>Scroll to load more logs</span></div>}
+                    </>
                 )}
             </div>
         </section>
