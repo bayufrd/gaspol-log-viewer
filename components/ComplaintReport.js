@@ -118,12 +118,11 @@ const ComplaintReport = ({
         setExpandedMap((prev) => ({ ...prev, [key]: !prev[key] }));
     };
 
+    // The server applies the active filters; retain this guard for compatibility with older callers.
     const filtered = (complaints || []).filter((c) => {
         if (!hideUntitled) return true;
         const displayName = (c.name || c.title || '').toString().trim();
-        if (!displayName) return false;
-        if (displayName.toLowerCase() === 'untitled') return false;
-        return true;
+        return displayName && displayName.toLowerCase() !== 'untitled';
     });
 
     React.useEffect(() => {
@@ -222,7 +221,7 @@ const ComplaintReport = ({
                 </div>
             )}
 
-            {!loading && !progress?.error && complaints.length === 0 && (
+            {!loading && !progress?.error && filtered.length === 0 && (
                 <div
                     className="alert text-info text-center rounded shadow-sm"
                     style={{
@@ -247,7 +246,7 @@ const ComplaintReport = ({
             <div className="viewer-scroll" style={{ flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: 4 }}>
                 <div style={{ display: 'grid', gap: 14 }}>
                     {filtered.slice(0, showCount).map((c, i) => {
-                        const key = c.name || `${i}`;
+                        const key = c.id || c.name || `${i}`;
                         const expanded = !!expandedMap[key];
                         const { outletId, outletName, version, reportedBy } = parseName(c.name || '');
                         return (
@@ -301,10 +300,10 @@ const ComplaintReport = ({
                 </div>
             </div>
 
-            {complaints.length > 0 && (
+            {filtered.length > 0 && (
                 <div className="d-flex justify-content-between align-items-center flex-wrap" style={{ gap: 10 }}>
                     <span style={{ color: '#94a3b8', fontSize: 12 }}>
-                        Showing {complaints.length} of {total || complaints.length} complaints (page size {pageSize})
+                        Showing {filtered.length} of {total || filtered.length} complaints (page size {pageSize})
                     </span>
                     {loadingMore && <span className="text-info" style={{ fontSize: 12 }}>Loading more complaints...</span>}
                     {!loadingMore && loadMoreError && (

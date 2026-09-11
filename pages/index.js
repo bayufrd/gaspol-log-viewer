@@ -575,7 +575,7 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
 
         try {
             const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/complaint`);
-            url.searchParams.set('limit', '40');
+            url.searchParams.set('limit', '5');
             if (filters.search) url.searchParams.set('search', filters.search);
             if (filters.excludeUntitled) url.searchParams.set('exclude_untitled', 'true');
             if (isLoadMore) url.searchParams.set('cursor', complaintCursorRef.current);
@@ -652,7 +652,7 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
             const baseUri = process.env.NEXT_PUBLIC_API_URL;
             const endpoint = outletId === 'ALL' ? `${baseUri}/logs` : `${baseUri}/logs/${encodeURIComponent(outletId)}`;
             const url = new URL(endpoint);
-            url.searchParams.set('limit', '40');
+            url.searchParams.set('limit', '5');
             const response = await fetch(url.toString(), { signal: controller.signal, cache: isRefresh ? 'no-store' : 'default' });
             if (!response.ok) throw new Error('Gagal ambil logs');
             const data = await response.json();
@@ -689,7 +689,7 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
             const baseUri = process.env.NEXT_PUBLIC_API_URL;
             const endpoint = outletLogs === 'ALL' ? `${baseUri}/logs` : `${baseUri}/logs/${encodeURIComponent(outletLogs)}`;
             const url = new URL(endpoint);
-            url.searchParams.set('limit', '40');
+            url.searchParams.set('limit', '5');
             url.searchParams.set('cursor', cursor);
             const response = await fetch(url.toString(), { signal: controller.signal });
             if (!response.ok) throw new Error('Gagal memuat halaman berikutnya');
@@ -1015,7 +1015,7 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
                                                         loadMoreError={complaintLoadMoreError}
                                                         hasMore={complaintHasMore}
                                                         total={complaintTotal}
-                                                        pageSize={40}
+                                                        pageSize={5}
                                                     />
                                                 );
                                             })()}
@@ -1058,7 +1058,7 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
                         onChange={setActiveTab}
                     />
 
-                    {(!complaintProgress.done || complaintProgress.loaded > 0) && (
+                    {complaintLoading && (!complaintProgress.done || complaintProgress.loaded > 0) && (
                         <div style={{ position: 'fixed', right: 16, bottom: 16, zIndex: 1200 }}>
                             <div
                                 className="surface-card"

@@ -14,7 +14,7 @@
 
 - ✅ Visualisasi logs dari berbagai sumber (API, PM2, Windows Client)
 - ✅ Search & filter logs dengan berbagai kriteria
-- ✅ Complaint reporting system dengan streaming data
+- ✅ Complaint reporting system dengan cursor pagination
 - ✅ Multi-outlet log management
 - ✅ Session management dengan enkripsi
 - ✅ Dark mode UI yang responsif
@@ -168,7 +168,7 @@ User selects an outlet
     ↓
 GET /logs?limit=40 or GET /logs/{outlet_id}?limit=40
     ↓
-API returns one cursor page (at most 40 rows)
+API returns one cursor page (at most 40 rows for Windows Logs)
     ↓
 LogWindowsViewer groups the loaded rows
     ↓
@@ -181,18 +181,18 @@ Windows Logs use keyset/cursor pagination rather than offsets. Changing the outl
 ```
 Dashboard Load
     ↓
-Fetch page 1: GET /complaint?limit=40
+Fetch page 1: GET /complaint?limit=5
     ↓
 Render current page and pagination metadata
     ↓
-Load more: GET /complaint?limit=40&cursor=<next_cursor>
+Load more: GET /complaint?limit=5&cursor=<next_cursor>
     ↓
 Append and de-duplicate by complaint id
     ↓
 Reset cursor and fetch page 1 when search/filter changes
 ```
 
-Complaint pagination uses the same cursor contract as Windows Logs: the default page size is 40 and the maximum is 100. Responses preserve `data` and add `pagination.total`, `pagination.has_more`, and an opaque `pagination.next_cursor`. Results are ordered by `sent_at DESC, id DESC`; `search`, `outlet_id`, `exclude_untitled`, and the existing `sent_at_desc` sort are applied server-side. The UI shows first-page loading, load-more loading, retry, empty, and no-more states. The previous full-array IndexedDB/streaming path remains available only in the legacy compatibility function and is not used by the paginated tab.
+Complaint pagination uses the same cursor contract as Windows Logs: the default page size is 5 and the maximum is 100. Responses preserve `data` and add `pagination.total`, `pagination.has_more`, and an opaque `pagination.next_cursor`. Results are ordered by `sent_at DESC, id DESC`; `search`, `outlet_id`, `exclude_untitled`, and the existing `sent_at_desc` sort are applied server-side. The UI shows first-page loading, load-more loading, retry, empty, and no-more states. The previous full-array IndexedDB/streaming path remains available only in the legacy compatibility function and is not used by the paginated tab.
 
 ### 4. Update Confirmation Flow
 ```
@@ -285,10 +285,8 @@ const encryptSession = (str) => {
 ```
 
 ### 2. Client-side Caching
-- **IndexedDB** for large payloads (complaints data)
-- **Cache Metadata** to track freshness
-- **6-hour TTL** for cached data
-- **Force refresh** option available
+- Complaint list pages are fetched from the API with cursor pagination.
+- The legacy IndexedDB cache helpers remain only for older internal callers and are not used by the paginated Complaint tab.
 
 ### 3. Password Protection
 - Single password via `.env` variable
@@ -312,11 +310,11 @@ const encryptSession = (str) => {
 - Status per outlet display
 
 ### Feature 3: Complaint Reporting System
-- Progressive data loading (no UI freeze)
+- Cursor-paginated loading with server-side search and untitled filtering
 - Complaint card expansion/collapse
 - JSON data viewer with copy buttons
-- Filter by outlet & category
-- Batch rendering with 5-card steps
+- Load-more, retry, empty, and no-more states
+- Batch rendering with 5-card steps for the loaded pages
 
 ### Feature 4: API Documentation
 - Auto-generated from Swagger docs
@@ -386,7 +384,7 @@ const [complaintCardsLoaded, setComplaintCardsLoaded] = useState(0);
 | GET | `/logs?limit=40&outlet_id={id}` | First page for an outlet; `/logs/{id}` remains supported | Paginated Windows Logs response |
 | GET | `/logs?limit=40&cursor={cursor}` | Next cursor page; keep the same filters as the first request | Paginated Windows Logs response |
 | GET | `/update-confirm` | Get update confirmations | `{ data: [{ outlet_id, status, version, ... }] }` |
-| GET | `/complaint?limit=40&cursor={cursor}` | Get cursor-paginated complaints | `{ data: [...], pagination: { limit, total, has_more, next_cursor } }` |
+| GET | `/complaint?limit=5&cursor={cursor}` | Get cursor-paginated complaints | `{ data: [...], pagination: { limit, total, has_more, next_cursor } }` |
 | GET | `/version` | Get current version | `{ version: "x.y.z" }` |
 
 #### Windows Logs pagination contract
@@ -606,26 +604,22 @@ App (_app.js)
 ### Workflow 3: Review Complaints
 ```
 1. Navigate ke tab "Complaints"
-2. Wait untuk progressive loading selesai
-3. Search/filter by outlet
-4. Click complaint card untuk expand
-5. View detail JSON & attached info
-6. Copy data menggunakan copy button
+2. Halaman pertama dimuat dari GET /complaint?limit=5
+3. Gunakan pencarian atau hide/show untitled; perubahan filter memuat ulang halaman pertama
+4. Klik "Load more" untuk meminta cursor berikutnya
+5. Click complaint card untuk expand
+6. View detail JSON & attached info, lalu copy data menggunakan copy button
 ```
 
 ---
 
 ## ⚡ Performance Optimizations
 
-1. **Client-side Caching**
-   - IndexedDB untuk large payloads
-   - 6-hour TTL mengurangi API calls
+1. **Cursor Pagination**
+   - Complaint requests return at most 5 rows by default
+   - Additional pages use the opaque `next_cursor` and avoid downloading the full dataset
 
-2. **Streaming JSON Parsing**
-   - Complaints data parsed per-object
-   - Incremental state updates prevent UI freeze
-
-3. **Batched Rendering**
+2. **Batched Rendering**
    - Complaint cards di-render 5 at a time
    - 120ms intervals untuk smooth animation
 
