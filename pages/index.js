@@ -143,8 +143,19 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
     const [activeTab, setActiveTab] = React.useState('api');
     const [complaintsData, setComplaintsData] = React.useState([]);
     const [complaintLoading, setComplaintLoading] = React.useState(false);
+    const [complaintLoadingMore, setComplaintLoadingMore] = React.useState(false);
+    const [complaintLoadMoreError, setComplaintLoadMoreError] = React.useState('');
+    const [complaintHasMore, setComplaintHasMore] = React.useState(false);
+    const [complaintTotal, setComplaintTotal] = React.useState(0);
+    const [complaintFilters, setComplaintFilters] = React.useState({ search: '', excludeUntitled: false });
     const [complaintProgress, setComplaintProgress] = React.useState({ loaded: 0, total: null, done: false, error: null });
     const [complaintCardsLoaded, setComplaintCardsLoaded] = React.useState(0);
+    const complaintRequestRef = React.useRef(null);
+    const complaintRequestIdRef = React.useRef(0);
+    const complaintCursorRef = React.useRef(null);
+    const complaintHasMoreRef = React.useRef(false);
+    const complaintLoadingMoreRef = React.useRef(false);
+    const complaintFiltersRef = React.useRef({ search: '', excludeUntitled: false });
 
     // Simple custom encrypt/decrypt (XOR + base64)
     function encryptSession(str) {
@@ -259,7 +270,7 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
         } catch (e) { reject(e); }
     });
 
-    // Fetch complaints with streaming parsing per-object, incremental UI updates and caching in IndexedDB
+    // Retained for compatibility with existing callers; paginated requests use fetchPaginatedComplaints below.
     const fetchComplaints = React.useCallback(async (opts = { force: false }) => {
         // check cache first unless forced
         try {
@@ -538,10 +549,88 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
         }
     }, []);
 
-    // start fetch on mount, but prefer cache
+    const fetchPaginatedComplaints = React.useCallback(async (options = {}) => {
+        const isLoadMore = Boolean(options.loadMore);
+        const filters = options.filters || complaintFiltersRef.current;
+        if (isLoadMore && (!complaintHasMoreRef.current || complaintLoadingMoreRef.current || !complaintCursorRef.current)) return false;
+
+        const requestId = isLoadMore ? complaintRequestIdRef.current : ++complaintRequestIdRef.current;
+        if (!isLoadMore && complaintRequestRef.current) complaintRequestRef.current.abort();
+        if (!isLoadMore) {
+            complaintCursorRef.current = null;
+            complaintHasMoreRef.current = false;
+            setComplaintHasMore(false);
+            setComplaintTotal(0);
+            setComplaintsData([]);
+            setComplaintCardsLoaded(0);
+            setComplaintLoading(true);
+        } else {
+            complaintLoadingMoreRef.current = true;
+            setComplaintLoadingMore(true);
+            setComplaintLoadMoreError('');
+        }
+        setComplaintProgress({ loaded: 0, total: null, done: false, error: null });
+        const controller = new AbortController();
+        if (!isLoadMore) complaintRequestRef.current = controller;
+
+        try {
+            const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/complaint`);
+            url.searchParams.set('limit', '40');
+            if (filters.search) url.searchParams.set('search', filters.search);
+            if (filters.excludeUntitled) url.searchParams.set('exclude_untitled', 'true');
+            if (isLoadMore) url.searchParams.set('cursor', complaintCursorRef.current);
+            const response = await fetch(url.toString(), { signal: controller.signal, cache: isLoadMore ? 'default' : 'no-store' });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const payload = await response.json();
+            if (requestId !== complaintRequestIdRef.current) return false;
+            const page = Array.isArray(payload.data) ? payload.data : [];
+            setComplaintsData((previous) => {
+                if (!isLoadMore) return page;
+                const byId = new Map(previous.map((item, index) => [String(item.id || `${item.name}_${index}`), item]));
+                page.forEach((item, index) => byId.set(String(item.id || `${item.name}_${index}`), item));
+                return Array.from(byId.values());
+            });
+            setComplaintCardsLoaded((previous) => isLoadMore ? previous + page.length : page.length);
+            setComplaintTotal(Number(payload.pagination?.total || 0));
+            complaintCursorRef.current = payload.pagination?.next_cursor || null;
+            complaintHasMoreRef.current = Boolean(payload.pagination?.has_more && payload.pagination?.next_cursor);
+            setComplaintHasMore(complaintHasMoreRef.current);
+            setComplaintProgress({ loaded: page.length, total: page.length, done: true, error: null });
+            return true;
+        } catch (error) {
+            if (error.name === 'AbortError') return false;
+            if (requestId === complaintRequestIdRef.current) {
+                if (isLoadMore) setComplaintLoadMoreError('Unable to load more complaints.');
+                else setComplaintProgress({ loaded: 0, total: null, done: true, error: 'Unable to load complaints. Check the connection and try again.' });
+            }
+            return false;
+        } finally {
+            if (!isLoadMore) {
+                if (complaintRequestRef.current === controller) complaintRequestRef.current = null;
+                if (requestId === complaintRequestIdRef.current) setComplaintLoading(false);
+            } else {
+                complaintLoadingMoreRef.current = false;
+                setComplaintLoadingMore(false);
+            }
+        }
+    }, []);
+
+    const loadMoreComplaints = React.useCallback(() => fetchPaginatedComplaints({ loadMore: true }), [fetchPaginatedComplaints]);
+    const retryLoadMoreComplaints = React.useCallback(() => loadMoreComplaints(), [loadMoreComplaints]);
+    const updateComplaintFilters = React.useCallback((nextFilters) => {
+        const normalized = { search: String(nextFilters.search || '').trim(), excludeUntitled: Boolean(nextFilters.excludeUntitled) };
+        complaintFiltersRef.current = normalized;
+        setComplaintFilters(normalized);
+        fetchPaginatedComplaints({ filters: normalized });
+    }, [fetchPaginatedComplaints]);
+
+    // Start with page one; filter changes intentionally reset the cursor.
     useEffect(() => {
-        fetchComplaints({ force: false });
-    }, [fetchComplaints]);
+        fetchPaginatedComplaints();
+        return () => {
+            if (complaintRequestRef.current) complaintRequestRef.current.abort();
+        };
+    }, [fetchPaginatedComplaints]);
 
     const fetchLogsByOutlet = React.useCallback(async (outletId, options = {}) => {
         const isRefresh = Boolean(options.refresh);
@@ -915,9 +1004,18 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
                                                     <C
                                                         complaints={complaintsData}
                                                         loading={complaintLoading}
-                                                        onRefetch={() => fetchComplaints({ force: true })}
+                                                        onRefetch={() => fetchPaginatedComplaints()}
                                                         progress={complaintProgress}
                                                         cardsLoaded={complaintCardsLoaded}
+                                                        filters={complaintFilters}
+                                                        onFiltersChange={updateComplaintFilters}
+                                                        onLoadMore={loadMoreComplaints}
+                                                        onRetryLoadMore={retryLoadMoreComplaints}
+                                                        loadingMore={complaintLoadingMore}
+                                                        loadMoreError={complaintLoadMoreError}
+                                                        hasMore={complaintHasMore}
+                                                        total={complaintTotal}
+                                                        pageSize={40}
                                                     />
                                                 );
                                             })()}

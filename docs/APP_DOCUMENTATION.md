@@ -181,21 +181,18 @@ Windows Logs use keyset/cursor pagination rather than offsets. Changing the outl
 ```
 Dashboard Load
     ↓
-fetchComplaints() with cache check
+Fetch page 1: GET /complaint?limit=40
     ↓
-Check IndexedDB (6-hour cache)
+Render current page and pagination metadata
     ↓
-If cached & valid → Load from cache
-If expired → Fetch from API with streaming
+Load more: GET /complaint?limit=40&cursor=<next_cursor>
     ↓
-Streaming parse JSON objects incrementally
+Append and de-duplicate by complaint id
     ↓
-Update state progressively (no UI freeze)
-    ↓
-Save to IndexedDB for next load
-    ↓
-ComplaintReport renders with batched card rendering
+Reset cursor and fetch page 1 when search/filter changes
 ```
+
+Complaint pagination uses the same cursor contract as Windows Logs: the default page size is 40 and the maximum is 100. Responses preserve `data` and add `pagination.total`, `pagination.has_more`, and an opaque `pagination.next_cursor`. Results are ordered by `sent_at DESC, id DESC`; `search`, `outlet_id`, `exclude_untitled`, and the existing `sent_at_desc` sort are applied server-side. The UI shows first-page loading, load-more loading, retry, empty, and no-more states. The previous full-array IndexedDB/streaming path remains available only in the legacy compatibility function and is not used by the paginated tab.
 
 ### 4. Update Confirmation Flow
 ```
@@ -389,7 +386,7 @@ const [complaintCardsLoaded, setComplaintCardsLoaded] = useState(0);
 | GET | `/logs?limit=40&outlet_id={id}` | First page for an outlet; `/logs/{id}` remains supported | Paginated Windows Logs response |
 | GET | `/logs?limit=40&cursor={cursor}` | Next cursor page; keep the same filters as the first request | Paginated Windows Logs response |
 | GET | `/update-confirm` | Get update confirmations | `{ data: [{ outlet_id, status, version, ... }] }` |
-| GET | `/complaints` | Get complaints data | Streaming JSON objects |
+| GET | `/complaint?limit=40&cursor={cursor}` | Get cursor-paginated complaints | `{ data: [...], pagination: { limit, total, has_more, next_cursor } }` |
 | GET | `/version` | Get current version | `{ version: "x.y.z" }` |
 
 #### Windows Logs pagination contract

@@ -93,9 +93,25 @@ const MetaBadge = ({ children, tone = 'default' }) => {
     );
 };
 
-const ComplaintReport = ({ complaints = [], loading, onRefetch, progress, cardsLoaded }) => {
+const ComplaintReport = ({
+    complaints = [],
+    loading,
+    loadingMore = false,
+    loadMoreError = '',
+    hasMore = false,
+    total = 0,
+    pageSize = 40,
+    filters = { search: '', excludeUntitled: false },
+    onFiltersChange,
+    onLoadMore,
+    onRetryLoadMore,
+    onRefetch,
+    progress,
+    cardsLoaded,
+}) => {
     const [expandedMap, setExpandedMap] = useState({});
-    const [hideUntitled, setHideUntitled] = useState(false);
+    const [hideUntitled, setHideUntitled] = useState(Boolean(filters.excludeUntitled));
+    const [search, setSearch] = useState(filters.search || '');
     const [showCount, setShowCount] = useState(0);
 
     const toggleExpanded = (key) => {
@@ -166,7 +182,23 @@ const ComplaintReport = ({ complaints = [], loading, onRefetch, progress, cardsL
                             {Math.round((progress.loaded || 0) / 1024)} KB
                         </div>
                     )}
-                    <button className="btn btn-outline-light btn-sm" onClick={() => setHideUntitled((prev) => !prev)}>
+                    <input
+                        className="form-control form-control-sm"
+                        value={search}
+                        onChange={(event) => setSearch(event.target.value)}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter' && onFiltersChange) {
+                                onFiltersChange({ search, excludeUntitled: hideUntitled });
+                            }
+                        }}
+                        placeholder="Search complaints"
+                        style={{ width: 180 }}
+                    />
+                    <button className="btn btn-outline-light btn-sm" onClick={() => {
+                        const next = !hideUntitled;
+                        setHideUntitled(next);
+                        onFiltersChange && onFiltersChange({ search, excludeUntitled: next });
+                    }}>
                         {hideUntitled ? 'Show all' : 'Hide untitled'}
                     </button>
                     <button className="btn btn-outline-light btn-sm" onClick={() => onRefetch && onRefetch()}>
@@ -190,7 +222,7 @@ const ComplaintReport = ({ complaints = [], loading, onRefetch, progress, cardsL
                 </div>
             )}
 
-            {!loading && complaints.length === 0 && (
+            {!loading && !progress?.error && complaints.length === 0 && (
                 <div
                     className="alert text-info text-center rounded shadow-sm"
                     style={{
@@ -202,6 +234,13 @@ const ComplaintReport = ({ complaints = [], loading, onRefetch, progress, cardsL
                     }}
                 >
                     No complaint data available
+                </div>
+            )}
+
+            {progress?.error && !loading && (
+                <div className="alert alert-danger text-center" style={{ marginBottom: 0 }}>
+                    {progress.error}
+                    <button className="btn btn-sm btn-outline-light ms-2" onClick={() => onRefetch && onRefetch()}>Retry</button>
                 </div>
             )}
 
@@ -261,6 +300,25 @@ const ComplaintReport = ({ complaints = [], loading, onRefetch, progress, cardsL
                     })}
                 </div>
             </div>
+
+            {complaints.length > 0 && (
+                <div className="d-flex justify-content-between align-items-center flex-wrap" style={{ gap: 10 }}>
+                    <span style={{ color: '#94a3b8', fontSize: 12 }}>
+                        Showing {complaints.length} of {total || complaints.length} complaints (page size {pageSize})
+                    </span>
+                    {loadingMore && <span className="text-info" style={{ fontSize: 12 }}>Loading more complaints...</span>}
+                    {!loadingMore && loadMoreError && (
+                        <span className="text-danger" style={{ fontSize: 12 }}>
+                            {loadMoreError}
+                            <button className="btn btn-outline-light btn-sm ms-2" onClick={() => onRetryLoadMore && onRetryLoadMore()}>Retry</button>
+                        </span>
+                    )}
+                    {!loadingMore && !loadMoreError && hasMore && (
+                        <button className="btn btn-outline-light btn-sm" onClick={() => onLoadMore && onLoadMore()}>Load more</button>
+                    )}
+                    {!loadingMore && !loadMoreError && !hasMore && <span style={{ color: '#64748b', fontSize: 12 }}>No more complaints</span>}
+                </div>
+            )}
         </div>
     );
 };
