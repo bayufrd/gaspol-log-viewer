@@ -1,5 +1,7 @@
+import fs from 'fs';
 import path from 'path';
 import React, { useEffect } from 'react';
+import { normalizeOutletSummary } from '../lib/outletSummary';
 import Link from 'next/link';
 import LogViewer from '../components/LogViewer';
 import LogFileButton from '../components/LogFileButton';
@@ -222,7 +224,7 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
             const response = await fetch(`${baseUri}/logsummary/all`);
             if (!response.ok) throw new Error("Gagal ambil summary");
             const data = await response.json();
-            setSummaryData(data.data || []);
+            setSummaryData(normalizeOutletSummary(data.data));
         } catch (err) {
             console.error("Error fetch summary:", err);
         }
