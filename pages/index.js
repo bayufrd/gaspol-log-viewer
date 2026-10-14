@@ -1060,34 +1060,6 @@ const Home = ({ logFiles, pm2Logs, windowsLogs }) => {
                         onChange={setActiveTab}
                     />
 
-                    {complaintLoading && (!complaintProgress.done || complaintProgress.loaded > 0) && (
-                        <div style={{ position: 'fixed', right: 16, bottom: 16, zIndex: 1200 }}>
-                            <div
-                                className="surface-card"
-                                style={{
-                                    padding: '12px 14px',
-                                    borderRadius: 18,
-                                    border: '1px solid rgba(148, 163, 184, 0.14)',
-                                    minWidth: 220,
-                                }}
-                            >
-                                <div style={{ fontSize: 12 }}>
-                                    {complaintProgress.error ? (
-                                        <span style={{ color: '#fca5a5' }}>Error: {complaintProgress.error}</span>
-                                    ) : (
-                                        <>
-                                            <strong style={{ color: '#f8fafc' }}>Complaint fetch</strong>
-                                            <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 6 }}>
-                                                {complaintProgress.loaded ? `${Math.round(complaintProgress.loaded / 1024)} KB` : '0 KB'}
-                                                {complaintProgress.total ? ` / ${Math.round(complaintProgress.total / 1024)} KB` : ''}
-                                                {complaintProgress.total ? ` (${Math.round((complaintProgress.loaded / complaintProgress.total) * 100)}%)` : ''}
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    )}
             </div>
         </div>
     );
