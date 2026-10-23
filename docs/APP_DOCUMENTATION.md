@@ -44,7 +44,7 @@
          │    │   ├── SidebarNavigation.js
          │    │   └── ThemeToggle.js
          │    │
-         │    ├── Log Viewers
+         │    ├── Log Viewe rs
          │    │   ├── LogViewer.js (API Logs)
          │    │   ├── LogWindowsViewer.js (Windows Logs)
          │    │   ├── LogEntry.js (Single Log Entry)
