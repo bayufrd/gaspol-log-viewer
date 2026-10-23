@@ -888,7 +888,14 @@ code,
   .windows-log-viewer__header { flex-direction: column; }
   .windows-summary-cards { width: 100%; }
   .windows-summary-card { flex: 1; }
-  .windows-log-list { max-height: none; }
+  .windows-log-list { max-height: 260px; min-height: 180px; }
+  .complaint-report { width: 100%; min-width: 0; padding: 12px !important; overflow-x: hidden; }
+  .complaint-report > .viewer-scroll { max-height: 360px; overflow-x: hidden; }
+  .complaint-card { width: 100%; min-width: 0; overflow: hidden; }
+  .complaint-card .d-flex { min-width: 0; }
+  .complaint-card .d-flex > div:first-child { max-width: 100%; overflow-wrap: anywhere; }
+  .complaint-card .btn { max-width: 100%; white-space: normal; }
+  .complaint-card .complaint-json { max-height: 180px; overflow: auto; }
 }
 
 @media (max-width: 576px) {

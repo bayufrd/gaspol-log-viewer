@@ -154,7 +154,7 @@ const ComplaintReport = ({
     }, [filtered.length]);
 
     return (
-        <div style={{ width: '100%', minHeight: 400, display: 'flex', flexDirection: 'column', gap: 16, padding: 16 }}>
+        <div className="complaint-report" style={{ width: '100%', minHeight: 400, display: 'flex', flexDirection: 'column', gap: 16, padding: 16 }}>
             <div className="toolbar-card" style={{ marginBottom: 0 }}>
                 <div>
                     <div className="section-heading__eyebrow">
@@ -206,21 +206,6 @@ const ComplaintReport = ({
                 </div>
             </div>
 
-            {loading && (
-                <div
-                    className="alert text-info text-center rounded shadow-sm"
-                    style={{
-                        fontSize: 13,
-                        padding: 14,
-                        marginBottom: 0,
-                        background: 'rgba(56, 189, 248, 0.08)',
-                        borderColor: 'rgba(56, 189, 248, 0.22)',
-                    }}
-                >
-                    Fetching complaint data in background...
-                </div>
-            )}
-
             {!loading && !progress?.error && filtered.length === 0 && (
                 <div
                     className="alert text-info text-center rounded shadow-sm"
@@ -252,7 +237,7 @@ const ComplaintReport = ({
                         return (
                             <div
                                 key={`${key}_${i}`}
-                                className="surface-card"
+                                className="surface-card complaint-card"
                                 style={{
                                     borderRadius: 22,
                                     padding: 18,
